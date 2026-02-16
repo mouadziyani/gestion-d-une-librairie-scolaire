@@ -1,0 +1,21 @@
+[Admin / Moderator / Client UI Pages]
+        │
+        ▼
+[Components]
+    ├─ SearchBar / Filter / Sort → Table → ExportButton
+    └─ ReportGenerator → select type → generate PDF/CSV
+        │
+        ▼
+[Service Layer]
+    ├─ invoiceService.js → CRUD invoices
+    ├─ orderService.js → order details
+    └─ reportService.js → generate report data / export
+        │
+        ▼
+[Utils]
+    ├─ pdfGenerator.js → create downloadable PDF
+    └─ dateFormatter / currencyFormatter → format data in reports
+        │
+        ▼
+[Backend API]
+    └─ REST endpoints → invoices / orders / products / reports
