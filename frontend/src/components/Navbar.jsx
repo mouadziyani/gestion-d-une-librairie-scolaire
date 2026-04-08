@@ -1,27 +1,19 @@
 import React from "react";
 
-function Nav() {
+function Navbar() {
   return (
-      <div>
-        <nav>
-          <div>
-            <span>Librairie</span>BOUGDIM
-          </div>
-          <div>
-            <input type="text" />
-            <button>search</button>
-          </div>
-          <ul>
-            <li><a href="#">Aceuil</a></li>
-            <li><a href="#">Category</a></li>
-            <li><a href="#">Team</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Login</a></li>
-          </ul>
-        </nav>
-      </div>
+    <div>
+      <nav aria-label="Primary">
+        <h3>Navbar</h3>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Products</a></li>
+          <li><a href="#">Orders</a></li>
+          <li><a href="#">Profile</a></li>
+        </ul>
+      </nav>
+    </div>
   );
 }
 
-export default Nav;
+export default Navbar;
