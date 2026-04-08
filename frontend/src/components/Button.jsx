@@ -1,6 +1,11 @@
-import React, {useState} from "react";
+import React from "react";
 
-function Button(){
-
+function Button() {
+  return (
+    <div>
+      <button type="button">Button</button>
+    </div>
+  );
 }
+
 export default Button;

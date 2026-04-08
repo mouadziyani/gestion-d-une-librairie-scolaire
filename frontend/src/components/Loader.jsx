@@ -1,6 +1,11 @@
-import React, {useState} from "react";
+import React from "react";
 
-function Loader(){
-
+function Loader() {
+  return (
+    <div>
+      <div><p>Loading, please wait...</p></div>
+    </div>
+  );
 }
-export default Header;
+
+export default Loader;
