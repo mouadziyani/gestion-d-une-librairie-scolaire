@@ -5,22 +5,10 @@ import logo from "../../assets/logo/library.png";
 function Home() {
   return (
     <div className="home-wrapper">
-      {/* Navbar Static */}
-      <nav className="main-nav">
-        <div className="nav-logo">
-          <img src={logo} alt="BOUGDIM" style={{height: '40px'}} />
-        </div>
-        <div className="nav-links">
-          <Link to="/products">Shop</Link>
-          <Link to="/login">Login</Link>
-          <Link to="/register">Sign Up</Link>
-        </div>
-      </nav>
-
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <span>EST. 2026</span>
+          <span>Librairie BOUGDIM 2026</span>
           <h1>Your Gateway <br/> to Knowledge.</h1>
           <p>
             Digitalizing the school supply experience. Order your books, 

@@ -20,20 +20,6 @@ function Products() {
 
   return (
     <div className="products-wrapper">
-      {/* Navigation */}
-      <nav className="main-nav">
-        <div className="nav-logo">
-          <Link to="/">
-            <img src={logo} alt="BOUGDIM" style={{ height: '40px' }} />
-          </Link>
-        </div>
-        <div className="nav-links">
-          <Link to="/products">Shop</Link>
-          <Link to="/login">Login</Link>
-          <Link to="/register">Sign Up</Link>
-        </div>
-      </nav>
-
       {/* Header & Search */}
       <section className="search-filter-section">
         <div className="search-box">

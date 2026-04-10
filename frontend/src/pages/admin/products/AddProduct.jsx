@@ -1,47 +1,69 @@
 import React from "react";
 
-function AddProduct() {
+function AddProductAdmin() {
   return (
-    <div>
-      <h1>Library BOUGDIM</h1>
-      <h2>Add Product</h2>
-      <p>Section: Admin Area</p>
-      <section>
-        <h3>Create Product</h3>
+    <div className="add-admin-wrapper">
+      <header style={{ marginBottom: '40px' }}>
+        <span style={{ fontSize: '11px', letterSpacing: '2px', color: '#888', fontWeight: 'bold' }}>
+          ADMIN / INVENTORY / NEW
+        </span>
+      </header>
+
+      <div className="add-card">
+        <h2>Add New Product</h2>
+        
         <form action="#">
-          <fieldset>
-            <legend>Create Details</legend>
-            <div>
-              <label htmlFor="name">Name:</label><br />
-              <input type="text" id="name" name="name" required />
+          <div className="form-grid">
+            {/* Name */}
+            <div className="input-group full-row">
+              <label htmlFor="name">Product Title</label>
+              <input type="text" id="name" name="name" placeholder="e.g. Oxford English Dictionary" required />
             </div>
-            <div>
-              <label htmlFor="pics">Pics:</label><br />
-              <input type="text" id="Pics" name="Pics" required />
+
+            {/* Price (Fiksina l-input type) */}
+            <div className="input-group">
+              <label htmlFor="price">Price (DH)</label>
+              <input type="number" id="price" name="price" placeholder="0.00" step="0.01" required />
             </div>
-            <div>
-              <label htmlFor="price">price:</label><br />
-              <input type="file" id="price" name="price" required />
+
+            {/* CodeBar */}
+            <div className="input-group">
+              <label htmlFor="code">CodeBar / SKU</label>
+              <input type="text" id="code" name="code" placeholder="Scan or enter code" required />
             </div>
-            <div>
-              <label htmlFor="code">CodeBar:</label><br />
-              <input type="text" id="code" name="code" required />
-            </div>
-            <div>
-              <label htmlFor="status">Status:</label><br />
-              <select id="status" name="status">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+
+            {/* Category (Zdna hada bach t-naddem s-sel3a) */}
+            <div className="input-group">
+              <label htmlFor="category">Category</label>
+              <select id="category" name="category">
+                <option value="textbooks">Textbooks</option>
+                <option value="supplies">School Supplies</option>
+                <option value="equipment">Scientific Equipment</option>
               </select>
             </div>
-            <div>
-              <button type="submit">Create</button>
+
+            {/* Status */}
+            <div className="input-group">
+              <label htmlFor="status">Initial Status</label>
+              <select id="status" name="status">
+                <option value="active">Active</option>
+                <option value="inactive">Draft / Inactive</option>
+              </select>
             </div>
-          </fieldset>
+
+            {/* Pics (Rddinaha File Upload) */}
+            <div className="input-group full-row">
+              <label htmlFor="pics">Product Image</label>
+              <input type="file" id="pics" name="pics" accept="image/*" required />
+              <p style={{fontSize: '10px', color: '#aaa', marginTop: '5px'}}>Recommended size: 800x1000px (JPG/PNG)</p>
+            </div>
+
+            <button type="submit" className="btn-create">Create Product</button>
+          </div>
         </form>
-      </section>
+      </div>
     </div>
   );
 }
 
-export default AddProduct;
+export default AddProductAdmin;

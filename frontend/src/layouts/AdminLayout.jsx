@@ -7,14 +7,6 @@ function AdminLayout() {
         <h1>Library BOUGDIM</h1>
         <h2>Admin Layout</h2>
       </header>
-      <nav aria-label="Layout Navigation">
-        <ul>
-          <li><a href="#">Dashboard</a></li>
-          <li><a href="#">Management</a></li>
-          <li><a href="#">Reports</a></li>
-          <li><a href="#">Settings</a></li>
-        </ul>
-      </nav>
       <main>
         <section>
           <h3>Main Content Area</h3>

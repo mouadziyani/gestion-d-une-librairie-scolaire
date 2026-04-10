@@ -7,19 +7,6 @@ import styloBleu from "../../assets/products/stylo-a-bille-bleu-bic-cristal.jpg"
 function ProductDetail() {
   return (
     <div className="product-detail-page">
-      {/* Navbar dima dakhla m3ana */}
-      <nav className="main-nav">
-        <div className="nav-logo">
-          <Link to="/">
-            <img src={logo} alt="BOUGDIM" style={{ height: '40px' }} />
-          </Link>
-        </div>
-        <div className="nav-links">
-          <Link to="/products">Shop</Link>
-          <Link to="/login">Login</Link>
-        </div>
-      </nav>
-
       <main className="detail-wrapper">
         {/* Left: Image */}
         <div className="detail-image-box">
