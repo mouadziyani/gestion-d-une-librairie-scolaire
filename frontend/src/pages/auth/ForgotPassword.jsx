@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "../../assets/library.png";
+import logo from "../../assets/logo/library.png";
 
 function ForgotPassword() {
   return (

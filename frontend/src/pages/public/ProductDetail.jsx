@@ -1,20 +1,59 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import logo from "../../assets/logo/library.png";
+
+import styloBleu from "../../assets/products/stylo-a-bille-bleu-bic-cristal.jpg";
 
 function ProductDetail() {
   return (
-    <div>
-      <h1>Library BOUGDIM</h1>
-      <h2>Product Detail</h2>
-      <p>Section: Public Area</p>
-      <section>
-        <h3>Product Overview</h3>
-        <p>Detailed description and usage.</p>
-      </section>
-      <section>
-        <h3>Actions</h3>
-        <button type="button">Add to Cart</button>
-        <button type="button">Add to Wishlist</button>
-      </section>
+    <div className="product-detail-page">
+      {/* Navbar dima dakhla m3ana */}
+      <nav className="main-nav">
+        <div className="nav-logo">
+          <Link to="/">
+            <img src={logo} alt="BOUGDIM" style={{ height: '40px' }} />
+          </Link>
+        </div>
+        <div className="nav-links">
+          <Link to="/products">Shop</Link>
+          <Link to="/login">Login</Link>
+        </div>
+      </nav>
+
+      <main className="detail-wrapper">
+        {/* Left: Image */}
+        <div className="detail-image-box">
+          <img src={styloBleu} alt="Stylo BIC Bleu" />
+        </div>
+
+        {/* Right: Info */}
+        <div className="detail-info-box">
+          <span className="brand">BIC France</span>
+          <h1>Stylo à bille Bleu <br/> Cristal Classic</h1>
+          <span className="price-tag">1.5 DH</span>
+          
+          <div className="detail-description">
+            <p>
+              The iconic BIC Cristal pen is the world's best-selling ballpoint pen. 
+              Its clear barrel lets you see the ink level, and its 1.0mm point 
+              delivers a smooth writing experience. Perfect for students and professionals.
+            </p>
+          </div>
+
+          <div className="detail-actions">
+            <button className="btn-cart">Add to Cart</button>
+            <button className="btn-wishlist">♥</button>
+          </div>
+
+          <div style={{marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
+             <p style={{fontSize: '13px', color: '#888'}}>
+                <strong>SKU:</strong> BIC-001 <br/>
+                <strong>Category:</strong> School Supplies <br/>
+                <strong>Stock:</strong> Available in Store
+             </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

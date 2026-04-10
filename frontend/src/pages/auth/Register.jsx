@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import logo from "../../assets/library.png";
+import logo from "../../assets/logo/library.png";
+import api from "../../api/axios";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -10,40 +11,72 @@ function Register() {
     confirmPassword: ""
   });
 
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match! ❌");
+      setError("Passwords don't match");
       return;
     }
-    // Logic dyal register hna
-    console.log("Registering...", formData);
+
+    try {
+      await api.get("/sanctum/csrf-cookie");
+
+      // Register
+      await api.post("/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+      });
+
+      // Get user
+      const user = await api.get("/api/user");
+      console.log("User:", user.data);
+
+      // Redirect
+      window.location.href = "/dashboard";
+
+    } catch (err) {
+      if (err.response?.status === 422) {
+        setError("Email deja utilisé ou données invalides");
+      } else {
+        console.log(err.response);
+        console.log(err.response?.data);
+        setError(JSON.stringify(err.response?.data));
+      }
+    }
   };
 
   return (
     <div className="auth-wrapper">
-      {/* Visual Side (Desktop) */}
       <div className="auth-panel">
         <div className="panel-overlay-text">
           <h2>Join <br/> Us.</h2>
         </div>
       </div>
-
-      {/* Form Side */}
       <main className="auth-main">
         <div className="auth-container-inner">
           <div className="logo-box">
-             <img src={logo} alt="BOUGDIM" />
+            <img src={logo} alt="BOUGDIM" />
           </div>
 
           <div className="hero-text">
             <h1>Register</h1>
             <p>Create your account to start your journey.</p>
           </div>
+          {error && (
+            <p style={{ color: "red", marginBottom: "10px" }}>
+              {error}
+            </p>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="input-stack">
@@ -94,13 +127,18 @@ function Register() {
               />
             </div>
 
-            <button type="submit" className="btn-elegant">Create Account</button>
+            <button type="submit" className="btn-elegant">
+              Create Account
+            </button>
           </form>
 
           <div className="footer-nav">
-             <p style={{fontSize: '14px', color: '#777'}}>
-                Already have an account? <Link to="/" style={{opacity: 1, color: '#1a1a1a'}}>Sign in</Link>
-             </p>
+            <p style={{ fontSize: "14px", color: "#777" }}>
+              Already have an account?{" "}
+              <Link to="/" style={{ opacity: 1, color: "#1a1a1a" }}>
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
       </main>
