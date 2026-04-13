@@ -29,7 +29,7 @@ function Register() {
     try {
       await api.get("/sanctum/csrf-cookie");
 
-      // Register
+      
       await api.post("/register", {
         name: formData.name,
         email: formData.email,
@@ -37,11 +37,11 @@ function Register() {
         password_confirmation: formData.confirmPassword,
       });
 
-      // Get user
+      
       const user = await api.get("/api/user");
       console.log("User:", user.data);
 
-      // Redirect
+      
       window.location.href = "/dashboard";
 
     } catch (err) {

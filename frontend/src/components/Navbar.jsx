@@ -5,7 +5,7 @@ import logo from "../assets/logo/library.png";
 function Navbar() {
   const location = useLocation();
 
-  // Bach n-choufo ana link active
+  
   const isActive = (path) => location.pathname === path;
 
   return (

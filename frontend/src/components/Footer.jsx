@@ -5,7 +5,6 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="footer-grid">
-        {/* Brand & About */}
         <div className="footer-brand">
           <h3>BOUGDIM.</h3>
           <p>
@@ -14,7 +13,7 @@ function Footer() {
           </p>
         </div>
 
-        {/* Quick Links for Guests */}
+        
         <div className="footer-col">
           <h4>Explore</h4>
           <ul>
@@ -25,7 +24,6 @@ function Footer() {
           </ul>
         </div>
 
-        {/* Support */}
         <div className="footer-col">
           <h4>Support</h4>
           <ul>
@@ -35,7 +33,7 @@ function Footer() {
           </ul>
         </div>
 
-        {/* Contact Info */}
+        
         <div className="footer-col">
           <h4>Office</h4>
           <ul className="contact-list">
@@ -46,13 +44,13 @@ function Footer() {
         </div>
       </div>
 
-      {/* Copyright & Creator */}
+      
       <div className="footer-bottom">
         <p>© 2026 Library BOUGDIM. All rights reserved.</p>
         <p>
           Created by{" "}
           <a 
-            href="https://www.mouadziyani.com/" 
+            href="https:
             target="_blank" 
             rel="noopener noreferrer"
             className="creator-link"

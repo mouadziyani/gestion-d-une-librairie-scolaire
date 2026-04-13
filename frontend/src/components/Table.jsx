@@ -1,14 +1,40 @@
 import React from "react";
 
-function Table() {
+function Table({ columns = [], data = [], actions }) {
   return (
-    <div>
-      <table>
+    <div className="table-container">
+      <table className="custom-table">
         <thead>
-          <tr><th>Column 1</th><th>Column 2</th><th>Column 3</th></tr>
+          <tr>
+            {columns.map((col, index) => (
+              <th key={index}>{col}</th>
+            ))}
+            {actions && <th>Actions</th>}
+          </tr>
         </thead>
         <tbody>
-          <tr><td>Data A</td><td>Data B</td><td>Data C</td></tr>
+          {data.length > 0 ? (
+            data.map((item, rowIndex) => (
+              <tr key={rowIndex}>
+                {Object.values(item).map((val, colIndex) => (
+                  <td key={colIndex}>{val}</td>
+                ))}
+                {actions && (
+                  <td>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      {actions(item)}
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={columns.length + (actions ? 1 : 0)} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+                No data available in this section.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

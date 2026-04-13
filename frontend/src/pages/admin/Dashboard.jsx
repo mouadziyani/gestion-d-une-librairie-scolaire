@@ -17,7 +17,6 @@ function Dashboard() {
 
   return (
     <div className="dashboard-wrapper">
-      {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-logo">
           <h2>B.</h2>
@@ -42,14 +41,13 @@ function Dashboard() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="dashboard-main">
         <header className="dashboard-header">
           <h1>Library BOUGDIM</h1>
           <p>Admin Overview & Analytics</p>
         </header>
 
-        {/* Quick Stats Grid */}
+        
         <div className="stats-grid">
           <div className="stat-card">
             <h4>Total Users</h4>
@@ -65,7 +63,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Activity Table */}
+        
         <section className="table-container">
           <h3>Recent Activity</h3>
           <table>

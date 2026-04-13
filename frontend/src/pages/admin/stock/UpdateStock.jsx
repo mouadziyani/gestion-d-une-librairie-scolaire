@@ -12,14 +12,13 @@ function UpdateStock() {
       <div className="stock-card">
         <h2>Update Inventory</h2>
 
-        {/* Status indicator d s-sel3a li khtar l-admin */}
+        
         <div className="current-stock-badge">
           <span>Currently in Stock</span>
           <strong>1,240 Units</strong>
         </div>
 
         <form>
-          {/* Product Identification */}
           <div className="update-field-group">
             <label htmlFor="name">Item Name</label>
             <input 
@@ -36,7 +35,7 @@ function UpdateStock() {
             <input type="text" id="code" defaultValue="BIC-001" required />
           </div>
 
-          {/* Stock Logic */}
+          
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
             <div className="update-field-group">
               <label htmlFor="quantity">Add / Remove Stock</label>

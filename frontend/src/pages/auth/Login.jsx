@@ -10,7 +10,7 @@ function Login() {
   e.preventDefault();
 
   try {
-    // مهم بزاف
+    
     await api.get("/sanctum/csrf-cookie");
 
     const res = await api.post("/login", {
@@ -28,14 +28,13 @@ function Login() {
 
   return (
     <div className="auth-wrapper">
-      {/* Visual Artistic Side */}
       <div className="auth-panel">
         <div className="panel-overlay-text">
           <h2>Read <br/> More.</h2>
         </div>
       </div>
 
-      {/* Form Side */}
+      
       <main className="auth-main">
         <div className="auth-container-inner">
           <div className="logo-box">

@@ -1,7 +1,7 @@
 import React from "react";
 
 function StockHistory() {
-  // Dummy data bach t-chouf kifach kiy-ban l-journal
+  
   const logs = [
     { id: 1, date: "2026-04-10", item: "Stylo BIC Bleu", action: "Restock", change: "+500", user: "Admin_Ahmed" },
     { id: 2, date: "2026-04-09", item: "Mathematics Grade 6", action: "Sale #992", change: "-2", user: "System" },
@@ -17,7 +17,6 @@ function StockHistory() {
         <p style={{ color: '#666' }}>Track every change made to your library inventory.</p>
       </header>
 
-      {/* Filter Section */}
       <section className="history-filters">
         <input type="date" className="admin-input" style={{ flex: 1 }} />
         <select className="admin-input" style={{ flex: 1 }}>
@@ -29,7 +28,7 @@ function StockHistory() {
         <button className="btn-filled" style={{ padding: '0 30px' }}>Filter Logs</button>
       </section>
 
-      {/* Timeline List */}
+      
       <section className="log-timeline">
         {logs.map((log) => (
           <div className="log-item" key={log.id}>

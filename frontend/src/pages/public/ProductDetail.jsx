@@ -8,12 +8,11 @@ function ProductDetail() {
   return (
     <div className="product-detail-page">
       <main className="detail-wrapper">
-        {/* Left: Image */}
         <div className="detail-image-box">
           <img src={styloBleu} alt="Stylo BIC Bleu" />
         </div>
 
-        {/* Right: Info */}
+        
         <div className="detail-info-box">
           <span className="brand">BIC France</span>
           <h1>Stylo à bille Bleu <br/> Cristal Classic</h1>

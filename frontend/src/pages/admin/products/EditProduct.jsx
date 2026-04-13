@@ -14,31 +14,31 @@ function EditProductAdmin() {
         
         <form action="#">
           <div className="form-grid">
-            {/* Name */}
+            
             <div className="edit-group full-row">
               <label htmlFor="name">Product Name</label>
               <input type="text" id="name" name="name" defaultValue="Stylo à bille Bleu - BIC" required />
             </div>
 
-            {/* Image URL / Path */}
+            
             <div className="edit-group full-row">
               <label htmlFor="Pics">Image Path / URL</label>
               <input type="text" id="Pics" name="Pics" defaultValue="../../assets/products/stylo-bleu.jpg" required />
             </div>
 
-            {/* Price */}
+            
             <div className="edit-group">
               <label htmlFor="Price">Price (DH)</label>
               <input type="text" id="Price" name="Price" defaultValue="1.50" required />
             </div>
 
-            {/* CodeBar */}
+            
             <div className="edit-group">
               <label htmlFor="code">CodeBar / SKU</label>
               <input type="text" id="code" name="code" defaultValue="BIC-CRISTAL-001" required />
             </div>
 
-            {/* Status */}
+            
             <div className="edit-group full-row">
               <label htmlFor="status">Availability Status</label>
               <select id="status" name="status">

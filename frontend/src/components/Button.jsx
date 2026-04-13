@@ -1,10 +1,36 @@
 import React from "react";
 
-function Button() {
+function Button({ 
+  children, 
+  type = "button", 
+  variant = "primary", 
+  size = "md", 
+  isLoading = false, 
+  disabled = false,
+  onClick,
+  icon
+}) {
+  const className = `btn-base btn-${variant} btn-${size}`;
+
   return (
-    <div>
-      <button type="button">Button</button>
-    </div>
+    <button 
+      type={type} 
+      className={className} 
+      onClick={onClick} 
+      disabled={disabled || isLoading}
+    >
+      {isLoading ? (
+        <>
+          <div className="spinner"></div>
+          <span>Loading...</span>
+        </>
+      ) : (
+        <>
+          {icon && <span className="btn-icon">{icon}</span>}
+          {children}
+        </>
+      )}
+    </button>
   );
 }
 

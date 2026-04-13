@@ -14,25 +14,25 @@ function AddProductAdmin() {
         
         <form action="#">
           <div className="form-grid">
-            {/* Name */}
+            
             <div className="input-group full-row">
               <label htmlFor="name">Product Title</label>
               <input type="text" id="name" name="name" placeholder="e.g. Oxford English Dictionary" required />
             </div>
 
-            {/* Price (Fiksina l-input type) */}
+            
             <div className="input-group">
               <label htmlFor="price">Price (DH)</label>
               <input type="number" id="price" name="price" placeholder="0.00" step="0.01" required />
             </div>
 
-            {/* CodeBar */}
+            
             <div className="input-group">
               <label htmlFor="code">CodeBar / SKU</label>
               <input type="text" id="code" name="code" placeholder="Scan or enter code" required />
             </div>
 
-            {/* Category (Zdna hada bach t-naddem s-sel3a) */}
+            
             <div className="input-group">
               <label htmlFor="category">Category</label>
               <select id="category" name="category">
@@ -42,7 +42,7 @@ function AddProductAdmin() {
               </select>
             </div>
 
-            {/* Status */}
+            
             <div className="input-group">
               <label htmlFor="status">Initial Status</label>
               <select id="status" name="status">
@@ -51,7 +51,7 @@ function AddProductAdmin() {
               </select>
             </div>
 
-            {/* Pics (Rddinaha File Upload) */}
+            
             <div className="input-group full-row">
               <label htmlFor="pics">Product Image</label>
               <input type="file" id="pics" name="pics" accept="image/*" required />

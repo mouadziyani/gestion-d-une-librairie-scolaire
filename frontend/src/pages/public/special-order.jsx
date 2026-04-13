@@ -12,7 +12,7 @@ function SpecialOrder() {
         </div>
 
         <form className="order-form-grid">
-          {/* Product Details */}
+          
           <div className="form-group full-width">
             <label>Item Name / Title</label>
             <input type="text" placeholder="e.g. Advanced Physics Grade 12" required />
@@ -33,7 +33,7 @@ function SpecialOrder() {
             <input type="number" placeholder="1" min="1" />
           </div>
 
-          {/* School Details - Context men cahier des charges */}
+          
           <div className="form-group full-width">
             <label>Associated School (Optional)</label>
             <input type="text" placeholder="e.g. Lycée Technique Oujda" />

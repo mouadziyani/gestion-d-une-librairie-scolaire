@@ -1,7 +1,7 @@
 import React from "react";
 
 function CategoriesAdmin() {
-  // Dummy data for administration
+  
   const categories = [
     { id: 1, name: "Textbooks", productCount: 450, status: "Active" },
     { id: 2, name: "School Supplies", productCount: 1200, status: "Active" },
@@ -19,7 +19,7 @@ function CategoriesAdmin() {
         <button className="btn-filled">+ New Category</button>
       </header>
 
-      {/* Quick Overview Stats */}
+      
       <section className="category-stats-grid">
         <div className="stat-card">
           <h4>Total Categories</h4>
@@ -35,7 +35,7 @@ function CategoriesAdmin() {
         </div>
       </section>
 
-      {/* Management Table */}
+      
       <section className="admin-table-area">
         <h3 style={{ marginBottom: '20px', fontSize: '18px' }}>Category Management</h3>
         <table className="cat-list-table">

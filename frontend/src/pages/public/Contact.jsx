@@ -10,7 +10,6 @@ function Contact() {
     <div className="contact-page">
       <main className="contact-wrapper">
         
-        {/* Left Side: Info */}
         <section className="contact-info-side">
           <span style={{ fontSize: '12px', fontWeight: '700', letterSpacing: '2px', color: '#888' }}>
             GET IN TOUCH
@@ -37,7 +36,7 @@ function Contact() {
           </div>
         </section>
 
-        {/* Right Side: Form */}
+        
         <section className="contact-form-side">
           <div className="contact-form-card">
             <form onSubmit={handleSubmit}>

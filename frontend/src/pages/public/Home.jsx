@@ -5,7 +5,6 @@ import logo from "../../assets/logo/library.png";
 function Home() {
   return (
     <div className="home-wrapper">
-      {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
           <span>Librairie BOUGDIM 2026</span>
@@ -19,10 +18,10 @@ function Home() {
             <Link to="/specialorder" className="btn-outline">Special Order</Link>
           </div>
         </div>
-        {/* Hna t9der t-zid tswira dyal ktab aw library f l-jiha l-khra f Desktop */}
+        
       </section>
 
-      {/* Services Section - Men l-Cahier des Charges */}
+      
       <section className="features-strip">
         <div className="feature-item">
           <h3>Fast Delivery</h3>
@@ -42,13 +41,13 @@ function Home() {
         </div>
       </section>
 
-      {/* Featured Preview Section */}
+      
       <section style={{padding: '80px 8%', background: '#f9f9f9'}}>
         <h2 style={{fontFamily: 'Fraunces, serif', fontSize: '32px', marginBottom: '40px'}}>Featured Essentials</h2>
         <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
-            {/* Hna t9der t-7et k-preview sghir d-l-produits */}
+            
             <div style={{background: '#fff', padding: '20px', flex: '1', minWidth: '250px', borderRadius: '8px'}}>
-                <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=400" alt="Book" style={{width: '100%', marginBottom: '15px'}} />
+                <img src="https:
                 <h4>Mathematics Grade 6</h4>
                 <p style={{color: '#888'}}>120 DH</p>
             </div>

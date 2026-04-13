@@ -6,7 +6,6 @@ function Cart() {
     <div className="cart-page">
       <main className="cart-wrapper">
         
-        {/* Left Side: Items List */}
         <section className="cart-items-section">
           <h2>Your Cart</h2>
           
@@ -20,7 +19,7 @@ function Cart() {
               </tr>
             </thead>
             <tbody>
-              {/* Item 1 */}
+              
               <tr className="cart-item-row">
                 <td>
                   <div className="cart-product-info">
@@ -47,7 +46,7 @@ function Cart() {
           </table>
         </section>
 
-        {/* Right Side: Summary */}
+        
         <section className="cart-summary-side">
           <div className="cart-summary-card">
             <h3 style={{ marginBottom: '25px' }}>Order Summary</h3>

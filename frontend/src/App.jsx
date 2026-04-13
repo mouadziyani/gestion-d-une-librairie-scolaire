@@ -23,6 +23,15 @@ import Footer from "./components/Footer";
 import FAQ from "./pages/public/Faq";
 import RouteTester from "./RouteTester";
 import Cart from "./pages/client/Cart";
+import NotFound from "./pages/errors/NotFound";
+import ServerError from "./pages/errors/ServerError";
+import Unauthorized from "./pages/errors/Unauthorized";
+import GeneralSettings from "./pages/admin/settings/GeneralSettings";
+import RolesPermissions from "./pages/admin/settings/RolesPermissions";
+import SystemConfig from "./pages/admin/settings/SystemConfig";
+import Notifications from "./pages/notifications/Notifications";
+import Profile from "./pages/auth/Profile";
+import Header from "./components/Header";
 
 function App() {
   return (
@@ -51,6 +60,15 @@ function App() {
         <Route path="/Contact" element={<Contact />} />
         <Route path="/FAQ" element={<FAQ />} />
         <Route path="/Cart" element={<Cart />} />
+        <Route path="/NotFound" element={<NotFound />} />
+        <Route path="/ServerError" element={<ServerError />} />
+        <Route path="/Unauthorized" element={<Unauthorized />} />
+        <Route path="/SystemConfig" element={<SystemConfig />} />
+        <Route path="/RolesPermissions" element={<RolesPermissions />} />
+        <Route path="/GeneralSettings" element={<GeneralSettings />} />
+        <Route path="/Notifications" element={<Notifications />} />
+        <Route path="/Profile" element={<Profile />} />
+        <Route path="/Header" element={<Header />} />
       </Routes>
       <Footer />
     </BrowserRouter>

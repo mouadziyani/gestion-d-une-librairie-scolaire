@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 function StockList() {
   const stockItems = [
     { id: "001", name: "Stylo à bille Bleu - BIC", code: "BIC-BL-001", status: "Active", qty: 1240 },
-    { id: "002", name: "Mathematics Grade 6", code: "BK-MATH-06", status: "Active", qty: 8 }, // Low stock
+    { id: "002", name: "Mathematics Grade 6", code: "BK-MATH-06", status: "Active", qty: 8 }, 
     { id: "003", name: "Scientific Calculator", code: "CALC-FX-99", status: "Inactive", qty: 0 },
   ];
 
@@ -17,7 +17,6 @@ function StockList() {
         </div>
       </header>
 
-      {/* Quick Summary Cards */}
       <section className="stock-stats-row">
         <div className="stock-card-mini">
           <span>Total Items</span>
@@ -33,7 +32,6 @@ function StockList() {
         </div>
       </section>
 
-      {/* Filter Section */}
       <section className="admin-filters" style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
         <input type="text" placeholder="Search by name or code..." className="admin-input" style={{ flex: 3 }} />
         <select className="admin-input" style={{ flex: 1 }}>
@@ -44,7 +42,6 @@ function StockList() {
         <button className="btn-filled" style={{ padding: '0 30px' }}>Apply</button>
       </section>
 
-      {/* Stock Table */}
       <section className="admin-table-wrapper">
         <table className="admin-table">
           <thead>

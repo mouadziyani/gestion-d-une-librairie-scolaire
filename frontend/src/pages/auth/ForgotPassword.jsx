@@ -4,14 +4,13 @@ import logo from "../../assets/logo/library.png";
 function ForgotPassword() {
   return (
     <div className="auth-wrapper">
-      {/* Visual Side (Desktop) */}
       <div className="auth-panel">
         <div className="panel-overlay-text">
           <h2>Find <br/> Access.</h2>
         </div>
       </div>
 
-      {/* Form Side */}
+      
       <main className="auth-main">
         <div className="auth-container-inner">
           <div className="logo-box">

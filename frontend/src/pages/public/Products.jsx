@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo/library.png";
 
-// Imports dyal l-istylat b asma' mokhtalifa bach maykonch error
+
 import styloBleu from "../../assets/products/stylo-a-bille-bleu-bic-cristal.jpg";
 import styloRouge from "../../assets/products/stylo-a-bille-rouge-bic-cristal.jpg";
 import styloVert from "../../assets/products/stylo-a-bille-vert-bic-cristal.jpg";
 import styloNoir from "../../assets/products/stylos-a-bille-noir-bic-cristal.jpg";
 
 function Products() {
-  // Data fihom l-istylat b 1.5 DH
+  
   const bookList = [
     { id: 1, name: "Stylo à bille Bleu - BIC", price: "1.5 DH", cat: "Supplies", img: styloBleu },
     { id: 2, name: "Stylo à bille Rouge - BIC", price: "1.5 DH", cat: "Supplies", img: styloRouge },
@@ -20,7 +20,6 @@ function Products() {
 
   return (
     <div className="products-wrapper">
-      {/* Header & Search */}
       <section className="search-filter-section">
         <div className="search-box">
           <input type="text" placeholder="Find your essentials..." />
@@ -40,7 +39,7 @@ function Products() {
         </div>
       </section>
 
-      {/* Grid */}
+      
       <section className="products-list-area">
         <div className="products-grid">
           {bookList.map((product) => (

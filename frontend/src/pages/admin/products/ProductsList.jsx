@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function ProductsListAdmin() {
-  // Data dummy bach n-choufo l-mndar
+  
   const products = [
     { id: 101, name: "Stylo à bille Bleu - BIC", price: "1.50 DH", status: "active", stock: 150 },
     { id: 102, name: "Mathematics Grade 6", price: "120.00 DH", status: "active", stock: 24 },
@@ -21,7 +21,7 @@ function ProductsListAdmin() {
         </Link>
       </header>
 
-      {/* Modern Filter Section */}
+      
       <section className="filter-bar-admin">
         <div className="filter-field" style={{ flex: 2 }}>
           <label htmlFor="search">Search Products</label>
@@ -40,7 +40,7 @@ function ProductsListAdmin() {
         <button className="btn-elegant" style={{ padding: '12px 30px' }}>Filter</button>
       </section>
 
-      {/* Table View */}
+      
       <section className="data-table-container">
         <table className="admin-table">
           <thead>

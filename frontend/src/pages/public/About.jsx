@@ -19,7 +19,6 @@ function About() {
           </div>
           
           <div className="about-visual">
-             {/* Hna t9der t-zid chi tswira dyal l-bibliothèque dyalkom */}
              <div style={{width: '100%', height: '400px', backgroundColor: '#f0f0f0', borderRadius: '20px'}}></div>
           </div>
         </section>

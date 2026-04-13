@@ -10,7 +10,7 @@ function ProductDetailsAdmin() {
       </header>
 
       <div className="admin-card">
-        {/* Left: Product Visual */}
+        
         <div className="admin-product-side">
           <div className="admin-product-img">
             <img src={styloBleu} alt="Stylo BIC" />
@@ -20,7 +20,7 @@ function ProductDetailsAdmin() {
           </button>
         </div>
 
-        {/* Right: Management Form */}
+        
         <div className="admin-detail-content">
           <div className="admin-stats-strip">
             <div className="stat-item">

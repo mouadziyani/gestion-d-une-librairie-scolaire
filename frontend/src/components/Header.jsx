@@ -1,13 +1,29 @@
 import React from "react";
+import { Bell } from "lucide-react"; 
+import Avatar from "./Avatar"; 
+import { Link } from "react-router-dom";
 
 function Header() {
   return (
-    <div>
-      <header>
-        <h1>Library BOUGDIM</h1>
-        <p>Manage schools, orders, and inventory.</p>
-      </header>
-    </div>
+    <header className="main-header">
+      <div className="header-actions">
+        
+        <Link to="/notifications" className="notif-link-wrapper">
+          <div className="notif-badge-wrapper" title="View Notifications">
+            <span className="notif-icon-span">
+              <Bell size={22} strokeWidth={2} />
+            </span>
+            
+            <div className="badge-dot"></div>
+          </div>
+        </Link>
+
+        <Link to="/Profile" className="profile-link-header">
+          <Avatar size={40} />
+        </Link>
+        
+      </div>
+    </header>
   );
 }
 
