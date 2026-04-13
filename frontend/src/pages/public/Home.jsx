@@ -47,7 +47,9 @@ function Home() {
         <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
             
             <div style={{background: '#fff', padding: '20px', flex: '1', minWidth: '250px', borderRadius: '8px'}}>
-                <img src="https:
+                <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=500" alt="Book"
+  style={{width: '100%', marginBottom: '15px'}} 
+/>
                 <h4>Mathematics Grade 6</h4>
                 <p style={{color: '#888'}}>120 DH</p>
             </div>

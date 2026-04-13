@@ -50,8 +50,8 @@ function Footer() {
         <p>
           Created by{" "}
           <a 
-            href="https:
-            target="_blank" 
+            href="https://www.mouadziyani.com/"
+            target="_blank"
             rel="noopener noreferrer"
             className="creator-link"
           >
