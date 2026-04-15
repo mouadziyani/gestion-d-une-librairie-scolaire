@@ -14,7 +14,7 @@ function About() {
               providing quality textbooks and supplies to schools and families since 2026.
             </p>
             <p style={{fontSize: '1rem', color: '#888'}}>
-               Digitalizing the way you access knowledge, from Oujda to your doorstep.
+               Digitalizing the way you access knowledge, from El Aïoun Sidi Mellouk to your doorstep.
             </p>
           </div>
           
@@ -26,7 +26,7 @@ function About() {
         <section className="contact-info-grid">
            <div className="info-block">
               <h4>Location</h4>
-              <p>Oujda, Morocco <br/> Hay Al-Qods</p>
+              <p>El Aïoun Sidi Mellouk  <br/>Oujda, Morocco</p>
            </div>
            <div className="info-block">
               <h4>Contact</h4>
@@ -34,7 +34,7 @@ function About() {
            </div>
            <div className="info-block">
               <h4>Hours</h4>
-              <p>Mon - Sat: 09:00 - 19:00 <br/> Sun: Closed</p>
+              <p>Mon - Sun: 09:00 - 19:00 </p>
            </div>
         </section>
 

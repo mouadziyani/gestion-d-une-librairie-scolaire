@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import logo from "../../assets/logo/library.png";
-import api from "../../api/axios";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -135,7 +134,7 @@ function Register() {
           <div className="footer-nav">
             <p style={{ fontSize: "14px", color: "#777" }}>
               Already have an account?{" "}
-              <Link to="/" style={{ opacity: 1, color: "#1a1a1a" }}>
+              <Link to="/login" style={{ opacity: 1, color: "#1a1a1a" }}>
                 Sign in
               </Link>
             </p>

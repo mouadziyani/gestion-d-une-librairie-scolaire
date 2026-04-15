@@ -1,6 +1,6 @@
 import React from "react";
 
-function InvoiceBySchool() {
+function AdminInvoiceBySchool() {
   return (
     <div>
       <h1>Library BOUGDIM</h1>
@@ -21,4 +21,4 @@ function InvoiceBySchool() {
   );
 }
 
-export default InvoiceBySchool;
+export default AdminInvoiceBySchool;

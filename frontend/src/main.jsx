@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from "react-router-dom"
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import './index.css'
 import App from './App.jsx'
@@ -10,7 +11,9 @@ axios.defaults.baseURL = "http://127.0.0.1:8000";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
     <SpeedInsights /> 
   </StrictMode>,
 )

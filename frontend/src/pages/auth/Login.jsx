@@ -1,30 +1,10 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+
 import logo from "../../assets/logo/library.png";
-import api from "../../api/axios";
+import useLoginForm from "../../hooks/useLoginForm";
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const handleLogin = async (e) => {
-  e.preventDefault();
-
-  try {
-    
-    await api.get("/sanctum/csrf-cookie");
-
-    const res = await api.post("/login", {
-      email: username,
-      password: password,
-    });
-
-    console.log("Login success", res.data);
-    window.location.href = "/dashboard";
-
-  } catch (err) {
-    console.error(err.response?.data);
-  }
-};
+  const {Form , handleChange , handleSubmit} = useLoginForm();
 
   return (
     <div className="auth-wrapper">
@@ -46,15 +26,16 @@ function Login() {
             <p>Welcome back to BOUGDIM Library.</p>
           </div>
 
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSubmit} >
             <div className="input-stack">
               <label>EMAIL</label>
               <input 
                 type="email" 
+                name="email"
                 placeholder="name@example.com"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 required 
+                onChange={handleChange}
+                value={Form.email}
               />
             </div>
 
@@ -62,10 +43,11 @@ function Login() {
               <label>PASSWORD</label>
               <input 
                 type="password" 
+                name="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required 
+                onChange={handleChange}
+                value={Form.password}
               />
             </div>
 

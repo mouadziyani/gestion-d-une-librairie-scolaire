@@ -27,7 +27,7 @@ function Contact() {
             </div>
             <div className="contact-item">
               <h4>Visit us</h4>
-              <p>Hay Al-Qods, Oujda <br /> Morocco</p>
+              <p>El Aïoun Sidi Mellouk <br /> Morocco</p>
             </div>
             <div className="contact-item">
               <h4>Call us</h4>

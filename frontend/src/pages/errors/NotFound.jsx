@@ -22,7 +22,7 @@ function NotFound() {
       </div>
 
       <div style={{ marginTop: '50px', fontSize: '13px', color: '#ccc' }}>
-        Library BOUGDIM — Oujda, Morocco
+        Library BOUGDIM — El Aïoun Sidi Mellouk, Oujda, Morocco
       </div>
     </div>
   );
