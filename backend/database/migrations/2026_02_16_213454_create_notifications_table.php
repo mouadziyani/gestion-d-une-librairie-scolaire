@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->onDelete('cascade');
+            $table->string('type');
+            $table->text('message');
+            $table->boolean('is_read')->default(false);
+            $table->foreignId('order_id')
+                ->nullable()
+                ->constrained('orders')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }
