@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class School extends Model
 {
@@ -13,4 +14,14 @@ class School extends Model
         'phone',
         'email',
     ];
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function specialOrders(): HasMany
+    {
+        return $this->hasMany(SpecialOrder::class);
+    }
 }
