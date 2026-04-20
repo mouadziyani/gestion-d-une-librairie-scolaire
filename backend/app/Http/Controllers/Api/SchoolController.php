@@ -12,7 +12,7 @@ class SchoolController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => School::all(),
+            'data' => School::paginate(10),
             'message' => 'The operation was successful',
         ]);
     }
