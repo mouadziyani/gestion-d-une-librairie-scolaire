@@ -13,7 +13,7 @@ class CategoryController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => Category::all(),
+            'data' => Category::withCount('products')->get(),
             'message' => 'The operation was successful',
         ]);
     }
@@ -36,7 +36,7 @@ class CategoryController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => Category::findOrFail($id),
+            'data' => Category::withCount('products')->findOrFail($id),
             'message' => 'The operation was successful',
         ]);
     }
