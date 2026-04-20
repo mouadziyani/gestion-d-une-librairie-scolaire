@@ -4,7 +4,7 @@ import logo from "../../assets/logo/library.png";
 import useLoginForm from "../../hooks/useLoginForm";
 
 function Login() {
-  const {Form , handleChange , handleSubmit} = useLoginForm();
+  const { Form , handleChange , handleSubmit, error } = useLoginForm();
 
   return (
     <div className="auth-wrapper">
@@ -27,6 +27,11 @@ function Login() {
           </div>
 
           <form onSubmit={handleSubmit} >
+            {error && (
+              <p style={{ color: "#b42318", marginBottom: "10px", fontSize: "13px" }}>
+                {error}
+              </p>
+            )}
             <div className="input-stack">
               <label>EMAIL</label>
               <input 

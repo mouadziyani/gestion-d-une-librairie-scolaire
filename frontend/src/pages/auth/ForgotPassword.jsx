@@ -1,7 +1,28 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo/library.png";
+import { api } from "../../services/api";
 
 function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setMessage("");
+    setError("");
+
+    try {
+      const res = await api.post("/forgot-password", { email });
+      setMessage(res.data?.status || "Reset link sent.");
+      setEmail("");
+    } catch (err) {
+      const msg = err?.response?.data?.message || err?.response?.data?.errors?.email?.[0] || "Failed to send reset link.";
+      setError(msg);
+    }
+  }
+
   return (
     <div className="auth-wrapper">
       <div className="auth-panel">
@@ -10,7 +31,6 @@ function ForgotPassword() {
         </div>
       </div>
 
-      
       <main className="auth-main">
         <div className="auth-container-inner">
           <div className="logo-box">
@@ -19,16 +39,29 @@ function ForgotPassword() {
 
           <div className="hero-text">
             <h1>Reset</h1>
-            <p>Don't worry, enter your email and we'll send you instructions.</p>
+            <p>Enter your email and we will send you a reset link.</p>
           </div>
 
-          <form action="#">
+          {message && (
+            <p style={{ color: "#027a48", marginBottom: "10px", fontSize: "13px" }}>
+              {message}
+            </p>
+          )}
+          {error && (
+            <p style={{ color: "#b42318", marginBottom: "10px", fontSize: "13px" }}>
+              {error}
+            </p>
+          )}
+
+          <form onSubmit={handleSubmit}>
             <div className="input-stack">
               <label>YOUR REGISTERED EMAIL</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="name@example.com"
-                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
@@ -36,8 +69,8 @@ function ForgotPassword() {
           </form>
 
           <div className="footer-nav">
-             <Link to="/" style={{opacity: 1, color: '#1a1a1a'}}>
-                ← Back to Login
+             <Link to="/login" style={{opacity: 1, color: '#1a1a1a'}}>
+                Back to Login
              </Link>
           </div>
         </div>
