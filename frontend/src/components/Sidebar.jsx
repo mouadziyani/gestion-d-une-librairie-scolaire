@@ -1,27 +1,45 @@
-import React from "react";
+import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  Users, 
-  BookOpen, 
-  ShoppingCart, 
-  Settings, 
-  LogOut,
-  PackageSearch
-} from "lucide-react";
+import { LayoutDashboard, Users, Settings, LogOut, PackageSearch, ShoppingCart, BookOpen, ChartColumn, ShieldCheck } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
+import { getSidebarLinks } from "../utils/helpers";
 
 function Sidebar() {
-  const menuItems = [
-    { title: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
-    { title: "Inventory", path: "/StockList", icon: <PackageSearch size={18} /> },
-    { title: "Orders", path: "/orders", icon: <ShoppingCart size={18} /> },
-    { title: "Customers", path: "/users", icon: <Users size={18} /> },
-  ];
+  const { user, logout } = useContext(AuthContext);
+  const roleSlug = user?.role?.slug;
+  const menuItems = getSidebarLinks(roleSlug);
+
+  const iconByTitle = (title) => {
+    const normalized = (title || "").toLowerCase();
+
+    if (normalized.includes("dashboard")) return <LayoutDashboard size={18} />;
+    if (normalized.includes("analytic") || normalized.includes("report")) return <ChartColumn size={18} />;
+    if (normalized.includes("product") || normalized.includes("category")) return <BookOpen size={18} />;
+    if (normalized.includes("stock")) return <PackageSearch size={18} />;
+    if (normalized.includes("order") || normalized.includes("checkout")) return <ShoppingCart size={18} />;
+    if (normalized.includes("user") || normalized.includes("customer")) return <Users size={18} />;
+    if (normalized.includes("setting") || normalized.includes("config")) return <Settings size={18} />;
+    if (normalized.includes("role") || normalized.includes("permission")) return <ShieldCheck size={18} />;
+
+    return <LayoutDashboard size={18} />;
+  };
+
+  async function handleLogout() {
+    try {
+      await logout();
+    } catch (error) {
+      console.error(error?.response?.data || error);
+    }
+  }
+
+  if (!roleSlug) {
+    return null;
+  }
 
   return (
     <aside className="main-sidebar">
       <div className="sidebar-logo">
-        <strong>BOUGDIM</strong>.lab
+        <strong>BOUGDIM</strong>
       </div>
 
       <nav className="sidebar-nav">
@@ -32,20 +50,27 @@ function Sidebar() {
             to={item.path} 
             className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}
           >
-            {item.icon}
-            <span>{item.title}</span>
+            {iconByTitle(item.title || item.label)}
+            <span>{item.label}</span>
           </NavLink>
         ))}
 
         <p className="nav-group-title">System</p>
-        <NavLink to="/GeneralSettings" className="sidebar-link">
-          <Settings size={18} />
-          <span>Settings</span>
-        </NavLink>
+        {(roleSlug === "admin" || roleSlug === "moderator") && (
+          <NavLink to="/GeneralSettings" className="sidebar-link">
+            <Settings size={18} />
+            <span>Home Settings</span>
+          </NavLink>
+        )}
       </nav>
 
       <div className="sidebar-footer">
-        <button className="sidebar-link" style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer' }}>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="sidebar-link"
+          style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer' }}
+        >
           <LogOut size={18} />
           <span>Logout</span>
         </button>

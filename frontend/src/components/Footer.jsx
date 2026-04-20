@@ -1,55 +1,96 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getSitePreferences } from "../services/sitePreferencesService";
 
 function Footer() {
+  const [preferences, setPreferences] = useState(() => getSitePreferences());
+
+  useEffect(() => {
+    function handlePreferencesChange() {
+      setPreferences(getSitePreferences());
+    }
+
+    window.addEventListener("bougdim:site-preferences-changed", handlePreferencesChange);
+
+    return () => {
+      window.removeEventListener("bougdim:site-preferences-changed", handlePreferencesChange);
+    };
+  }, []);
+
+  const footer = preferences.footer || {};
+  const general = preferences.general || {};
+  const publicPages = footer.publicPages || {};
+  const columnLabels = footer.columnLabels || {};
+
+  const pageLinks = [
+    { key: "home", label: "Home", to: "/" },
+    { key: "products", label: "All Products", to: "/products" },
+    { key: "categories", label: "Categories", to: "/categories" },
+    { key: "specialOrder", label: "Special Requests", to: "/special-order" },
+    { key: "about", label: "Our Story", to: "/about" },
+    { key: "contact", label: "Contact Us", to: "/contact" },
+    { key: "support", label: "FAQ", to: "/faq" },
+    { key: "login", label: "Client Login", to: "/login" },
+  ].filter((item) => publicPages[item.key] !== false);
+
+  const exploreLinks = pageLinks.filter((item) => ["home", "products", "categories", "specialOrder", "about"].includes(item.key));
+  const supportLinks = pageLinks.filter((item) => ["contact", "support", "login"].includes(item.key));
+
+  if (footer.enabled === false) {
+    return null;
+  }
+
   return (
     <footer className="site-footer">
       <div className="footer-grid">
         <div className="footer-brand">
-          <h3>BOUGDIM.</h3>
-          <p>
-            Your trusted library for school books, scientific equipment, 
-            and office supplies. Empowering education since 2026.
-          </p>
+          <h3>{footer.brandTitle || general.storeName || "BOUGDIM."}</h3>
+          <p>{footer.brandDescription || "Your trusted library for school books, scientific equipment, and office supplies. Empowering education since 2026."}</p>
         </div>
 
-        
-        <div className="footer-col">
-          <h4>Explore</h4>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/products">All Products</Link></li>
-            <li><Link to="/specialOrder">Special Requests</Link></li>
-            <li><Link to="/about">Our Story</Link></li>
-          </ul>
-        </div>
+        {footer.columns?.explore !== false ? (
+          <div className="footer-col">
+            <h4>{columnLabels.explore || "Explore"}</h4>
+            <ul>
+              {exploreLinks.map((item) => (
+                <li key={item.key}>
+                  <Link to={item.to}>{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
-        <div className="footer-col">
-          <h4>Support</h4>
-          <ul>
-            <li><Link to="/contact">Contact Us</Link></li>
-            <li><Link to="/faq">FAQ</Link></li>
-            <li><Link to="/login">Client Login</Link></li>
-          </ul>
-        </div>
+        {footer.columns?.support !== false ? (
+          <div className="footer-col">
+            <h4>{columnLabels.support || "Support"}</h4>
+            <ul>
+              {supportLinks.map((item) => (
+                <li key={item.key}>
+                  <Link to={item.to}>{item.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
-        
-        <div className="footer-col">
-          <h4>Office</h4>
-          <ul className="contact-list">
-            <li>BD HASSAN II NR 07, <br /> ELAIOUN SIDI MELLOUK</li>
-            <li>+212 536 XX XX XX</li>
-            <li>contact@bougdim.com</li>
-          </ul>
-        </div>
+        {footer.columns?.office !== false ? (
+          <div className="footer-col">
+            <h4>{columnLabels.office || "Office"}</h4>
+            <ul className="contact-list">
+              <li>{general.address || "BD HASSAN II NR 07, ELAIOUN SIDI MELLOUK"}</li>
+              <li>{general.phone || "+212 536 XX XX XX"}</li>
+              <li>{general.email || "contact@bougdim.com"}</li>
+            </ul>
+          </div>
+        ) : null}
       </div>
 
-      
       <div className="footer-bottom">
-        <p>© 2026 Library BOUGDIM. All rights reserved.</p>
+        <p>© 2026 {general.storeName || "Library BOUGDIM"}. All rights reserved.</p>
         <p>
           Created by{" "}
-          <a 
+          <a
             href="https://www.mouadziyani.com/"
             target="_blank"
             rel="noopener noreferrer"
