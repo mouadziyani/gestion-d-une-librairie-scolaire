@@ -1,79 +1,196 @@
-import React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { deleteProduct, getProducts } from "../../../services/productService";
+
+function formatMoney(value) {
+  const amount = Number(value || 0);
+  return new Intl.NumberFormat("fr-MA", {
+    style: "currency",
+    currency: "MAD",
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
 
 function ProductsListAdmin() {
-  
-  const products = [
-    { id: 101, name: "Stylo à bille Bleu - BIC", price: "1.50 DH", status: "active", stock: 150 },
-    { id: 102, name: "Mathematics Grade 6", price: "120.00 DH", status: "active", stock: 24 },
-    { id: 103, name: "Scientific Calculator", price: "280.00 DH", status: "inactive", stock: 0 },
-  ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+
+  async function loadProducts() {
+    try {
+      setLoading(true);
+      const data = await getProducts(page);
+      setProducts(Array.isArray(data?.data) ? data.data : []);
+      setLastPage(data?.last_page || 1);
+      setError("");
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to load products.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadProducts();
+  }, [page]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesSearch = `${product.name || ""} ${product.reference || ""} ${product.category?.name || ""}`
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchesStatus = statusFilter === "all" || product.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [products, search, statusFilter]);
+
+  async function handleDelete(id) {
+    const confirmed = window.confirm("Delete this product?");
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteProduct(id);
+      await loadProducts();
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to delete product.");
+    }
+  }
 
   return (
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span style={{ fontSize: '11px', color: '#888', letterSpacing: '2px', fontWeight: 'bold' }}>ADMIN AREA</span>
+          <span style={{ fontSize: "11px", color: "#888", letterSpacing: "2px", fontWeight: "bold" }}>ADMIN AREA</span>
           <h2>Inventory List</h2>
         </div>
-        <Link to="/admin/add-product" className="btn-filled" style={{ textDecoration: 'none', padding: '12px 25px' }}>
+        <Link
+          to="/AddProductAdmin"
+          className="btn-base btn-primary"
+          style={{ textDecoration: "none", padding: "12px 25px" }}
+        >
           + Add New Product
         </Link>
       </header>
 
-      
       <section className="filter-bar-admin">
         <div className="filter-field" style={{ flex: 2 }}>
           <label htmlFor="search">Search Products</label>
-          <input type="text" id="search" placeholder="Search by name or barcode..." />
+          <input
+            type="text"
+            id="search"
+            placeholder="Search by name, reference, or category..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-        
+
         <div className="filter-field">
           <label htmlFor="status">Status</label>
-          <select id="status">
+          <select id="status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="all">All Items</option>
             <option value="active">Active Only</option>
-            <option value="inactive">Out of Stock</option>
+            <option value="inactive">Inactive Only</option>
           </select>
         </div>
 
-        <button className="btn-elegant" style={{ padding: '12px 30px' }}>Filter</button>
+        <button
+          type="button"
+          className="btn-elegant"
+          style={{ padding: "12px 30px" }}
+          onClick={loadProducts}
+        >
+          Refresh
+        </button>
       </section>
 
-      
+      {error && (
+        <div style={{ marginBottom: "16px", color: "#b91c1c", fontSize: "14px" }}>
+          {error}
+        </div>
+      )}
+
       <section className="data-table-container">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Product Name</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr key={p.id}>
-                <td style={{ color: '#aaa', fontSize: '12px' }}>#{p.id}</td>
-                <td style={{ fontWeight: '600' }}>{p.name}</td>
-                <td>{p.price}</td>
-                <td>{p.stock} units</td>
-                <td>
-                  <span className={`status-indicator ${p.status === 'active' ? 'active-status' : 'inactive-status'}`}>
-                    {p.status.toUpperCase()}
-                  </span>
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <Link to={`/admin/edit-product/${p.id}`} style={{ marginRight: '15px', fontSize: '13px', color: '#1a1a1a' }}>Edit</Link>
-                  <button style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '13px' }}>Delete</button>
-                </td>
+        {!loading ? (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredProducts.length ? (
+                filteredProducts.map((product) => {
+                  const isActive = product.status === "active" && Number(product.is_available) !== 0;
+
+                  return (
+                    <tr key={product.id}>
+                      <td style={{ color: "#aaa", fontSize: "12px" }}>#{product.id}</td>
+                      <td style={{ fontWeight: "600" }}>{product.name}</td>
+                      <td>{product.category?.name || "-"}</td>
+                      <td>{formatMoney(product.price)}</td>
+                      <td>{product.stock ?? 0} units</td>
+                      <td>
+                        <span className={`status-indicator ${isActive ? "active-status" : "inactive-status"}`}>
+                          {isActive ? "ACTIVE" : "INACTIVE"}
+                        </span>
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <Link
+                          to={`/ProductDetailsAdmin?id=${product.id}`}
+                          style={{ marginRight: "15px", fontSize: "13px", color: "#1a1a1a" }}
+                        >
+                          View
+                        </Link>
+                        <Link
+                          to={`/EditProductAdmin?id=${product.id}`}
+                          style={{ marginRight: "15px", fontSize: "13px", color: "#1a1a1a" }}
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(product.id)}
+                          style={{ background: "none", border: "none", color: "#ff6b6b", cursor: "pointer", fontSize: "13px" }}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="7" style={{ padding: "24px", textAlign: "center", color: "#888" }}>
+                    No products found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        ) : null}
       </section>
+
+      <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+        <button type="button" className="btn-base btn-outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+          Previous
+        </button>
+        <button type="button" className="btn-base btn-outline" disabled={page >= lastPage} onClick={() => setPage(page + 1)}>
+          Next
+        </button>
+      </div>
     </div>
   );
 }
