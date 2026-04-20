@@ -14,13 +14,13 @@ class SpecialOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|integer|exists:users,id',
+            'user_id' => 'nullable|integer|exists:users,id',
             'school_id' => 'nullable|integer|exists:schools,id',
             'item_name' => 'required|string|max:255',
             'category_id' => 'nullable|integer|exists:categories,id',
             'quantity' => 'required|integer|min:1',
             'details' => 'nullable|string',
-            'status' => 'required|string|in:pending,approved,rejected,completed',
+            'status' => 'nullable|string|in:pending,approved,rejected,completed',
             'admin_note' => 'nullable|string',
         ];
     }
