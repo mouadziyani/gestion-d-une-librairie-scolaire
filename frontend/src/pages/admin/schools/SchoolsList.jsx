@@ -1,55 +1,138 @@
-import React from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { api } from "../../../services/api";
 
 function SchoolsList() {
+  const [schools, setSchools] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadSchools() {
+      try {
+        setLoading(true);
+        const response = await api.get("/schools", { params: { page } });
+        if (active) {
+          const schoolsData = response.data?.data;
+          setSchools(Array.isArray(schoolsData?.data) ? schoolsData.data : []);
+          setLastPage(schoolsData?.last_page || 1);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err?.response?.data?.message || "Failed to load schools.");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadSchools();
+
+    return () => {
+      active = false;
+    };
+  }, [page]);
+
+  const filteredSchools = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return schools.filter((school) => {
+      const matchesSearch =
+        !query ||
+        [school.name, school.code, school.status]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query));
+      const matchesStatus = status === "all" || String(school.status).toLowerCase() === status.toLowerCase();
+      return matchesSearch && matchesStatus;
+    });
+  }, [schools, search, status]);
+
   return (
-    <div>
-      <h1>Library BOUGDIM</h1>
-      <h2>Schools List</h2>
-      <p>Section: Admin Area</p>
-      <section>
-        <h3>Search and Filters</h3>
-        <form action="#">
-          <fieldset>
-            <legend>Filter Schools</legend>
-            <div>
-              <label htmlFor="search">Search:</label><br />
-              <input type="text" id="search" name="search" />
-            </div>
-            <div>
-              <label htmlFor="status">Status:</label><br />
-              <select id="status" name="status">
-                <option value="all">All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-            <div>
-              <button type="submit">Apply Filters</button>
-            </div>
-          </fieldset>
-        </form>
+    <div className="admin-list-wrapper">
+      <header className="admin-list-header">
+        <div>
+          <span className="eyebrow-label">ADMIN / SCHOOLS</span>
+          <h2>Schools List</h2>
+        </div>
+        <Link to="/admin/schools/create" className="btn-add-role">
+          + Add School
+        </Link>
+      </header>
+
+      <div className="filter-bar-admin">
+        <div className="filter-field">
+          <label htmlFor="school-search">Search</label>
+          <input id="school-search" type="search" placeholder="Search by school name or code..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        </div>
+        <div className="filter-field">
+          <label htmlFor="school-status">Status</label>
+          <select id="school-status" value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      {error ? <p className="form-alert form-alert-error">{error}</p> : null}
+
+      <section className="admin-table-card">
+        <div className="table-scroll">
+          <table className="custom-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {!loading ? (
+                filteredSchools.length ? (
+                  filteredSchools.map((school) => (
+                    <tr key={school.id}>
+                      <td>#{school.id}</td>
+                      <td>{school.name}</td>
+                      <td>{school.code || "-"}</td>
+                      <td>{school.status || "-"}</td>
+                      <td>
+                        <Link to={`/admin/schools/details?id=${school.id}`} className="action-link">
+                          View
+                        </Link>
+                        <Link to={`/admin/schools/edit?id=${school.id}`} className="action-link">
+                          Edit
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5">No schools match your filters.</td>
+                  </tr>
+                )
+              ) : null}
+            </tbody>
+          </table>
+        </div>
       </section>
-      <section>
-        <h3>Schools Table</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>School Name</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>001</td>
-              <td>Sample School</td>
-              <td>Active</td>
-              <td>View | Edit | Delete</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+
+      <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+        <button type="button" className="btn-base btn-outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+          Previous
+        </button>
+        <button type="button" className="btn-base btn-outline" disabled={page >= lastPage} onClick={() => setPage(page + 1)}>
+          Next
+        </button>
+      </div>
     </div>
   );
 }
