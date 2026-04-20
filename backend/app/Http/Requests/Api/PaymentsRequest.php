@@ -26,7 +26,7 @@ class PaymentsRequest extends FormRequest
             'invoice_id' => 'nullable|integer|exists:invoices,id',
             'user_id' => 'required|integer|exists:users,id',
             'amount' => 'required|numeric|min:0',
-            'payment_method' => 'required|string|in:cash,bank_transfer',
+            'payment_method' => 'required|string|in:cash,bank_transfer,stripe',
             'payment_status' => 'required|string|in:pending,paid,failed',
             'reference' => 'nullable|string',
             'paid_at' => 'nullable|date',

@@ -14,6 +14,7 @@ class Payments extends Model
         'amount',
         'payment_method',
         'payment_status',
+        'stripe_payment_intent_id',
         'reference',
         'paid_at',
         'note',
