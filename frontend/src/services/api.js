@@ -21,3 +21,16 @@ api.interceptors.request.use((config) => {
 
     return config;
 })
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error?.response?.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("auth_user");
+            window.dispatchEvent(new Event("auth:unauthenticated"));
+        }
+
+        return Promise.reject(error);
+    }
+);

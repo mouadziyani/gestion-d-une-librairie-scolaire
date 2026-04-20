@@ -5,6 +5,8 @@ import { getCategories } from "../../services/categoryService";
 import { getSitePreferences } from "../../services/sitePreferencesService";
 import { resolveMediaUrl } from "../../utils/media";
 
+const HOME_CACHE_KEY = "bougdim_home_catalogue";
+
 function formatMoney(value) {
   return new Intl.NumberFormat("fr-MA", {
     style: "currency",
@@ -13,8 +15,31 @@ function formatMoney(value) {
   }).format(Number(value || 0));
 }
 
+function readHomeCache() {
+  if (typeof window === "undefined") {
+    return { products: [], categories: [], activeProductsTotal: 0 };
+  }
+
+  try {
+    const cached = JSON.parse(window.localStorage.getItem(HOME_CACHE_KEY) || "{}");
+    return {
+      products: Array.isArray(cached.products) ? cached.products : [],
+      categories: Array.isArray(cached.categories) ? cached.categories : [],
+      activeProductsTotal: Number(cached.activeProductsTotal || 0),
+    };
+  } catch {
+    return { products: [], categories: [], activeProductsTotal: 0 };
+  }
+}
+
+function writeHomeCache(payload) {
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(HOME_CACHE_KEY, JSON.stringify(payload));
+  }
+}
+
 function ProductVisual({ product, fallbackLabel }) {
-  const imageUrl = resolveMediaUrl(product?.image);
+  const imageUrl = resolveMediaUrl(product?.image_url || product?.image || product?.img);
 
   if (imageUrl) {
     return <img src={imageUrl} alt={product?.name || fallbackLabel} />;
@@ -23,17 +48,18 @@ function ProductVisual({ product, fallbackLabel }) {
   return (
     <div className="home-visual-placeholder">
       <span>{fallbackLabel}</span>
-      <strong>{product?.name || "No image available"}</strong>
+      <strong>{product?.name || "Catalogue"}</strong>
     </div>
   );
 }
 
 function Home() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [catalogue, setCatalogue] = useState(() => readHomeCache());
   const [preferences, setPreferences] = useState(() => getSitePreferences());
   const sections = preferences.landingSections || {};
+  const products = catalogue.products;
+  const categories = catalogue.categories;
+  const activeProductsTotal = catalogue.activeProductsTotal;
 
   useEffect(() => {
     function handlePreferencesChange() {
@@ -52,17 +78,27 @@ function Home() {
 
     async function loadData() {
       try {
-        const [productData, categoryData] = await Promise.all([getProducts(), getCategories()]);
+        const [productData, categoryData] = await Promise.all([
+          getProducts({ page: 1, per_page: 8, status: "available", sort: "discount" }),
+          getCategories(),
+        ]);
         if (!active) {
           return;
         }
 
-        setProducts(Array.isArray(productData) ? productData : []);
-        setCategories(Array.isArray(categoryData) ? categoryData : []);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
+        const liveProducts = Array.isArray(productData?.data) ? productData.data : [];
+        const liveCategories = Array.isArray(categoryData) ? categoryData : [];
+
+        const nextCatalogue = {
+          products: liveProducts,
+          categories: liveCategories,
+          activeProductsTotal: Number(productData?.total || liveProducts.length),
+        };
+
+        setCatalogue(nextCatalogue);
+        writeHomeCache(nextCatalogue);
+      } catch {
+        // Keep the last successful catalogue visible if the API is still waking up.
       }
     }
 
@@ -104,7 +140,8 @@ function Home() {
 
   const heroProduct = featuredProducts[0] || bestSellerProducts[0] || activeProducts[0] || null;
   const heroCategory = highlightedCategories[0] || null;
-  const activeProductsCount = activeProducts.length;
+  const hasCatalogueData = products.length > 0 || categories.length > 0;
+  const activeProductsCount = activeProductsTotal || activeProducts.length;
   const discountedProductsCount = products.filter((product) => Number(product.discount || 0) > 0).length;
   const averageDiscount = products.length
     ? Math.round(products.reduce((sum, product) => sum + Number(product.discount || 0), 0) / products.length)
@@ -131,11 +168,13 @@ function Home() {
               </Link>
             </div>
 
-            <div className="home-hero-chips">
-              <span>{activeProductsCount} active products</span>
-              <span>{categories.length} categories</span>
-              <span>{discountedProductsCount} discounted items</span>
-            </div>
+            {hasCatalogueData ? (
+              <div className="home-hero-chips">
+                <span>{activeProductsCount} active products</span>
+                <span>{categories.length} categories</span>
+                <span>{discountedProductsCount} discounted items</span>
+              </div>
+            ) : null}
           </div>
 
           <div className="home-hero-visual">
@@ -152,15 +191,15 @@ function Home() {
               <div className="home-hero-meta-grid">
                 <div>
                   <span>Featured item</span>
-                  <strong>{heroProduct?.name || "Selected school supply"}</strong>
+                  <strong>{heroProduct?.name || "Catalogue"}</strong>
                 </div>
                 <div>
                   <span>Top category</span>
-                  <strong>{heroCategory?.name || "School essentials"}</strong>
+                  <strong>{heroCategory?.name || "Categories"}</strong>
                 </div>
                 <div>
                   <span>Average discount</span>
-                  <strong>{averageDiscount}%</strong>
+                  <strong>{hasCatalogueData ? `${averageDiscount}%` : "Offers"}</strong>
                 </div>
               </div>
             </div>
@@ -219,7 +258,7 @@ function Home() {
           </div>
 
           <div className="home-product-grid home-product-grid-featured">
-            {(loading ? [] : featuredProducts).map((product) => (
+            {featuredProducts.map((product) => (
               <Link
                 key={product.id}
                 to={`/ProductDetail?productId=${product.id}`}
@@ -254,7 +293,7 @@ function Home() {
           </div>
 
           <div className="home-product-grid home-product-grid-best">
-            {(loading ? [] : bestSellerProducts).map((product) => (
+            {bestSellerProducts.map((product) => (
               <Link
                 key={product.id}
                 to={`/ProductDetail?productId=${product.id}`}

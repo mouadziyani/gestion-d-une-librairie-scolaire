@@ -6,12 +6,14 @@ function Register() {
   const { Form, handleChange, handleSubmit, error } = useRegisterForm();
 
   return (
-    <div className="auth-wrapper">
+    <div className="auth-wrapper auth-register">
       <div className="auth-panel">
         <div className="panel-overlay-text">
-          <h2>Join <br/> Us.</h2>
+          <span>Join the library</span>
+          <h2>Join <br /> Us.</h2>
         </div>
       </div>
+
       <main className="auth-main">
         <div className="auth-container-inner">
           <div className="logo-box">
@@ -19,15 +21,12 @@ function Register() {
           </div>
 
           <div className="hero-text">
-            <h1>Register</h1>
-            <p>Create your account to start your journey.</p>
+            <span className="auth-eyebrow">New account</span>
+            <h1>Create account</h1>
+            <p>Start ordering books, stationery, and special requests from one clean space.</p>
           </div>
 
-          {error && (
-            <p style={{ color: "#b42318", marginBottom: "10px", fontSize: "13px" }}>
-              {error}
-            </p>
-          )}
+          {error ? <p className="auth-alert auth-alert-error">{error}</p> : null}
 
           <form onSubmit={handleSubmit}>
             <div className="input-stack">
@@ -59,7 +58,7 @@ function Register() {
               <input
                 type="password"
                 name="password"
-                placeholder="••••••••"
+                placeholder="Minimum 8 characters"
                 value={Form.password}
                 onChange={handleChange}
                 required
@@ -71,7 +70,7 @@ function Register() {
               <input
                 type="password"
                 name="password_confirmation"
-                placeholder="••••••••"
+                placeholder="Repeat your password"
                 value={Form.password_confirmation}
                 onChange={handleChange}
                 required
@@ -84,11 +83,8 @@ function Register() {
           </form>
 
           <div className="footer-nav">
-            <p style={{ fontSize: "14px", color: "#777" }}>
-              Already have an account?{" "}
-              <Link to="/login" style={{ opacity: 1, color: "#1a1a1a" }}>
-                Sign in
-              </Link>
+            <p>
+              Already have an account? <Link to="/login">Sign in</Link>
             </p>
           </div>
         </div>

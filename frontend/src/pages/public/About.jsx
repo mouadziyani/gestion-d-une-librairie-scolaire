@@ -30,7 +30,7 @@ function About() {
            </div>
            <div className="info-block">
               <h4>Contact</h4>
-              <p>contact@bougdim.com <br/> +212 5XX XX XX XX</p>
+              <p>contact@bougdim.com <br/> +212 566 66 66 66</p>
            </div>
            <div className="info-block">
               <h4>Hours</h4>

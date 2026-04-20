@@ -4,41 +4,39 @@ import logo from "../../assets/logo/library.png";
 import useLoginForm from "../../hooks/useLoginForm";
 
 function Login() {
-  const { Form , handleChange , handleSubmit, error } = useLoginForm();
+  const { Form, handleChange, handleSubmit, error } = useLoginForm();
 
   return (
-    <div className="auth-wrapper">
+    <div className="auth-wrapper auth-login">
       <div className="auth-panel">
         <div className="panel-overlay-text">
-          <h2>Read <br/> More.</h2>
+          <span>Student supply hub</span>
+          <h2>Read <br /> More.</h2>
         </div>
       </div>
 
-      
       <main className="auth-main">
         <div className="auth-container-inner">
           <div className="logo-box">
-             <img src={logo} alt="BOUGDIM" />
+            <img src={logo} alt="BOUGDIM" />
           </div>
 
           <div className="hero-text">
+            <span className="auth-eyebrow">Welcome back</span>
             <h1>Sign in</h1>
-            <p>Welcome back to BOUGDIM Library.</p>
+            <p>Access your Library BOUGDIM account and keep your school essentials close.</p>
           </div>
 
-          <form onSubmit={handleSubmit} >
-            {error && (
-              <p style={{ color: "#b42318", marginBottom: "10px", fontSize: "13px" }}>
-                {error}
-              </p>
-            )}
+          <form onSubmit={handleSubmit}>
+            {error ? <p className="auth-alert auth-alert-error">{error}</p> : null}
+
             <div className="input-stack">
               <label>EMAIL</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 name="email"
                 placeholder="name@example.com"
-                required 
+                required
                 onChange={handleChange}
                 value={Form.email}
               />
@@ -46,11 +44,11 @@ function Login() {
 
             <div className="input-stack">
               <label>PASSWORD</label>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 name="password"
-                placeholder="••••••••"
-                required 
+                placeholder="Enter your password"
+                required
                 onChange={handleChange}
                 value={Form.password}
               />
@@ -60,8 +58,8 @@ function Login() {
           </form>
 
           <div className="footer-nav">
-            <Link to="/register">Register</Link>
-            <Link to="/forgot-password">Forgot Password</Link>
+            <Link to="/register">Create account</Link>
+            <Link to="/forgot-password">Forgot password</Link>
           </div>
         </div>
       </main>

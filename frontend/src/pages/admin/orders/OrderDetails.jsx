@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { api } from "../../../services/api";
 
 function OrderDetails() {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const listPath = isModeratorRoute ? "/moderator/orders" : "/admin/orders";
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -46,11 +49,11 @@ function OrderDetails() {
     <div className="admin-detail-wrapper">
       <header className="page-shell-header">
         <div>
-          <span className="eyebrow-label">ADMIN / ORDERS</span>
+          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / ORDERS</span>
           <h1 className="page-shell-title">Order Details</h1>
           <p className="page-shell-subtitle">Inspect one order, its items, and payment flow.</p>
         </div>
-        <Link to="/admin/orders" className="btn-archive">
+        <Link to={listPath} className="btn-archive">
           Back to list
         </Link>
       </header>

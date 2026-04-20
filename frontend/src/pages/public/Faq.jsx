@@ -1,7 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { api } from "../../services/api";
 
 function FAQ() {
   const [activeIndex, setActiveIndex] = useState(null);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [sending, setSending] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
 
   const faqs = [
     {
@@ -29,6 +38,38 @@ function FAQ() {
   const toggleFAQ = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  async function handleSupportSubmit(event) {
+    event.preventDefault();
+    setSending(true);
+    setNotice("");
+    setError("");
+
+    try {
+      await api.post("/contact-messages", {
+        type: "support",
+        name: form.name,
+        email: form.email,
+        category: "support",
+        subject: "New support request",
+        message: form.message,
+      });
+      setNotice("Support request sent to support@bougdim.com.");
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to send your support request.");
+    } finally {
+      setSending(false);
+    }
+  }
 
   return (
     <div className="faq-page">
@@ -61,8 +102,42 @@ function FAQ() {
         <div style={{ textAlign: 'center', marginTop: '60px', padding: '40px', background: '#f9f9f9', borderRadius: '15px' }}>
           <h3>Still have questions?</h3>
           <p style={{ color: '#666', margin: '15px 0' }}>We're here to help you find what you need.</p>
-          <a href="/contact" style={{ color: '#1a1a1a', fontWeight: '700', textDecoration: 'underline' }}>
-            Contact Support
+          <form onSubmit={handleSupportSubmit} style={{ display: "grid", gap: "14px", maxWidth: "560px", margin: "24px auto 0", textAlign: "left" }}>
+            <input
+              name="name"
+              type="text"
+              placeholder="Full Name"
+              value={form.name}
+              onChange={handleChange}
+              required
+              style={{ padding: "14px", border: "1px solid #eee", borderRadius: "10px" }}
+            />
+            <input
+              name="email"
+              type="email"
+              placeholder="Email Address"
+              value={form.email}
+              onChange={handleChange}
+              required
+              style={{ padding: "14px", border: "1px solid #eee", borderRadius: "10px" }}
+            />
+            <textarea
+              name="message"
+              rows="4"
+              placeholder="How can support help?"
+              value={form.message}
+              onChange={handleChange}
+              required
+              style={{ padding: "14px", border: "1px solid #eee", borderRadius: "10px", resize: "vertical" }}
+            />
+            {notice ? <p className="form-alert form-alert-success">{notice}</p> : null}
+            {error ? <p className="form-alert form-alert-error">{error}</p> : null}
+            <button type="submit" className="btn-send" disabled={sending}>
+              {sending ? "Sending..." : "Contact Support"}
+            </button>
+          </form>
+          <a href="mailto:support@bougdim.com" style={{ color: '#1a1a1a', fontWeight: '700', textDecoration: 'underline', display: "inline-block", marginTop: "18px" }}>
+            support@bougdim.com
           </a>
         </div>
       </main>

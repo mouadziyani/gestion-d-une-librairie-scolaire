@@ -1,8 +1,7 @@
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Header from "../components/Header";
 
 import RoleRoute from "./RoleRoute";
 import PrivateRoute from "./PrivateRoute";
@@ -68,7 +67,6 @@ import AdminSpecialOrderDetails from "../pages/admin/special-orders/SpecialOrder
 import Cart from "../pages/client/Cart";
 import Checkout from "../pages/client/Checkout";
 import DashboardClient from "../pages/client/Dashboard";
-import EditProfile from "../pages/client/EditProfile";
 import Wishlist from "../pages/client/Wishlist";
 import MyInvoices from "../pages/client/invoices/MyInvoices";
 import ClientInvoiceDetail from "../pages/client/invoices/InvoiceDetail";
@@ -76,10 +74,6 @@ import Notifications from "../pages/notifications/Notifications";
 import ClientOrders from "../pages/client/Orders";
 import ClientOrderDetail from "../pages/client/OrderDetail";
 import ClientSpecialOrder from "../pages/client/SpecialOrder";
-import ClientProducts from "../pages/client/Products";
-import ClientProductDetail from "../pages/client/ProductDetail";
-import ClientHome from "../pages/client/Home";
-import ClientProfile from "../pages/client/Profile";
 import ClientNotifications from "../pages/client/Notifications";
 
 import ModeratorDashboard from "../pages/moderator/Dashboard";
@@ -140,26 +134,19 @@ function AppRoutes() {
 
         {/* Private routes */}
         <Route path="/Profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-        <Route path="/Header" element={<PrivateRoute><Header /></PrivateRoute>} />
+        <Route path="/public/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
 
         {/* Client routes */}
         <Route path="/client/dashboard" element={<RoleRoute allowedRoles={["client"]}><DashboardClient /></RoleRoute>} />
-        <Route path="/DashboardClient" element={<RoleRoute allowedRoles={["client"]}><DashboardClient /></RoleRoute>} />
         <Route path="/Cart" element={<RoleRoute allowedRoles={["client"]}><Cart /></RoleRoute>} />
         <Route path="/Checkout" element={<RoleRoute allowedRoles={["client"]}><Checkout /></RoleRoute>} />
         <Route path="/Wishlist" element={<RoleRoute allowedRoles={["client"]}><Wishlist /></RoleRoute>} />
-        <Route path="/EditProfile" element={<RoleRoute allowedRoles={["client"]}><EditProfile /></RoleRoute>} />
         <Route path="/MyInvoices" element={<RoleRoute allowedRoles={["client"]}><MyInvoices /></RoleRoute>} />
         <Route path="/InvoiceDetail" element={<RoleRoute allowedRoles={["client"]}><ClientInvoiceDetail /></RoleRoute>} />
         <Route path="/Orders" element={<RoleRoute allowedRoles={["client"]}><ClientOrders /></RoleRoute>} />
         <Route path="/OrderDetail" element={<RoleRoute allowedRoles={["client"]}><ClientOrderDetail /></RoleRoute>} />
-        <Route path="/SpecialOrderClient" element={<RoleRoute allowedRoles={["client"]}><ClientSpecialOrder /></RoleRoute>} />
         <Route path="/Notifications" element={<RoleRoute allowedRoles={["client", "admin", "moderator"]}><Notifications /></RoleRoute>} />
         <Route path="/client/notifications" element={<RoleRoute allowedRoles={["client"]}><ClientNotifications /></RoleRoute>} />
-        <Route path="/client/home" element={<RoleRoute allowedRoles={["client"]}><ClientHome /></RoleRoute>} />
-        <Route path="/client/products" element={<RoleRoute allowedRoles={["client"]}><ClientProducts /></RoleRoute>} />
-        <Route path="/client/product-detail" element={<RoleRoute allowedRoles={["client"]}><ClientProductDetail /></RoleRoute>} />
-        <Route path="/client/profile" element={<RoleRoute allowedRoles={["client"]}><ClientProfile /></RoleRoute>} />
         <Route path="/client/special-order" element={<RoleRoute allowedRoles={["client"]}><ClientSpecialOrder /></RoleRoute>} />
 
         {/* Admin routes */}
@@ -178,7 +165,8 @@ function AppRoutes() {
         <Route path="/RolesPermissions" element={<RoleRoute allowedRoles={["admin"]}><RolesPermissions /></RoleRoute>} />
         <Route path="/GeneralSettings" element={<RoleRoute allowedRoles={["admin", "moderator"]}><GeneralSettings /></RoleRoute>} />
         <Route path="/AdminInvoiceBySchool" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceBySchool /></RoleRoute>} />
-        <Route path="/AdminInvoiceCreate" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceCreate /></RoleRoute>} />
+        <Route path="/AdminInvoiceCreate" element={<Navigate to="/admin/invoices/create" replace />} />
+        <Route path="/admin/invoices/create" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceCreate /></RoleRoute>} />
         <Route path="/AdminInvoiceDetail" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceDetail /></RoleRoute>} />
         <Route path="/AdminInvoiceList" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceList /></RoleRoute>} />
         <Route path="/admin/users" element={<RoleRoute allowedRoles={["admin"]}><AdminUsersList /></RoleRoute>} />

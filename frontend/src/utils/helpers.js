@@ -60,7 +60,7 @@ const PAGE_SECTIONS = {
       { label: "Orders", path: "/Orders" },
       { label: "Invoices", path: "/MyInvoices" },
       { label: "Wishlist", path: "/Wishlist" },
-      { label: "Profile", path: "/client/profile" },
+      { label: "Profile", path: "/public/profile" },
       { label: "Notifications", path: "/client/notifications" },
     ],
   },
@@ -139,7 +139,7 @@ const SIDEBAR_LINKS = {
     { label: "Orders", path: "/Orders" },
     { label: "Invoices", path: "/MyInvoices" },
     { label: "Wishlist", path: "/Wishlist" },
-    { label: "Profile", path: "/client/profile" },
+    { label: "Profile", path: "/public/profile" },
   ],
 };
 

@@ -23,6 +23,10 @@ function storeCachedUser(user) {
     localStorage.removeItem(AUTH_USER_KEY);
 }
 
+function readAuthPayload(response) {
+    return response?.data ?? response ?? {};
+}
+
 function AuthProvider({ children }) {
     const [user, setUser] = useState(() => readCachedUser());
     const [loading, setLoading] = useState(() => {
@@ -60,7 +64,7 @@ function AuthProvider({ children }) {
     async function register(Form) {
         try {
             const res = await authServices.registerUser(Form);
-            const { user, token } = res.data || {};
+            const { user, token } = readAuthPayload(res);
 
             localStorage.setItem('token', token);
             setUser(user);
@@ -75,7 +79,7 @@ function AuthProvider({ children }) {
     async function login(Form) {
         try {
             const res = await authServices.loginUser(Form);
-            const { user, token } = res.data || {};
+            const { user, token } = readAuthPayload(res);
 
             localStorage.setItem('token', token);
             setUser(user);
@@ -108,11 +112,22 @@ function AuthProvider({ children }) {
     }
 
     useEffect(() => {
+        function handleUnauthenticated() {
+            localStorage.removeItem('token');
+            setUser(null);
+            storeCachedUser(null);
+            setLoading(false);
+        }
+
+        window.addEventListener('auth:unauthenticated', handleUnauthenticated);
+
         const token = localStorage.getItem('token');
 
         if (!token) {
             setLoading(false);
-            return;
+            return () => {
+                window.removeEventListener('auth:unauthenticated', handleUnauthenticated);
+            };
         }
 
         const cachedUser = readCachedUser();
@@ -134,6 +149,10 @@ function AuthProvider({ children }) {
             .finally(() => {
                 setLoading(false);
             });
+
+        return () => {
+            window.removeEventListener('auth:unauthenticated', handleUnauthenticated);
+        };
     }, []);
 
     return (

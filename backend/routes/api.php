@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderItemController;
 use App\Http\Controllers\Api\PaymentsController;
@@ -25,6 +27,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', PasswordResetLinkController::class);
 Route::post('/reset-password', NewPasswordController::class);
+Route::post('/contact-messages', [ContactMessageController::class, 'store']);
 
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{id}', [CategoryController::class, 'show']);
@@ -106,6 +109,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/reports/sales', [SalesReportController::class, 'index']);
         Route::get('/reports/sales/export', [SalesReportController::class, 'export']);
         Route::get('/reports/sales/pdf', [SalesReportController::class, 'exportPdf']);
+
+        Route::post('/invoices', [InvoiceController::class, 'store']);
     });
 
     Route::middleware('role:admin')->prefix('admin/users')->group(function () {

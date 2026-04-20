@@ -25,7 +25,7 @@ class OrderController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => Order::with(['user.role', 'school', 'orderItems.product', 'payments.user'])
+            'data' => Order::with(['user.role', 'school', 'orderItems.product', 'invoice.items', 'payments.invoice.items', 'payments.user'])
                 ->latest()
                 ->paginate(10),
             'message' => 'The operation was successful',
@@ -225,7 +225,7 @@ class OrderController extends Controller
     {
         return response()->json([
             'success' => true,
-            'data' => Order::with(['user.role', 'school', 'orderItems.product', 'payments.invoice', 'payments.user'])->findOrFail($id),
+            'data' => Order::with(['user.role', 'school', 'orderItems.product', 'invoice.items', 'payments.invoice.items', 'payments.user'])->findOrFail($id),
             'message' => 'The operation was successful',
         ]);
     }

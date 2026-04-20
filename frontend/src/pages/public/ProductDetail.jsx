@@ -24,7 +24,16 @@ function ProductDetail() {
     let active = true;
 
     async function loadProduct() {
+      if (!productId) {
+        setProduct(null);
+        setError("Please choose a product from the catalogue.");
+        setLoading(false);
+        return;
+      }
+
       try {
+        setLoading(true);
+        setError("");
         const data = await getProduct(productId);
         if (active) {
           setProduct(data);

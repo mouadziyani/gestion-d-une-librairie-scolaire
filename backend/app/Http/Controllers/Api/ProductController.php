@@ -5,16 +5,68 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductRequest;
 use App\Models\Product;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Product::with(['category', 'supplier'])->withCount('orderItems');
+
+        if ($search = trim((string) $request->query('search', ''))) {
+            $query->where(function ($builder) use ($search) {
+                $builder
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('reference', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('level', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($categoryQuery) use ($search) {
+                        $categoryQuery
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('slug', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $category = strtolower(trim((string) $request->query('category', 'all')));
+        if ($category !== '' && $category !== 'all') {
+            $query->where(function ($builder) use ($category) {
+                if (is_numeric($category)) {
+                    $builder->where('category_id', (int) $category);
+                }
+
+                $builder->orWhereHas('category', function ($categoryQuery) use ($category) {
+                    $categoryQuery
+                        ->where('slug', $category)
+                        ->orWhere('name', $category);
+                });
+            });
+        }
+
+        $status = strtolower(trim((string) $request->query('status', 'all')));
+        if ($status !== '' && $status !== 'all') {
+            if ($status === 'available') {
+                $query->where('status', 'active')->where('is_available', true)->where('stock', '>', 0);
+            } else {
+                $query->where('status', $status);
+            }
+        }
+
+        match (strtolower((string) $request->query('sort', 'featured'))) {
+            'price-asc' => $query->orderBy('price'),
+            'price-desc' => $query->orderByDesc('price'),
+            'best-sellers' => $query->orderByDesc('order_items_count'),
+            'discount' => $query->orderByDesc('discount'),
+            default => $query->latest('id'),
+        };
+
+        $perPage = min(max((int) $request->query('per_page', 12), 1), 60);
+
         return response()->json([
             'success' => true,
-            'data' => Product::with(['category', 'supplier'])->withCount('orderItems')->paginate(10),
+            'data' => $query->paginate($perPage)->withQueryString(),
             'message' => 'The operation was successful',
         ]);
     }

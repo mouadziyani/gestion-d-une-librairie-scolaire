@@ -43,10 +43,10 @@ function Notifications() {
     <div className="notif-wrapper">
       <header className="notif-header">
         <div>
-          <span style={{ fontSize: "11px", fontWeight: "800", color: "#888", letterSpacing: "2px" }}>
+          <span className="notif-eyebrow">
             CLIENT / UPDATES
           </span>
-          <h2 style={{ fontFamily: "Fraunces, serif", fontSize: "2.5rem", marginTop: "10px" }}>Notifications</h2>
+          <h2 className="notif-title">Notifications</h2>
         </div>
         <button className="btn-mark-all" onClick={handleMarkAll} type="button">
           Mark all as read
@@ -71,9 +71,8 @@ function Notifications() {
                   {!notification.is_read ? (
                     <button
                       type="button"
-                      className="btn-mark-all"
+                      className="btn-mark-all notif-mark-one"
                       onClick={() => handleMarkOne(notification.id)}
-                      style={{ position: "absolute", right: "20px", top: "20px" }}
                     >
                       Mark read
                     </button>

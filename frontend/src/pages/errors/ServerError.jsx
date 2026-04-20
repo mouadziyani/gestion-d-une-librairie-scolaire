@@ -31,7 +31,7 @@ function ServerError() {
 
         <div style={{ marginTop: '60px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
           <p style={{ fontSize: '12px', color: '#aaa' }}>
-            If the problem persists, contact <strong>Mouad Ziyani</strong> for technical support.
+            If the problem persists, contact the support team for technical assistance.
           </p>
         </div>
       </div>

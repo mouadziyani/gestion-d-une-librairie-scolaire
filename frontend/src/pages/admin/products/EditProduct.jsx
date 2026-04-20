@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { getCategories } from "../../../services/categoryService";
 import { getProduct, updateProduct } from "../../../services/productService";
 import { resolveMediaUrl } from "../../../utils/media";
@@ -21,8 +21,10 @@ const initialForm = {
 
 function EditProductAdmin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("id");
+  const listPath = location.pathname.startsWith("/moderator") ? "/moderator/products" : "/ProductsListAdmin";
   const [form, setForm] = useState(initialForm);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
@@ -147,7 +149,7 @@ function EditProductAdmin() {
 
     try {
       await updateProduct(productId, buildPayload());
-      navigate("/ProductsListAdmin");
+      navigate(listPath);
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to update product.");
     } finally {

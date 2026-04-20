@@ -26,8 +26,10 @@ function AdminInvoiceBySchool() {
         const [ordersResponse, schoolsResponse] = await Promise.all([api.get("/orders"), api.get("/schools")]);
 
         if (active) {
-          setOrders(Array.isArray(ordersResponse.data?.data) ? ordersResponse.data.data : []);
-          setSchools(Array.isArray(schoolsResponse.data?.data) ? schoolsResponse.data.data : []);
+          const ordersData = ordersResponse.data?.data;
+          const schoolsData = schoolsResponse.data?.data;
+          setOrders(Array.isArray(ordersData?.data) ? ordersData.data : Array.isArray(ordersData) ? ordersData : []);
+          setSchools(Array.isArray(schoolsData?.data) ? schoolsData.data : Array.isArray(schoolsData) ? schoolsData : []);
         }
       } catch (err) {
         if (active) {

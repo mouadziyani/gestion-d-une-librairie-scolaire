@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { deleteProduct, getProducts } from "../../../services/productService";
 
 function formatMoney(value) {
@@ -12,6 +12,11 @@ function formatMoney(value) {
 }
 
 function ProductsListAdmin() {
+  const location = useLocation();
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const addPath = isModeratorRoute ? null : "/AddProductAdmin";
+  const detailsPath = isModeratorRoute ? "/moderator/product-details" : "/ProductDetailsAdmin";
+  const editPath = isModeratorRoute ? "/moderator/edit-product" : "/EditProductAdmin";
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -70,13 +75,15 @@ function ProductsListAdmin() {
           <span style={{ fontSize: "11px", color: "#888", letterSpacing: "2px", fontWeight: "bold" }}>ADMIN AREA</span>
           <h2>Inventory List</h2>
         </div>
-        <Link
-          to="/AddProductAdmin"
-          className="btn-base btn-primary"
-          style={{ textDecoration: "none", padding: "12px 25px" }}
-        >
-          + Add New Product
-        </Link>
+        {addPath ? (
+          <Link
+            to={addPath}
+            className="btn-base btn-primary"
+            style={{ textDecoration: "none", padding: "12px 25px" }}
+          >
+            + Add New Product
+          </Link>
+        ) : null}
       </header>
 
       <section className="filter-bar-admin">
@@ -149,13 +156,13 @@ function ProductsListAdmin() {
                       </td>
                       <td style={{ textAlign: "right" }}>
                         <Link
-                          to={`/ProductDetailsAdmin?id=${product.id}`}
+                          to={`${detailsPath}?id=${product.id}`}
                           style={{ marginRight: "15px", fontSize: "13px", color: "#1a1a1a" }}
                         >
                           View
                         </Link>
                         <Link
-                          to={`/EditProductAdmin?id=${product.id}`}
+                          to={`${editPath}?id=${product.id}`}
                           style={{ marginRight: "15px", fontSize: "13px", color: "#1a1a1a" }}
                         >
                           Edit

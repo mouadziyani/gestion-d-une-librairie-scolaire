@@ -4,13 +4,14 @@ function isFormData(payload) {
   return typeof FormData !== "undefined" && payload instanceof FormData;
 }
 
-export async function getProducts(page) {
+export async function getProducts(options) {
+  const params = typeof options === "number" ? { page: options } : { ...(options || {}) };
   const response = await api.get("/products", {
-    params: page ? { page } : {},
+    params,
   });
   const products = response.data?.data ?? [];
 
-  if (page) {
+  if (typeof options === "number" || options?.page) {
     return products;
   }
 

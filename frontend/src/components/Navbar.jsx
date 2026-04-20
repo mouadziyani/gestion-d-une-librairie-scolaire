@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, Search, UserRound } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Search, UserRound, X } from "lucide-react";
 import logo from "../assets/logo/library.png";
 import { AuthContext } from "../context/AuthContext";
 import { getCategories } from "../services/categoryService";
@@ -9,6 +9,7 @@ function Navbar() {
   const [categories, setCategories] = useState([]);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [, setPreferencesTick] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const location = useLocation();
@@ -45,6 +46,7 @@ function Navbar() {
   useEffect(() => {
     setCategoriesOpen(false);
     setProfileOpen(false);
+    setMobileMenuOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -64,8 +66,15 @@ function Navbar() {
       await logout();
     } finally {
       setProfileOpen(false);
+      setMobileMenuOpen(false);
       navigate("/");
     }
+  }
+
+  function closeMenus() {
+    setCategoriesOpen(false);
+    setProfileOpen(false);
+    setMobileMenuOpen(false);
   }
 
   function handleSearchSubmit(event) {
@@ -77,10 +86,12 @@ function Navbar() {
     } else {
       navigate("/products");
     }
+
+    closeMenus();
   }
 
   return (
-    <nav className="main-nav">
+    <nav className={`main-nav ${mobileMenuOpen ? "mobile-open" : ""}`}>
       <div className="nav-logo">
         <Link to="/" aria-label="Go to home">
           <img src={logo} alt="Library BOUGDIM" />
@@ -97,6 +108,16 @@ function Navbar() {
           aria-label="Search products"
         />
       </form>
+
+      <button
+        type="button"
+        className="nav-menu-toggle"
+        onClick={() => setMobileMenuOpen((current) => !current)}
+        aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={mobileMenuOpen}
+      >
+        {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
 
       <div className="nav-actions">
         <div
@@ -116,7 +137,7 @@ function Navbar() {
           </button>
 
           <div className="nav-dropdown-menu nav-categories-menu">
-            <Link to="/categories" onClick={() => setCategoriesOpen(false)} className="nav-dropdown-item">
+            <Link to="/categories" onClick={closeMenus} className="nav-dropdown-item">
               All Categories
             </Link>
             {categories.length ? (
@@ -124,7 +145,7 @@ function Navbar() {
                 <Link
                   key={category.id}
                   to={`/products?category=${encodeURIComponent(category.slug || category.name || category.id)}`}
-                  onClick={() => setCategoriesOpen(false)}
+                  onClick={closeMenus}
                   className="nav-dropdown-item"
                 >
                   {category.name}
@@ -136,7 +157,7 @@ function Navbar() {
           </div>
         </div>
 
-        <Link to="/pages" className="nav-action-button nav-pages-link">
+        <Link to="/pages" className="nav-action-button nav-pages-link" onClick={closeMenus}>
           Pages
         </Link>
 
@@ -160,7 +181,7 @@ function Navbar() {
           <div className="nav-dropdown-menu nav-profile-menu">
             {isAuthenticated ? (
               <>
-                <Link to="/Profile" onClick={() => setProfileOpen(false)} className="nav-dropdown-item">
+                <Link to="/Profile" onClick={closeMenus} className="nav-dropdown-item">
                   My Profile
                 </Link>
                 <button type="button" onClick={handleLogout} className="nav-dropdown-item nav-dropdown-button">
@@ -169,20 +190,20 @@ function Navbar() {
                 </button>
               </>
             ) : (
-              <Link to="/login" onClick={() => setProfileOpen(false)} className="nav-dropdown-item">
+              <Link to="/login" onClick={closeMenus} className="nav-dropdown-item">
                 Login
               </Link>
             )}
           </div>
         </div>
 
-        <Link to="/about" className="nav-text-link">
+        <Link to="/about" className="nav-text-link" onClick={closeMenus}>
           About
         </Link>
-        <Link to="/contact" className="nav-text-link">
+        <Link to="/contact" className="nav-text-link" onClick={closeMenus}>
           Contact
         </Link>
-        <Link to="/faq" className="nav-text-link">
+        <Link to="/faq" className="nav-text-link" onClick={closeMenus}>
           Support
         </Link>
       </div>

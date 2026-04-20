@@ -38,10 +38,10 @@ function Notifications() {
     <div className="notif-wrapper">
       <header className="notif-header">
         <div>
-          <span style={{ fontSize: '11px', fontWeight: '800', color: '#888', letterSpacing: '2px' }}>
+          <span className="notif-eyebrow">
             ADMIN / UPDATES
           </span>
-          <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '2.5rem', marginTop: '10px' }}>Notifications</h2>
+          <h2 className="notif-title">Notifications</h2>
         </div>
         <button className="btn-mark-all">Mark all as read</button>
       </header>
@@ -59,16 +59,14 @@ function Notifications() {
                 <p>{n.msg}</p>
                 <span className="notif-time">{n.time}</span>
               </div>
-              {n.isUnread && (
-                <div style={{ width: '8px', height: '8px', background: '#ff4757', borderRadius: '50%', position: 'absolute', right: '20px', top: '25px' }}></div>
-              )}
+              {n.isUnread && <div className="notif-unread-dot"></div>}
             </div>
           );
         })}
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '40px' }}>
-        <button style={{ background: '#f5f5f5', border: 'none', padding: '12px 25px', borderRadius: '6px', color: '#666', fontSize: '13px', cursor: 'pointer' }}>
+      <div className="notif-load-more">
+        <button className="notif-load-more-button">
           Load Older Notifications
         </button>
       </div>

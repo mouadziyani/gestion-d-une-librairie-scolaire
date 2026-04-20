@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { api } from "../../../services/api";
 
 function SpecialOrdersList() {
+  const location = useLocation();
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const detailsPath = isModeratorRoute ? "/moderator/special-order-details" : "/admin/special-orders/details";
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -53,7 +56,7 @@ function SpecialOrdersList() {
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span className="eyebrow-label">ADMIN / SPECIAL ORDERS</span>
+          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / SPECIAL ORDERS</span>
           <h2>Special Orders</h2>
         </div>
         <Link to="/special-order" className="btn-add-role">
@@ -102,7 +105,7 @@ function SpecialOrdersList() {
                       <td>{item.school?.name || "-"}</td>
                       <td>{item.status || "-"}</td>
                       <td>
-                        <Link to={`/admin/special-orders/details?id=${item.id}`} className="action-link">
+                        <Link to={`${detailsPath}?id=${item.id}`} className="action-link">
                           View
                         </Link>
                       </td>

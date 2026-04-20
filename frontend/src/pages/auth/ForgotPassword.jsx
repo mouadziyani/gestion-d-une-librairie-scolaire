@@ -7,11 +7,13 @@ function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setMessage("");
     setError("");
+    setSending(true);
 
     try {
       const res = await api.post("/forgot-password", { email });
@@ -20,14 +22,17 @@ function ForgotPassword() {
     } catch (err) {
       const msg = err?.response?.data?.message || err?.response?.data?.errors?.email?.[0] || "Failed to send reset link.";
       setError(msg);
+    } finally {
+      setSending(false);
     }
   }
 
   return (
-    <div className="auth-wrapper">
+    <div className="auth-wrapper auth-forgot">
       <div className="auth-panel">
         <div className="panel-overlay-text">
-          <h2>Find <br/> Access.</h2>
+          <span>Account recovery</span>
+          <h2>Recover <br/> Access.</h2>
         </div>
       </div>
 
@@ -38,17 +43,18 @@ function ForgotPassword() {
           </div>
 
           <div className="hero-text">
-            <h1>Reset</h1>
-            <p>Enter your email and we will send you a reset link.</p>
+            <span className="auth-eyebrow">Password help</span>
+            <h1>Reset access</h1>
+            <p>Enter your account email and we will send a secure reset link.</p>
           </div>
 
           {message && (
-            <p style={{ color: "#027a48", marginBottom: "10px", fontSize: "13px" }}>
+            <p className="auth-alert auth-alert-success">
               {message}
             </p>
           )}
           {error && (
-            <p style={{ color: "#b42318", marginBottom: "10px", fontSize: "13px" }}>
+            <p className="auth-alert auth-alert-error">
               {error}
             </p>
           )}
@@ -65,11 +71,13 @@ function ForgotPassword() {
               />
             </div>
 
-            <button type="submit" className="btn-elegant">Send Reset Link</button>
+            <button type="submit" className="btn-elegant" disabled={sending}>
+              {sending ? "Sending..." : "Send Reset Link"}
+            </button>
           </form>
 
           <div className="footer-nav">
-             <Link to="/login" style={{opacity: 1, color: '#1a1a1a'}}>
+             <Link to="/login">
                 Back to Login
              </Link>
           </div>

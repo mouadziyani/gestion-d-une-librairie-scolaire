@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { api } from "../../../services/api";
 
 function SchoolsList() {
+  const location = useLocation();
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const detailsPath = isModeratorRoute ? "/moderator/school-details" : "/admin/schools/details";
+  const editPath = isModeratorRoute ? null : "/admin/schools/edit";
   const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -58,12 +62,14 @@ function SchoolsList() {
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span className="eyebrow-label">ADMIN / SCHOOLS</span>
+          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / SCHOOLS</span>
           <h2>Schools List</h2>
         </div>
-        <Link to="/admin/schools/create" className="btn-add-role">
-          + Add School
-        </Link>
+        {!isModeratorRoute ? (
+          <Link to="/admin/schools/create" className="btn-add-role">
+            + Add School
+          </Link>
+        ) : null}
       </header>
 
       <div className="filter-bar-admin">
@@ -105,12 +111,14 @@ function SchoolsList() {
                       <td>{school.code || "-"}</td>
                       <td>{school.status || "-"}</td>
                       <td>
-                        <Link to={`/admin/schools/details?id=${school.id}`} className="action-link">
+                        <Link to={`${detailsPath}?id=${school.id}`} className="action-link">
                           View
                         </Link>
-                        <Link to={`/admin/schools/edit?id=${school.id}`} className="action-link">
-                          Edit
-                        </Link>
+                        {editPath ? (
+                          <Link to={`${editPath}?id=${school.id}`} className="action-link">
+                            Edit
+                          </Link>
+                        ) : null}
                       </td>
                     </tr>
                   ))

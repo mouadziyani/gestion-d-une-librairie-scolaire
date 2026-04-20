@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import logo from "../../assets/logo/library.png";
 import { api } from "../../services/api";
 
 function ResetPassword() {
@@ -14,15 +15,21 @@ function ResetPassword() {
   });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function handleSubmit(event) {
+    event.preventDefault();
     setMessage("");
     setError("");
+    setSaving(true);
 
     try {
       const res = await api.post("/reset-password", {
@@ -37,70 +44,83 @@ function ResetPassword() {
     } catch (err) {
       const msg =
         err?.response?.data?.errors?.email?.[0] ||
+        err?.response?.data?.errors?.password?.[0] ||
         err?.response?.data?.message ||
         "Failed to reset password.";
       setError(msg);
+    } finally {
+      setSaving(false);
     }
   }
 
   return (
-    <div className="auth-page-wrapper">
-      <div className="auth-card">
-        <div className="auth-sidebar">
-          <div className="tab-link active">NEW PASS</div>
+    <div className="auth-wrapper auth-reset">
+      <div className="auth-panel">
+        <div className="panel-overlay-text">
+          <span>Secure password update</span>
+          <h2>New <br /> Chapter.</h2>
         </div>
-        <div className="auth-content">
-          <div className="logo-container">
-            <div className="logo-graphic"></div>
-            <h1 className="auth-title">NEW PASSWORD</h1>
+      </div>
+
+      <main className="auth-main">
+        <div className="auth-container-inner">
+          <div className="logo-box">
+            <img src={logo} alt="BOUGDIM" />
           </div>
 
-          {message && (
-            <p style={{ color: "#027a48", marginBottom: "10px", fontSize: "13px" }}>
-              {message}
-            </p>
-          )}
-          {error && (
-            <p style={{ color: "#b42318", marginBottom: "10px", fontSize: "13px" }}>
-              {error}
-            </p>
-          )}
+          <div className="hero-text">
+            <span className="auth-eyebrow">Secure reset</span>
+            <h1>New password</h1>
+            <p>Choose a strong password for {email || "your account"}.</p>
+          </div>
 
-          <form className="custom-form" onSubmit={handleSubmit}>
-            <div className="input-row">
-              <span>Pwd</span>
+          {!token || !email ? (
+            <p className="auth-alert auth-alert-error">
+              This reset link is missing required information. Please request a new reset link.
+            </p>
+          ) : null}
+
+          {message ? <p className="auth-alert auth-alert-success">{message}</p> : null}
+          {error ? <p className="auth-alert auth-alert-error">{error}</p> : null}
+
+          <form onSubmit={handleSubmit}>
+            <div className="input-stack">
+              <label>NEW PASSWORD</label>
               <input
                 type="password"
                 name="password"
-                placeholder="New Password"
+                placeholder="Enter new password"
                 value={form.password}
                 onChange={handleChange}
+                minLength={8}
                 required
               />
             </div>
-            <div className="input-row">
-              <span>Chk</span>
+
+            <div className="input-stack">
+              <label>CONFIRM PASSWORD</label>
               <input
                 type="password"
                 name="password_confirmation"
-                placeholder="Confirm Password"
+                placeholder="Confirm new password"
                 value={form.password_confirmation}
                 onChange={handleChange}
+                minLength={8}
                 required
               />
             </div>
-            <div className="form-actions" style={{ justifyContent: "center" }}>
-              <button type="submit" className="submit-btn">UPDATE PASSWORD</button>
-            </div>
+
+            <button type="submit" className="btn-elegant" disabled={saving || !token || !email}>
+              {saving ? "Updating..." : "Update Password"}
+            </button>
           </form>
 
-          <div style={{ marginTop: "16px", textAlign: "center" }}>
-            <Link to="/login" style={{ color: "#1a1a1a", fontSize: "13px" }}>
-              Back to login
-            </Link>
+          <div className="footer-nav">
+            <Link to="/forgot-password">Request new link</Link>
+            <Link to="/login">Back to login</Link>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

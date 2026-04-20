@@ -40,18 +40,26 @@ function Products() {
 
   useEffect(() => {
     let active = true;
+    const filters = getFiltersFromLocation(location.search);
 
     async function loadCatalog() {
       try {
         setLoading(true);
-        const [productData, categoryData] = await Promise.all([getProducts(page), getCategories()]);
+        setError("");
+        const productData = await getProducts({
+          page,
+          per_page: 12,
+          search: filters.search || undefined,
+          category: filters.category !== "all" ? filters.category : undefined,
+          status: filters.status !== "all" ? filters.status : undefined,
+          sort: filters.sort !== "featured" ? filters.sort : undefined,
+        });
         if (!active) {
           return;
         }
 
         setProducts(Array.isArray(productData?.data) ? productData.data : []);
         setLastPage(productData?.last_page || 1);
-        setCategories(Array.isArray(categoryData) ? categoryData : []);
       } catch (err) {
         if (active) {
           setError(err?.response?.data?.message || "Failed to load products.");
@@ -68,7 +76,30 @@ function Products() {
     return () => {
       active = false;
     };
-  }, [page]);
+  }, [location.search, page]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCategories() {
+      try {
+        const categoryData = await getCategories();
+        if (active) {
+          setCategories(Array.isArray(categoryData) ? categoryData : []);
+        }
+      } catch {
+        if (active) {
+          setCategories([]);
+        }
+      }
+    }
+
+    loadCategories();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const normalizedCategories = useMemo(
     () =>
@@ -81,28 +112,7 @@ function Products() {
   );
 
   const filteredProducts = useMemo(() => {
-    const searchValue = form.search.trim().toLowerCase();
-    const categoryValue = form.category.trim().toLowerCase();
-    const statusValue = form.status.trim().toLowerCase();
-
-    const result = products.filter((product) => {
-      const productCategory = (product.category?.slug || product.category?.name || product.cat || "").toLowerCase();
-      const matchesSearch =
-        !searchValue ||
-        [product.name, product.reference, product.description, product.level, productCategory]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(searchValue));
-      const matchesCategory =
-        categoryValue === "all" ||
-        productCategory === categoryValue ||
-        String(product.category_id || "").toLowerCase() === categoryValue;
-      const matchesStatus =
-        statusValue === "all" ||
-        String(product.status || "").toLowerCase() === statusValue ||
-        (statusValue === "available" && Number(product.is_available) !== 0);
-
-      return matchesSearch && matchesCategory && matchesStatus;
-    });
+    const result = [...products];
 
     if (form.sort === "price-asc") {
       return result.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
@@ -121,7 +131,7 @@ function Products() {
     }
 
     return result.sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
-  }, [products, form.category, form.search, form.sort, form.status]);
+  }, [products, form.sort]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -140,6 +150,7 @@ function Products() {
     if (nextForm.sort !== "featured") params.set("sort", nextForm.sort);
 
     const queryString = params.toString();
+    setPage(1);
     navigate(queryString ? `/products?${queryString}` : "/products");
   }
 
@@ -151,6 +162,7 @@ function Products() {
   function handleReset() {
     const next = { search: "", category: "all", status: "all", sort: "featured" };
     setForm(next);
+    setPage(1);
     navigate("/products");
   }
 
@@ -216,7 +228,12 @@ function Products() {
 
       <section className="products-list-area">
         {error ? <p className="form-alert form-alert-error">{error}</p> : null}
-        {!loading ? (
+        {loading ? (
+          <div className="empty-state-card">
+            <h3>Loading products...</h3>
+            <p>Please wait while the catalogue is refreshed.</p>
+          </div>
+        ) : (
           <>
             <div className="products-grid">
               {filteredProducts.length ? (
@@ -269,7 +286,7 @@ function Products() {
               </button>
             </div>
           </>
-        ) : null}
+        )}
       </section>
     </div>
   );

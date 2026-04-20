@@ -8,7 +8,7 @@ const DEFAULT_PREFERENCES = {
     legalName: "S.A.R.L. Bougdim & Co",
     address: "BD HASSAN II NR 07 ELAIOUN SIDI MELLOUK",
     email: "contact@bougdim.com",
-    phone: "+212 536 XX XX XX",
+    phone: "+212 536 66 66 66",
   },
   publicPages: {
     home: true,

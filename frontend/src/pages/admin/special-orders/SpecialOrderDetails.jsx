@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { api } from "../../../services/api";
 
 function SpecialOrderDetails() {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const listPath = isModeratorRoute ? "/moderator/special-orders" : "/admin/special-orders";
   const [item, setItem] = useState(null);
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -100,11 +103,11 @@ function SpecialOrderDetails() {
     <div className="admin-detail-wrapper">
       <header className="page-shell-header">
         <div>
-          <span className="eyebrow-label">ADMIN / SPECIAL ORDERS</span>
+          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / SPECIAL ORDERS</span>
           <h1 className="page-shell-title">Special Order Details</h1>
           <p className="page-shell-subtitle">Track the item request and its current state.</p>
         </div>
-        <Link to="/admin/special-orders" className="btn-archive">
+        <Link to={listPath} className="btn-archive">
           Back to list
         </Link>
       </header>
@@ -195,7 +198,7 @@ function SpecialOrderDetails() {
                 <button type="submit" className="btn-elegant" disabled={saving}>
                   {saving ? "Saving..." : "Save changes"}
                 </button>
-                <Link to="/admin/special-orders" className="btn-archive">
+                <Link to={listPath} className="btn-archive">
                   Back to list
                 </Link>
               </div>

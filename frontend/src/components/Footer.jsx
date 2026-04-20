@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Mail, MapPin, Phone } from "lucide-react";
+import logo from "../assets/logo/library.png";
 import { getSitePreferences } from "../services/sitePreferencesService";
 
 function Footer() {
@@ -42,48 +44,65 @@ function Footer() {
 
   return (
     <footer className="site-footer">
-      <div className="footer-grid">
+      <div className="footer-shell">
         <div className="footer-brand">
-          <h3>{footer.brandTitle || general.storeName || "BOUGDIM."}</h3>
-          <p>{footer.brandDescription || "Your trusted library for school books, scientific equipment, and office supplies. Empowering education since 2026."}</p>
+          <Link to="/" className="footer-logo-link" aria-label="Go to home">
+            <img src={logo} alt="Library BOUGDIM" />
+          </Link>
+          <h3>{footer.brandTitle || general.storeName || "Library BOUGDIM"}</h3>
+          <p>
+            {footer.brandDescription ||
+              "Your trusted library for school books, scientific equipment, and office supplies. Empowering education since 2026."}
+          </p>
         </div>
 
-        {footer.columns?.explore !== false ? (
-          <div className="footer-col">
-            <h4>{columnLabels.explore || "Explore"}</h4>
-            <ul>
-              {exploreLinks.map((item) => (
-                <li key={item.key}>
-                  <Link to={item.to}>{item.label}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
+        <div className="footer-links-grid">
+          {footer.columns?.explore !== false ? (
+            <div className="footer-col">
+              <h4>{columnLabels.explore || "Explore"}</h4>
+              <ul>
+                {exploreLinks.map((item) => (
+                  <li key={item.key}>
+                    <Link to={item.to}>{item.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
-        {footer.columns?.support !== false ? (
-          <div className="footer-col">
-            <h4>{columnLabels.support || "Support"}</h4>
-            <ul>
-              {supportLinks.map((item) => (
-                <li key={item.key}>
-                  <Link to={item.to}>{item.label}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
+          {footer.columns?.support !== false ? (
+            <div className="footer-col">
+              <h4>{columnLabels.support || "Support"}</h4>
+              <ul>
+                {supportLinks.map((item) => (
+                  <li key={item.key}>
+                    <Link to={item.to}>{item.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
-        {footer.columns?.office !== false ? (
-          <div className="footer-col">
-            <h4>{columnLabels.office || "Office"}</h4>
-            <ul className="contact-list">
-              <li>{general.address || "BD HASSAN II NR 07, ELAIOUN SIDI MELLOUK"}</li>
-              <li>{general.phone || "+212 536 XX XX XX"}</li>
-              <li>{general.email || "contact@bougdim.com"}</li>
-            </ul>
-          </div>
-        ) : null}
+          {footer.columns?.office !== false ? (
+            <div className="footer-col footer-office">
+              <h4>{columnLabels.office || "Office"}</h4>
+              <ul className="contact-list">
+                <li>
+                  <MapPin size={16} />
+                  <span>{general.address || "BD HASSAN II NR 07, ELAIOUN SIDI MELLOUK"}</span>
+                </li>
+                <li>
+                  <Phone size={16} />
+                  <span>{general.phone || "+212 536 66 66 66"}</span>
+                </li>
+                <li>
+                  <Mail size={16} />
+                  <span>{general.email || "contact@bougdim.com"}</span>
+                </li>
+              </ul>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <div className="footer-bottom">

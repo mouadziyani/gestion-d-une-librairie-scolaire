@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { api } from "../../../services/api";
 
 function SchoolDetails() {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const schoolId = searchParams.get("id");
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const listPath = isModeratorRoute ? "/moderator/schools" : "/admin/schools";
   const [school, setSchool] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -46,11 +49,11 @@ function SchoolDetails() {
     <div className="admin-detail-wrapper">
       <header className="page-shell-header">
         <div>
-          <span className="eyebrow-label">ADMIN / SCHOOLS</span>
+          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / SCHOOLS</span>
           <h1 className="page-shell-title">School Details</h1>
           <p className="page-shell-subtitle">Inspect the school record and linked data.</p>
         </div>
-        <Link to="/admin/schools" className="btn-archive">
+        <Link to={listPath} className="btn-archive">
           Back to list
         </Link>
       </header>

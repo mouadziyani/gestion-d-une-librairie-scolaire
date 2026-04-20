@@ -1,103 +1,182 @@
-import React, { useState } from "react";
-import Button from "../../../components/Button";
-import Table from "../../../components/Table";
-import { Link } from "react-router-dom";
-import { Search, Plus, Eye, Edit3, Trash2, Filter } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { api } from "../../../services/api";
+
+function formatMoney(value) {
+  return new Intl.NumberFormat("fr-MA", {
+    style: "currency",
+    currency: "MAD",
+    maximumFractionDigits: 2,
+  }).format(Number(value || 0));
+}
+
+function getInvoiceFromOrder(order) {
+  return order.invoice || order.payments?.[0]?.invoice || null;
+}
 
 function AdminInvoiceList() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const location = useLocation();
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const detailPath = isModeratorRoute ? "/moderator/invoice-detail" : "/AdminInvoiceDetail";
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
 
-  const columns = ["ID", "Client", "Invoice Name", "Date", "Status", "Amount", "Actions"];
-  
-  const data = [
-    { 
-      id: "#001", 
-      client: "Mouad Ziyani", 
-      name: "Standard Pack", 
-      date: "2026-04-14", 
-      status: <span className="status-pill status-delivered">Paid</span>,
-      amount: "150.00 DH"
-    },
-    { 
-      id: "#002", 
-      client: "Ecole Al-Amal", 
-      name: "Exam Supplies", 
-      date: "2026-04-12", 
-      status: <span className="status-pill status-pending">Pending</span>,
-      amount: "2,400.00 DH"
+  useEffect(() => {
+    let active = true;
+
+    async function loadInvoices() {
+      try {
+        setLoading(true);
+        const response = await api.get("/orders", { params: { page } });
+        const ordersData = response.data?.data;
+        if (active) {
+          setOrders(Array.isArray(ordersData?.data) ? ordersData.data : []);
+          setLastPage(ordersData?.last_page || 1);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err?.response?.data?.message || "Failed to load invoices.");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
     }
-  ];
+
+    loadInvoices();
+
+    return () => {
+      active = false;
+    };
+  }, [page]);
+
+  const invoiceRows = useMemo(
+    () =>
+      orders.map((order) => {
+        const invoice = getInvoiceFromOrder(order);
+        return {
+          order,
+          invoice,
+          id: invoice?.id || order.id,
+          number: invoice?.invoice_number || `ORDER-${order.id}`,
+          client: order.user?.name || "-",
+          school: order.school?.name || "-",
+          date: invoice?.issued_at || invoice?.created_at || order.created_at || "-",
+          status: invoice?.status || order.payment_status || "-",
+          amount: invoice?.total_amount || order.total_price || 0,
+        };
+      }),
+    [orders],
+  );
+
+  const filteredRows = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return invoiceRows.filter((row) => {
+      const matchesSearch =
+        !query ||
+        [row.number, row.client, row.school, row.status]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query));
+      const matchesStatus = status === "all" || String(row.status).toLowerCase() === status.toLowerCase();
+      return matchesSearch && matchesStatus;
+    });
+  }, [invoiceRows, search, status]);
 
   return (
-    <div className="admin-list-container">
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
+    <div className="admin-list-wrapper">
+      <header className="admin-list-header">
         <div>
-          <p style={{ color: '#888', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            Operations
-          </p>
-          <h2 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', margin: 0 }}>Invoice Archive.</h2>
+          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / INVOICES</span>
+          <h2>Invoice Archive</h2>
         </div>
-        <Link to="/AdminInvoiceCreate" style={{ textDecoration: 'none' }}>
-          <Button style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Plus size={18} /> New Invoice
-          </Button>
-        </Link>
+        {!isModeratorRoute ? (
+          <Link to="/admin/invoices/create" className="btn-add-role">
+            + New Invoice
+          </Link>
+        ) : null}
       </header>
 
-      {/* Admin Toolbar */}
-      <section className="admin-toolbar">
-        <div className="search-wrapper">
-          <Search size={18} className="search-icon-inside" />
-          <input 
-            type="text" 
-            placeholder="Search by ID, client or invoice..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+      <section className="filter-bar-admin">
+        <div className="filter-field">
+          <label htmlFor="invoice-search">Search</label>
+          <input
+            id="invoice-search"
+            type="search"
+            placeholder="Search by invoice, customer, or school..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
           />
         </div>
-        
-        <div className="filter-group">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#888', fontSize: '14px' }}>
-            <Filter size={16} /> Filter by:
-          </div>
-          <select>
-            <option value="all">All Status</option>
+        <div className="filter-field">
+          <label htmlFor="invoice-status">Status</label>
+          <select id="invoice-status" value={status} onChange={(event) => setStatus(event.target.value)}>
+            <option value="all">All statuses</option>
             <option value="paid">Paid</option>
+            <option value="unpaid">Unpaid</option>
             <option value="pending">Pending</option>
-            <option value="draft">Draft</option>
-          </select>
-          <select>
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="amount">Highest Amount</option>
           </select>
         </div>
       </section>
 
-      {/* Main Table */}
+      {error ? <p className="form-alert form-alert-error">{error}</p> : null}
+
       <section className="admin-table-card">
-        <Table 
-          columns={columns} 
-          data={data} 
-          actions={(item) => (
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button title="View" style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#1a1a1a' }}>
-                <Eye size={18} />
-              </button>
-              <button title="Edit" style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#1a1a1a' }}>
-                <Edit3 size={18} />
-              </button>
-              <button title="Delete" style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ff4757' }}>
-                <Trash2 size={18} />
-              </button>
-            </div>
-          )}
-        />
+        <div className="table-scroll">
+          <table className="custom-table">
+            <thead>
+              <tr>
+                <th>Invoice</th>
+                <th>Client</th>
+                <th>School</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {!loading ? (
+                filteredRows.length ? (
+                  filteredRows.map((row) => (
+                    <tr key={`${row.order.id}-${row.id}`}>
+                      <td>{row.number}</td>
+                      <td>{row.client}</td>
+                      <td>{row.school}</td>
+                      <td>{row.date}</td>
+                      <td>{row.status}</td>
+                      <td>{formatMoney(row.amount)}</td>
+                      <td>
+                        <Link to={`${detailPath}?id=${row.order.id}`} className="action-link">
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7">No invoices match your filters.</td>
+                  </tr>
+                )
+              ) : null}
+            </tbody>
+          </table>
+        </div>
       </section>
-      
-      <footer style={{ marginTop: '20px', textAlign: 'center', color: '#888', fontSize: '13px' }}>
-        Showing {data.length} invoices in total.
-      </footer>
+
+      <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+        <button type="button" className="btn-base btn-outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+          Previous
+        </button>
+        <button type="button" className="btn-base btn-outline" disabled={page >= lastPage} onClick={() => setPage(page + 1)}>
+          Next
+        </button>
+      </div>
     </div>
   );
 }

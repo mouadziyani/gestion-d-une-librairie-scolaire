@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { api } from "../../../services/api";
 
 function OrdersList() {
+  const location = useLocation();
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const listPath = isModeratorRoute ? "/moderator/orders" : "/admin/orders";
+  const detailsPath = isModeratorRoute ? "/moderator/order-details" : "/admin/orders/details";
+  const managePath = isModeratorRoute ? null : "/admin/orders/manage";
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -58,10 +63,10 @@ function OrdersList() {
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span className="eyebrow-label">ADMIN / ORDERS</span>
+          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / ORDERS</span>
           <h2>Orders List</h2>
         </div>
-        <Link to="/admin/reports/sales" className="btn-add-role">
+        <Link to={isModeratorRoute ? "/moderator/reports" : "/admin/reports/sales"} className="btn-add-role">
           View Sales Report
         </Link>
       </header>
@@ -82,9 +87,11 @@ function OrdersList() {
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
-        <Link to="/admin/orders/manage" className="btn-elegant">
-          Manage orders
-        </Link>
+        {managePath ? (
+          <Link to={managePath} className="btn-elegant">
+            Manage orders
+          </Link>
+        ) : null}
       </div>
 
       {error ? <p className="form-alert form-alert-error">{error}</p> : null}
@@ -115,12 +122,14 @@ function OrdersList() {
                       <td>{order.payment_status || "-"}</td>
                       <td>{Number(order.total_price || 0).toFixed(2)} MAD</td>
                       <td>
-                        <Link to={`/admin/orders/details?id=${order.id}`} className="action-link">
+                        <Link to={`${detailsPath}?id=${order.id}`} className="action-link">
                           View
                         </Link>
-                        <Link to={`/admin/orders/manage?id=${order.id}`} className="action-link">
-                          Manage
-                        </Link>
+                        {managePath ? (
+                          <Link to={`${managePath}?id=${order.id}`} className="action-link">
+                            Manage
+                          </Link>
+                        ) : null}
                       </td>
                     </tr>
                   ))

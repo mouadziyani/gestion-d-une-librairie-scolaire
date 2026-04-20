@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { deleteProduct, getProduct } from "../../../services/productService";
 import { resolveMediaUrl } from "../../../utils/media";
 
@@ -14,7 +14,11 @@ function formatPrice(value) {
 
 function ProductDetailsAdmin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const listPath = isModeratorRoute ? "/moderator/products" : "/ProductsListAdmin";
+  const editPath = isModeratorRoute ? "/moderator/edit-product" : "/EditProductAdmin";
   const productId = searchParams.get("id");
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -80,7 +84,7 @@ function ProductDetailsAdmin() {
 
     try {
       await deleteProduct(product.id);
-      navigate("/ProductsListAdmin");
+      navigate(listPath);
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to delete product.");
     } finally {
@@ -112,7 +116,7 @@ function ProductDetailsAdmin() {
           <div className="admin-detail-content">
             <h2>Product Details</h2>
             <p style={{ color: "#b91c1c" }}>{error}</p>
-            <button type="button" className="btn-save" onClick={() => navigate("/ProductsListAdmin")}>
+            <button type="button" className="btn-save" onClick={() => navigate(listPath)}>
               Back to Products
             </button>
           </div>
@@ -127,7 +131,7 @@ function ProductDetailsAdmin() {
         <div className="admin-card">
           <div className="admin-detail-content">
             <h2>Product not found</h2>
-            <button type="button" className="btn-save" onClick={() => navigate("/ProductsListAdmin")}>
+            <button type="button" className="btn-save" onClick={() => navigate(listPath)}>
               Back to Products
             </button>
           </div>
@@ -152,7 +156,7 @@ function ProductDetailsAdmin() {
           </div>
           <div className="admin-actions-bar" style={{ flexDirection: "column" }}>
             <Link
-              to={`/EditProductAdmin?id=${product.id}`}
+              to={`${editPath}?id=${product.id}`}
               className="btn-save"
               style={{ textDecoration: "none", display: "inline-flex", justifyContent: "center" }}
             >

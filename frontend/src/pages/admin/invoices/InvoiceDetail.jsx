@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { api } from "../../../services/api";
 
 function formatMoney(value) {
@@ -33,9 +33,45 @@ function downloadCsv(filename, rows) {
   window.URL.revokeObjectURL(url);
 }
 
+function parsePaymentNoteItems(order, invoiceTotal) {
+  const note = order?.payments?.find((payment) => payment.note)?.note || "";
+
+  if (!note) {
+    return [];
+  }
+
+  const parsedItems = note
+    .split(",")
+    .map((part, index) => {
+      const match = part.trim().match(/^(.*)\s+x\s+(\d+)$/i);
+
+      if (!match) {
+        return null;
+      }
+
+      return {
+        id: `note-${index}`,
+        name: match[1].trim(),
+        quantity: Number(match[2] || 0),
+        price: 0,
+      };
+    })
+    .filter(Boolean);
+
+  if (parsedItems.length === 1 && parsedItems[0].quantity > 0) {
+    parsedItems[0].price = Number(invoiceTotal || 0) / parsedItems[0].quantity;
+  }
+
+  return parsedItems;
+}
+
 function AdminInvoiceDetail() {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
+  const isModeratorRoute = location.pathname.startsWith("/moderator");
+  const listPath = isModeratorRoute ? "/moderator/invoices" : "/AdminInvoiceList";
+  const reportPath = isModeratorRoute ? "/moderator/reports" : "/admin/reports/sales";
   const [order, setOrder] = useState(null);
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -82,8 +118,21 @@ function AdminInvoiceDetail() {
     };
   }, [id]);
 
-  const items = useMemo(() => order?.orderItems || order?.order_items || [], [order]);
   const total = Number(invoice?.total_amount || order?.total_price || 0);
+  const items = useMemo(() => {
+    const invoiceItems = invoice?.items || invoice?.invoice_items || [];
+    const orderItems = order?.orderItems || order?.order_items || [];
+
+    if (invoiceItems.length) {
+      return invoiceItems;
+    }
+
+    if (orderItems.length) {
+      return orderItems;
+    }
+
+    return parsePaymentNoteItems(order, total);
+  }, [invoice, order, total]);
 
   function handlePrint() {
     window.print();
@@ -100,7 +149,7 @@ function AdminInvoiceDetail() {
       [],
       ["Item", "Quantity", "Unit Price", "Line Total"],
       ...items.map((item) => [
-        item.product?.name || item.item_name || "-",
+        item.name || item.product?.name || item.item_name || "-",
         item.quantity || 0,
         Number(item.price || 0).toFixed(2),
         Number((item.price || 0) * (item.quantity || 0)).toFixed(2),
@@ -164,7 +213,7 @@ function AdminInvoiceDetail() {
                     {items.length ? (
                       items.map((item) => (
                         <tr key={item.id}>
-                          <td>{item.product?.name || item.item_name || "-"}</td>
+                          <td>{item.name || item.product?.name || item.item_name || "-"}</td>
                           <td>{item.quantity || 0}</td>
                           <td>{formatMoney(item.price || 0)}</td>
                           <td>{formatMoney((item.price || 0) * (item.quantity || 0))}</td>
@@ -196,10 +245,10 @@ function AdminInvoiceDetail() {
         <div className="sidebar-card">
           <h4>Quick Actions</h4>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <Link to="/AdminInvoiceList" className="btn-archive" style={{ textDecoration: "none", textAlign: "center" }}>
+            <Link to={listPath} className="btn-archive" style={{ textDecoration: "none", textAlign: "center" }}>
               Back to invoices
             </Link>
-            <Link to="/admin/reports/sales" className="btn-elegant" style={{ textDecoration: "none", textAlign: "center" }}>
+            <Link to={reportPath} className="btn-elegant" style={{ textDecoration: "none", textAlign: "center" }}>
               Open sales report
             </Link>
           </div>
