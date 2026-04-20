@@ -1,49 +1,207 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { api } from "../../../services/api";
 
 function SpecialOrderDetails() {
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const [item, setItem] = useState(null);
+  const [form, setForm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadItem() {
+      try {
+        const response = await api.get(`/special-orders/${id}`);
+        if (active) {
+          const data = response.data?.data ?? null;
+          setItem(data);
+          setForm(
+            data
+              ? {
+                  user_id: data.user_id,
+                  school_id: data.school_id ?? null,
+                  item_name: data.item_name || "",
+                  category_id: data.category_id ?? null,
+                  quantity: data.quantity || 1,
+                  details: data.details || "",
+                  status: data.status || "pending",
+                  admin_note: data.admin_note || "",
+                }
+              : null,
+          );
+        }
+      } catch (err) {
+        if (active) {
+          setError(err?.response?.data?.message || "Failed to load special order.");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    if (!id) {
+      setError("Missing special order id.");
+      setLoading(false);
+      return () => {};
+    }
+
+    loadItem();
+
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  async function handleSave(event) {
+    event.preventDefault();
+    if (!form || !item) {
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setSaved("");
+
+    try {
+      const response = await api.put(`/special-orders/${item.id}`, form);
+      const data = response.data?.data ?? null;
+      setItem(data);
+      setForm(
+        data
+          ? {
+              user_id: data.user_id,
+              school_id: data.school_id ?? null,
+              item_name: data.item_name || "",
+              category_id: data.category_id ?? null,
+              quantity: data.quantity || 1,
+              details: data.details || "",
+              status: data.status || "pending",
+              admin_note: data.admin_note || "",
+            }
+          : form,
+      );
+      setSaved("Special order updated successfully.");
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to update special order.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
-    <div>
-      <h1>Library BOUGDIM</h1>
-      <h2>Special Order Details</h2>
-      <p>Section: Admin Area</p>
-      <section>
-        <h3>Order Details</h3>
-        <dl>
-          <dt>ID</dt>
-          <dd>001</dd>
-          <dt>Order Name</dt>
-          <dd>Sample Order</dd>
-          <dt>Status</dt>
-          <dd>Active</dd>
-        </dl>
-      </section>
-      <section>
-        <h3>Related Information</h3>
-        <ul>
-          <li>Recent activity</li>
-          <li>Linked documents</li>
-        </ul>
-      </section>
-      <section>
-        <h3>Order Items</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Order Name</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>001</td>
-              <td>Sample Order</td>
-              <td>Active</td>
-              <td>View | Edit | Delete</td>
-            </tr>
-          </tbody>
-        </table>
+    <div className="admin-detail-wrapper">
+      <header className="page-shell-header">
+        <div>
+          <span className="eyebrow-label">ADMIN / SPECIAL ORDERS</span>
+          <h1 className="page-shell-title">Special Order Details</h1>
+          <p className="page-shell-subtitle">Track the item request and its current state.</p>
+        </div>
+        <Link to="/admin/special-orders" className="btn-archive">
+          Back to list
+        </Link>
+      </header>
+
+      {error ? <p className="form-alert form-alert-error">{error}</p> : null}
+      {saved ? <p className="form-alert form-alert-success">{saved}</p> : null}
+
+      <section className="admin-card">
+        {!loading ? (
+          item ? (
+            <form onSubmit={handleSave} className="create-card" style={{ padding: "24px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "20px", flexWrap: "wrap", marginBottom: "24px" }}>
+                <div>
+                  <h2 style={{ fontFamily: "Fraunces, serif", fontSize: "2rem", marginBottom: "8px" }}>
+                    {item.item_name || "Special order"}
+                  </h2>
+                  <p>{item.school?.name || "-"}</p>
+                </div>
+                <div className="status-pill status-pending" style={{ height: "fit-content" }}>
+                  {item.status || "pending"}
+                </div>
+              </div>
+
+              <div className="admin-stats-strip">
+                <div className="stat-item">
+                  <span>Item</span>
+                  <strong>{item.item_name || "-"}</strong>
+                </div>
+                <div className="stat-item">
+                  <span>Category</span>
+                  <strong>{item.category?.name || "-"}</strong>
+                </div>
+                <div className="stat-item">
+                  <span>Quantity</span>
+                  <strong>{item.quantity || "-"}</strong>
+                </div>
+                <div className="stat-item">
+                  <span>Created</span>
+                  <strong>{item.created_at || "-"}</strong>
+                </div>
+              </div>
+
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label htmlFor="special-status">Status</label>
+                  <select
+                    id="special-status"
+                    value={form.status}
+                    onChange={(e) => setForm((current) => ({ ...current, status: e.target.value }))}
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="special-admin-note">Admin Note</label>
+                  <input
+                    id="special-admin-note"
+                    type="text"
+                    value={form.admin_note}
+                    onChange={(e) => setForm((current) => ({ ...current, admin_note: e.target.value }))}
+                    placeholder="Optional note"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="special-details">Details</label>
+                <textarea
+                  id="special-details"
+                  rows="4"
+                  value={form.details}
+                  onChange={(e) => setForm((current) => ({ ...current, details: e.target.value }))}
+                />
+              </div>
+
+              <div style={{ display: "none" }}>
+                <input type="number" value={form.user_id} readOnly />
+                <input type="text" value={form.school_id ?? ""} readOnly />
+                <input type="text" value={form.item_name} readOnly />
+                <input type="text" value={form.category_id ?? ""} readOnly />
+                <input type="number" value={form.quantity} readOnly />
+              </div>
+
+              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                <button type="submit" className="btn-elegant" disabled={saving}>
+                  {saving ? "Saving..." : "Save changes"}
+                </button>
+                <Link to="/admin/special-orders" className="btn-archive">
+                  Back to list
+                </Link>
+              </div>
+            </form>
+          ) : null
+        ) : null}
       </section>
     </div>
   );
