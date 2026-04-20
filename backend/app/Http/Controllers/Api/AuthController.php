@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\RegisterRequest;
 use App\Http\Requests\Api\UpdateProfileRequest;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\LogoutRequest;
 use App\Http\Requests\Api\MeRequest;
+use App\Models\Role;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -32,16 +32,10 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        $clientRole = DB::table('roles')
-            ->where('slug', 'client')
-            ->first();
-
-        if (!$clientRole) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Client role is missing.',
-            ], 500);
-        }
+        $clientRole = Role::firstOrCreate(
+            ['slug' => 'client'],
+            ['name' => 'Client']
+        );
 
         $user = User::create([
             'name' => $request->name,
@@ -127,6 +121,24 @@ class AuthController extends Controller
                 'user' => $user->fresh()->load('role'),
             ],
             'message' => 'The operation was successful',
+        ]);
+    }
+
+    public function destroyProfile(MeRequest $request)
+    {
+        $user = $request->user();
+
+        if ($user->profile_photo) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
+
+        $user->currentAccessToken()?->delete();
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'data' => (object) [],
+            'message' => 'Profile deleted successfully.',
         ]);
     }
 }
