@@ -1,42 +1,120 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import logo from "../../assets/logo/library.png";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { getProduct } from "../../services/productService";
+import { addToCart } from "../../services/cartService";
+import { resolveMediaUrl } from "../../utils/media";
 
-import styloBleu from "../../assets/products/stylo-a-bille-bleu-bic-cristal.jpg";
+function formatMoney(value) {
+  return new Intl.NumberFormat("fr-MA", {
+    style: "currency",
+    currency: "MAD",
+    maximumFractionDigits: 2,
+  }).format(Number(value || 0));
+}
 
 function ProductDetail() {
+  const [searchParams] = useSearchParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [added, setAdded] = useState(false);
+  const [error, setError] = useState("");
+  const productId = searchParams.get("productId");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadProduct() {
+      try {
+        const data = await getProduct(productId);
+        if (active) {
+          setProduct(data);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err?.response?.data?.message || "Failed to load product details.");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadProduct();
+
+    return () => {
+      active = false;
+    };
+  }, [productId]);
+
+  const canAddToCart = useMemo(() => {
+    if (!product) {
+      return false;
+    }
+
+    return product.status === "active" && Number(product.is_available) !== 0 && Number(product.stock || 0) > 0;
+  }, [product]);
+
+  function handleAddToCart() {
+    if (!product || !canAddToCart) {
+      return;
+    }
+
+    addToCart(product, 1);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1600);
+  }
+
+  if (loading) {
+    return null;
+  }
+
+  if (error || !product) {
+    return (
+      <div className="product-detail-page detail-empty">
+        <h2>Product not found</h2>
+        <p>{error || "This product is not available."}</p>
+        <Link to="/products" className="btn-filled">
+          Back to products
+        </Link>
+      </div>
+    );
+  }
+
+  const imageSrc = resolveMediaUrl(product.image) || "https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=500";
+
   return (
     <div className="product-detail-page">
       <main className="detail-wrapper">
         <div className="detail-image-box">
-          <img src={styloBleu} alt="Stylo BIC Bleu" />
+          <img src={imageSrc} alt={product.name} />
         </div>
 
-        
         <div className="detail-info-box">
-          <span className="brand">BIC France</span>
-          <h1>Stylo à bille Bleu <br/> Cristal Classic</h1>
-          <span className="price-tag">1.5 DH</span>
-          
+          <span className="brand">{product.category?.name || "Product"}</span>
+          <h1>{product.name}</h1>
+          <span className="price-tag">{formatMoney(product.price)}</span>
+
           <div className="detail-description">
-            <p>
-              The iconic BIC Cristal pen is the world's best-selling ballpoint pen. 
-              Its clear barrel lets you see the ink level, and its 1.0mm point 
-              delivers a smooth writing experience. Perfect for students and professionals.
-            </p>
+            <p>{product.description || "No description available."}</p>
           </div>
 
           <div className="detail-actions">
-            <button className="btn-cart">Add to Cart</button>
-            <button className="btn-wishlist">♥</button>
+            <button className="btn-cart" type="button" onClick={handleAddToCart} disabled={!canAddToCart}>
+              {canAddToCart ? (added ? "Added to Cart" : "Add to Cart") : "Special Order"}
+            </button>
+            <Link to="/Cart" className="btn-wishlist">
+              View Cart
+            </Link>
           </div>
 
-          <div style={{marginTop: '40px', borderTop: '1px solid #eee', paddingTop: '20px'}}>
-             <p style={{fontSize: '13px', color: '#888'}}>
-                <strong>SKU:</strong> BIC-001 <br/>
-                <strong>Category:</strong> School Supplies <br/>
-                <strong>Stock:</strong> Available in Store
-             </p>
+          <div style={{ marginTop: "40px", borderTop: "1px solid #eee", paddingTop: "20px" }}>
+            <p style={{ fontSize: "13px", color: "#888" }}>
+              <strong>SKU:</strong> {product.reference || "-"} <br />
+              <strong>Category:</strong> {product.category?.name || "-"} <br />
+              <strong>Stock:</strong> {canAddToCart ? `${product.stock} available` : "Special order"} <br />
+              <strong>Discount:</strong> {Number(product.discount || 0) > 0 ? `${product.discount}%` : "No discount"}
+            </p>
           </div>
         </div>
       </main>
