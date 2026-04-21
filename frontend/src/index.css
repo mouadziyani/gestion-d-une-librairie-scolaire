@@ -5518,6 +5518,21 @@ textarea::placeholder {
     flex: 0 0 auto;
 }
 
+.nav-notification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #d92d20;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0;
+}
+
 .nav-pages-menu .nav-dropdown-item {
     padding: 10px 12px;
 }

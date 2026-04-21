@@ -32,11 +32,13 @@ function Notifications() {
   async function handleMarkAll() {
     await markAllNotificationsRead();
     await loadNotifications();
+    window.dispatchEvent(new Event("bougdim:notifications-changed"));
   }
 
   async function handleMarkOne(id) {
     await markNotificationRead(id);
     await loadNotifications();
+    window.dispatchEvent(new Event("bougdim:notifications-changed"));
   }
 
   return (

@@ -1,74 +1,102 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { getNotifications, markAllNotificationsRead, markNotificationRead } from "../../services/notificationService";
+
+function getIcon(type) {
+  if (type === "order") return { icon: "ORD", className: "icon-order" };
+  if (type === "stock") return { icon: "STK", className: "icon-stock" };
+  if (type === "special_order") return { icon: "REQ", className: "icon-system" };
+  return { icon: "SYS", className: "icon-system" };
+}
 
 function Notifications() {
-  const notifications = [
-    {
-      id: 1,
-      type: "order",
-      title: "New Order Received",
-      msg: "Customer #2901 placed an order for 5 'Stylo BIC' and 2 'Cahier Selecta'.",
-      time: "2 mins ago",
-      isUnread: true
-    },
-    {
-      id: 2,
-      type: "stock",
-      title: "Low Stock Alert",
-      msg: "Scientific Calculators (Casio fx-991) are below threshold (2 items left).",
-      time: "1 hour ago",
-      isUnread: true
-    },
-    {
-      id: 3,
-      type: "system",
-      title: "System Backup Complete",
-      msg: "Cloud backup for Library BOUGDIM database was successful.",
-      time: "5 hours ago",
-      isUnread: false
-    }
-  ];
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const getIcon = (type) => {
-    if (type === "order") return { icon: "📦", class: "icon-order" };
-    if (type === "stock") return { icon: "⚠️", class: "icon-stock" };
-    return { icon: "⚙️", class: "icon-system" };
-  };
+  async function loadNotifications() {
+    try {
+      const data = await getNotifications();
+      setNotifications(Array.isArray(data) ? data : []);
+      setError("");
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to load notifications.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadNotifications();
+  }, []);
+
+  async function handleMarkAll() {
+    await markAllNotificationsRead();
+    await loadNotifications();
+    window.dispatchEvent(new Event("bougdim:notifications-changed"));
+  }
+
+  async function handleMarkOne(id) {
+    await markNotificationRead(id);
+    await loadNotifications();
+    window.dispatchEvent(new Event("bougdim:notifications-changed"));
+  }
 
   return (
     <div className="notif-wrapper">
       <header className="notif-header">
         <div>
-          <span className="notif-eyebrow">
-            ADMIN / UPDATES
-          </span>
+          <span className="notif-eyebrow">ACCOUNT / UPDATES</span>
           <h2 className="notif-title">Notifications</h2>
         </div>
-        <button className="btn-mark-all">Mark all as read</button>
+        <button className="btn-mark-all" onClick={handleMarkAll} type="button">
+          Mark all as read
+        </button>
       </header>
 
-      <div className="notif-list">
-        {notifications.map((n) => {
-          const config = getIcon(n.type);
-          return (
-            <div key={n.id} className={`notif-card ${n.isUnread ? 'unread' : ''}`}>
-              <div className={`notif-icon ${config.class}`}>
-                {config.icon}
-              </div>
-              <div className="notif-content">
-                <h4>{n.title}</h4>
-                <p>{n.msg}</p>
-                <span className="notif-time">{n.time}</span>
-              </div>
-              {n.isUnread && <div className="notif-unread-dot"></div>}
-            </div>
-          );
-        })}
-      </div>
+      {error ? <p className="form-alert form-alert-error">{error}</p> : null}
 
-      <div className="notif-load-more">
-        <button className="notif-load-more-button">
-          Load Older Notifications
-        </button>
+      <div className="notif-list">
+        {!loading ? (
+          notifications.length ? (
+            notifications.map((notification) => {
+              const config = getIcon(notification.type);
+
+              return (
+                <div key={notification.id} className={`notif-card ${notification.is_read ? "" : "unread"}`}>
+                  <div className={`notif-icon ${config.className}`}>{config.icon}</div>
+                  <div className="notif-content">
+                    <h4>{notification.type?.replace(/_/g, " ") || "Notification"}</h4>
+                    <p>{notification.message}</p>
+                    <span className="notif-time">{notification.created_at || "Just now"}</span>
+                  </div>
+                  {!notification.is_read ? (
+                    <button
+                      type="button"
+                      className="btn-mark-all notif-mark-one"
+                      onClick={() => handleMarkOne(notification.id)}
+                    >
+                      Mark read
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })
+          ) : (
+            <div className="notif-card">
+              <div className="notif-content">
+                <h4>No notifications yet</h4>
+                <p>You will see order, stock, and system updates here.</p>
+              </div>
+            </div>
+          )
+        ) : (
+          <div className="notif-card">
+            <div className="notif-content">
+              <h4>Loading...</h4>
+              <p>Please wait.</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

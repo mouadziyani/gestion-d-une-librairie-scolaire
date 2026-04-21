@@ -4,6 +4,7 @@ import { Bell, ChevronDown, LogOut, Menu, Search, UserRound, X } from "lucide-re
 import logo from "../assets/logo/library.png";
 import { AuthContext } from "../context/AuthContext";
 import { getCategories } from "../services/categoryService";
+import { getUnreadNotificationCount } from "../services/notificationService";
 
 function Navbar() {
   const [categories, setCategories] = useState([]);
@@ -12,6 +13,7 @@ function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [, setPreferencesTick] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useContext(AuthContext);
@@ -62,6 +64,44 @@ function Navbar() {
       window.removeEventListener("bougdim:site-preferences-changed", handlePreferencesChange);
     };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadUnreadNotifications() {
+      if (!isAuthenticated) {
+        setUnreadNotifications(0);
+        return;
+      }
+
+      try {
+        const count = await getUnreadNotificationCount();
+        if (active) {
+          setUnreadNotifications(count);
+        }
+      } catch {
+        if (active) {
+          setUnreadNotifications(0);
+        }
+      }
+    }
+
+    loadUnreadNotifications();
+
+    const intervalId = window.setInterval(loadUnreadNotifications, 30000);
+
+    function handleNotificationsChanged() {
+      loadUnreadNotifications();
+    }
+
+    window.addEventListener("bougdim:notifications-changed", handleNotificationsChanged);
+
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener("bougdim:notifications-changed", handleNotificationsChanged);
+    };
+  }, [isAuthenticated, location.pathname, roleSlug]);
 
   async function handleLogout() {
     try {
@@ -167,6 +207,11 @@ function Navbar() {
           <Link to={notificationsPath} className="nav-action-button nav-notification-link" onClick={closeMenus}>
             <Bell size={16} />
             Notifications
+            {unreadNotifications > 0 ? (
+              <span className="nav-notification-badge" aria-label={`${unreadNotifications} unread notifications`}>
+                {unreadNotifications > 9 ? "9+" : unreadNotifications}
+              </span>
+            ) : null}
           </Link>
         ) : null}
 
