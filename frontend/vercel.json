@@ -7,6 +7,10 @@
     {
       "source": "/storage/:path*",
       "destination": "http://3.126.51.205/storage/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ]
 }
