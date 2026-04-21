@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, Menu, Search, UserRound, X } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Menu, Search, UserRound, X } from "lucide-react";
 import logo from "../assets/logo/library.png";
 import { AuthContext } from "../context/AuthContext";
 import { getCategories } from "../services/categoryService";
@@ -17,6 +17,8 @@ function Navbar() {
   const { logout, user } = useContext(AuthContext);
 
   const isAuthenticated = !!user;
+  const roleSlug = (user?.role?.slug || "").toLowerCase();
+  const notificationsPath = roleSlug === "client" ? "/client/notifications" : "/Notifications";
 
   useEffect(() => {
     let active = true;
@@ -160,6 +162,13 @@ function Navbar() {
         <Link to="/pages" className="nav-action-button nav-pages-link" onClick={closeMenus}>
           Pages
         </Link>
+
+        {isAuthenticated ? (
+          <Link to={notificationsPath} className="nav-action-button nav-notification-link" onClick={closeMenus}>
+            <Bell size={16} />
+            Notifications
+          </Link>
+        ) : null}
 
         <div
           className={`nav-dropdown ${profileOpen ? "open" : ""}`}
