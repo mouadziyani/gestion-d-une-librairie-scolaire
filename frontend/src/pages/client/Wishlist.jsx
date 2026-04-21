@@ -3,28 +3,8 @@ import { Link } from "react-router-dom";
 import Button from "../../components/Button";
 import { ShoppingCart, Trash2 } from "lucide-react";
 import { addToCart } from "../../services/cartService";
+import { getWishlistItems, saveWishlistItems } from "../../services/wishlistService";
 import { resolveMediaUrl } from "../../utils/media";
-
-const WISHLIST_KEY = "library_bougdim_wishlist";
-
-function readWishlist() {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(WISHLIST_KEY) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveWishlist(items) {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
-  }
-}
 
 function formatMoney(value) {
   return new Intl.NumberFormat("fr-MA", {
@@ -38,13 +18,13 @@ function Wishlist() {
   const [wishlistItems, setWishlistItems] = useState([]);
 
   useEffect(() => {
-    setWishlistItems(readWishlist());
+    setWishlistItems(getWishlistItems());
   }, []);
 
   function handleRemove(id) {
     const next = wishlistItems.filter((item) => String(item.id) !== String(id));
     setWishlistItems(next);
-    saveWishlist(next);
+    saveWishlistItems(next);
   }
 
   function handleMoveToCart(item) {

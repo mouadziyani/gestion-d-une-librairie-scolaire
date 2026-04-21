@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getProduct } from "../../services/productService";
 import { addToCart } from "../../services/cartService";
+import { addToWishlist, isInWishlist } from "../../services/wishlistService";
 import { resolveMediaUrl } from "../../utils/media";
 
 function formatMoney(value) {
@@ -17,6 +18,8 @@ function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState("");
   const productId = searchParams.get("productId");
 
@@ -37,6 +40,8 @@ function ProductDetail() {
         const data = await getProduct(productId);
         if (active) {
           setProduct(data);
+          setQuantity(1);
+          setWishlisted(isInWishlist(data?.id));
         }
       } catch (err) {
         if (active) {
@@ -69,9 +74,28 @@ function ProductDetail() {
       return;
     }
 
-    addToCart(product, 1);
+    addToCart(product, quantity);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
+  }
+
+  function handleQuantityChange(nextQuantity) {
+    if (!product) {
+      return;
+    }
+
+    const stock = Number(product.stock || 0);
+    const cappedQuantity = stock > 0 ? Math.min(Math.max(1, nextQuantity), stock) : 1;
+    setQuantity(cappedQuantity);
+  }
+
+  function handleWishlist() {
+    if (!product) {
+      return;
+    }
+
+    addToWishlist(product);
+    setWishlisted(true);
   }
 
   if (loading) {
@@ -91,39 +115,83 @@ function ProductDetail() {
   }
 
   const imageSrc = resolveMediaUrl(product.image_url) || "https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=500";
+  const hasDiscount = Number(product.discount || 0) > 0;
+  const stockCount = Number(product.stock || 0);
 
   return (
     <div className="product-detail-page">
       <main className="detail-wrapper">
-        <div className="detail-image-box">
-          <img src={imageSrc} alt={product.name} />
-        </div>
+        <section className="detail-media-panel">
+          <div className="detail-image-box">
+            <img src={imageSrc} alt={product.name} />
+          </div>
+          <div className="detail-media-strip">
+            <span>{product.reference || "NO-REF"}</span>
+            <strong>{product.category?.name || "Product"}</strong>
+          </div>
+        </section>
 
         <div className="detail-info-box">
-          <span className="brand">{product.category?.name || "Product"}</span>
+          <div className="detail-badges-row">
+            <span className="brand">{product.category?.name || "Product"}</span>
+            {hasDiscount ? <span className="detail-discount-badge">-{product.discount}%</span> : null}
+          </div>
           <h1>{product.name}</h1>
-          <span className="price-tag">{formatMoney(product.price)}</span>
+          <div className="detail-price-row">
+            <span className="price-tag">{formatMoney(product.price)}</span>
+            <span className={canAddToCart ? "detail-stock-pill is-available" : "detail-stock-pill"}>
+              {canAddToCart ? `${stockCount} in stock` : "Special order"}
+            </span>
+          </div>
 
           <div className="detail-description">
             <p>{product.description || "No description available."}</p>
           </div>
 
-          <div className="detail-actions">
-            <button className="btn-cart" type="button" onClick={handleAddToCart} disabled={!canAddToCart}>
-              {canAddToCart ? (added ? "Added to Cart" : "Add to Cart") : "Special Order"}
-            </button>
-            <Link to="/Cart" className="btn-wishlist">
-              View Cart
-            </Link>
+          <div className="detail-purchase-panel">
+            <div className="detail-quantity-row">
+              <span>Quantity</span>
+              <div className="detail-quantity-stepper">
+                <button type="button" onClick={() => handleQuantityChange(quantity - 1)} disabled={!canAddToCart || quantity <= 1}>
+                  -
+                </button>
+                <strong>{quantity}</strong>
+                <button type="button" onClick={() => handleQuantityChange(quantity + 1)} disabled={!canAddToCart || quantity >= stockCount}>
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="detail-actions">
+              <button className="btn-cart" type="button" onClick={handleAddToCart} disabled={!canAddToCart}>
+                {canAddToCart ? (added ? `${quantity} Added` : "Add to Cart") : "Special Order"}
+              </button>
+              <button className="btn-wishlist" type="button" onClick={handleWishlist} disabled={wishlisted}>
+                {wishlisted ? "In Wishlist" : "Add to Wishlist"}
+              </button>
+              <Link to="/Cart" className="btn-wishlist">
+                View Cart
+              </Link>
+            </div>
           </div>
 
-          <div style={{ marginTop: "40px", borderTop: "1px solid #eee", paddingTop: "20px" }}>
-            <p style={{ fontSize: "13px", color: "#888" }}>
-              <strong>SKU:</strong> {product.reference || "-"} <br />
-              <strong>Category:</strong> {product.category?.name || "-"} <br />
-              <strong>Stock:</strong> {canAddToCart ? `${product.stock} available` : "Special order"} <br />
-              <strong>Discount:</strong> {Number(product.discount || 0) > 0 ? `${product.discount}%` : "No discount"}
-            </p>
+          <div className="detail-spec-grid">
+            <div>
+              <span>SKU</span>
+              <strong>{product.reference || "-"}</strong>
+            </div>
+            <div>
+              <span>Category</span>
+              <strong>{product.category?.name || "-"}</strong>
+            </div>
+            <div>
+              <span>Stock</span>
+              <strong>{canAddToCart ? `${product.stock} available` : "Special order"}</strong>
+            </div>
+            <div>
+              <span>Discount</span>
+              <strong>{hasDiscount ? `${product.discount}%` : "No discount"}</strong>
+            </div>
           </div>
         </div>
       </main>

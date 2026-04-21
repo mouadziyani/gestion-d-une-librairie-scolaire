@@ -9817,3 +9817,175 @@ textarea {
         grid-template-columns: 1fr;
     }
 }
+
+/* Product detail refresh */
+.detail-media-panel {
+    min-width: 0;
+    display: grid;
+    gap: 14px;
+}
+
+.detail-media-panel .detail-image-box {
+    border: 1px solid #ececec;
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.06);
+}
+
+.detail-media-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.detail-media-strip span,
+.detail-spec-grid span,
+.detail-quantity-row > span {
+    color: #888888;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.detail-media-strip strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+}
+
+.detail-badges-row,
+.detail-price-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.detail-discount-badge,
+.detail-stock-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.detail-discount-badge {
+    background: #fff1f0;
+    color: #cf1322;
+}
+
+.detail-stock-pill {
+    background: #f4f4f5;
+    color: #52525b;
+}
+
+.detail-stock-pill.is-available {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.detail-purchase-panel {
+    display: grid;
+    gap: 18px;
+    margin: 28px 0;
+    padding: 18px;
+    border: 1px solid #eeeeee;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.detail-quantity-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.detail-quantity-stepper {
+    display: inline-grid;
+    grid-template-columns: 42px 54px 42px;
+    align-items: center;
+    min-height: 44px;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fcfcfc;
+}
+
+.detail-quantity-stepper button {
+    width: 42px;
+    height: 44px;
+    border: 0;
+    background: #ffffff;
+    color: #1a1a1a;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+.detail-quantity-stepper button:disabled {
+    cursor: not-allowed;
+    color: #b8b8b8;
+    background: #f6f6f6;
+}
+
+.detail-quantity-stepper strong {
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+}
+
+.detail-spec-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding-top: 22px;
+    border-top: 1px solid #eeeeee;
+}
+
+.detail-spec-grid div {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    background: #fcfcfc;
+}
+
+.detail-spec-grid strong {
+    display: block;
+    min-width: 0;
+    margin-top: 7px;
+    overflow-wrap: anywhere;
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .detail-purchase-panel {
+        padding: 14px;
+    }
+
+    .detail-quantity-row,
+    .detail-media-strip {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .detail-quantity-stepper {
+        width: 100%;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .detail-quantity-stepper button {
+        width: 100%;
+    }
+
+    .detail-spec-grid {
+        grid-template-columns: 1fr;
+    }
+}
