@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class DatabaseSeeder extends Seeder
@@ -19,16 +20,21 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 2. Get admin role safely (no hardcoded ID)
-        $adminRole = DB::table('roles')
-            ->where('slug', 'admin')
-            ->first();
+        $adminRole = DB::table('roles')->where('slug', 'admin')->first();
+
+        if (! $adminRole) {
+            throw new \RuntimeException('Admin role was not seeded.');
+        }
 
         // 3. Create test user
-        User::factory()->create([
-            'name' => 'Mouad Ziyani',
-            'email' => 'contact@mouadziyani.com',
-            'password' => bcrypt('02122023M'),
-            'role_id' => $adminRole?->id,
-        ]);
+        User::query()->updateOrCreate(
+            ['email' => 'contact@mouadziyani.com'],
+            [
+                'name' => 'Mouad Ziyani',
+                'password' => Hash::make('02122023M'),
+                'role_id' => $adminRole->id,
+                'email_verified_at' => now(),
+            ]
+        );
     }
 } 
