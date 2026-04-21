@@ -102,14 +102,6 @@ class AdminUserController extends Controller
             $data['password'] = Hash::make($data['password']);
         }
 
-        if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo) {
-                Storage::disk('public')->delete($user->profile_photo);
-            }
-
-            $data['profile_photo'] = $request->file('profile_photo')->store('profile-photos', 'public');
-        }
-
         $user->update($data);
 
         return response()->json([

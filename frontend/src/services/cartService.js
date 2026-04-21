@@ -1,4 +1,5 @@
 const CART_KEY = "library_bougdim_cart";
+export const CART_CHANGED_EVENT = "library-bougdim:cart-changed";
 
 function getProductImage(product) {
   return product.image_url || product.imageUrl || product.img || product.image || "";
@@ -34,6 +35,13 @@ function writeCart(items) {
   }
 
   window.localStorage.setItem(CART_KEY, JSON.stringify(items));
+  window.dispatchEvent(
+    new CustomEvent(CART_CHANGED_EVENT, {
+      detail: {
+        items,
+      },
+    }),
+  );
 }
 
 export function getCartItems() {

@@ -29,7 +29,7 @@ class AdminUserRequest extends FormRequest
             'role_id' => $isUpdate ? 'required|integer|exists:roles,id' : 'nullable|integer|exists:roles,id',
             'role_slug' => $isUpdate ? 'prohibited' : 'required|string|in:client,user,moderator',
             'password' => 'nullable|confirmed|min:8',
-            'profile_photo' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
+            'profile_photo' => $isUpdate ? 'prohibited' : 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
         ];
     }
 }

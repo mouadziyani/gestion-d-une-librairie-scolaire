@@ -11,7 +11,6 @@ function EditUser() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [profilePhoto, setProfilePhoto] = useState(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -77,20 +76,17 @@ function EditUser() {
     setError("");
 
     try {
-      const payload = new FormData();
-      payload.append("name", form.name);
-      payload.append("email", form.email);
-      payload.append("phone", form.phone);
-      payload.append("address", form.address);
-      payload.append("role_id", form.role_id);
+      const payload = {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        address: form.address,
+        role_id: form.role_id,
+      };
 
       if (form.password) {
-        payload.append("password", form.password);
-        payload.append("password_confirmation", form.password_confirmation);
-      }
-
-      if (profilePhoto) {
-        payload.append("profile_photo", profilePhoto);
+        payload.password = form.password;
+        payload.password_confirmation = form.password_confirmation;
       }
 
       await updateAdminUser(userId, payload);
@@ -112,7 +108,7 @@ function EditUser() {
         <div>
           <span className="eyebrow-label">ADMIN / USERS</span>
           <h1 className="page-shell-title">Edit User</h1>
-          <p className="page-shell-subtitle">Update the account, role, or profile photo.</p>
+          <p className="page-shell-subtitle">Update the account details, role, or password.</p>
         </div>
         <Link to="/admin/users" className="btn-archive">
           Back to list
@@ -167,11 +163,6 @@ function EditUser() {
               value={form.password_confirmation}
               onChange={handleChange}
             />
-          </div>
-
-          <div className="input-group full-row">
-            <label htmlFor="profile_photo">Profile Photo</label>
-            <input id="profile_photo" type="file" accept="image/*" onChange={(event) => setProfilePhoto(event.target.files?.[0] || null)} />
           </div>
 
           {error ? <p className="form-alert form-alert-error full-row">{error}</p> : null}
