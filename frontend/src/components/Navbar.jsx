@@ -9,8 +9,6 @@ import { getUnreadNotificationCount } from "../services/notificationService";
 import { formatDh } from "../data/catalog";
 import { resolveMediaUrl } from "../utils/media";
 
-const fallbackCartImage = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=220";
-
 function Navbar() {
   const [categories, setCategories] = useState([]);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -348,12 +346,12 @@ function Navbar() {
           <>
             <div className="cart-drawer-list">
               {cartItems.map((item) => {
-                const imageSrc = resolveMediaUrl(item.image_url || item.img || item.image) || fallbackCartImage;
+                const imageSrc = resolveMediaUrl(item.image_url || item.img || item.image);
                 const stockLimitReached = Number(item.stock || 0) > 0 && Number(item.quantity || 0) >= Number(item.stock || 0);
 
                 return (
                   <article className="cart-drawer-item" key={item.id}>
-                    <img src={imageSrc} alt={item.name} />
+                    {imageSrc ? <img src={imageSrc} alt={item.name} /> : <div className="cart-drawer-image-placeholder">No image</div>}
                     <div className="cart-drawer-item-body">
                       <div className="cart-drawer-item-head">
                         <h3>{item.name}</h3>

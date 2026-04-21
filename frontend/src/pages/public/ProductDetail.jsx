@@ -114,7 +114,7 @@ function ProductDetail() {
     );
   }
 
-  const imageSrc = resolveMediaUrl(product.image_url) || "https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=500";
+  const imageSrc = resolveMediaUrl(product.image_url);
   const hasDiscount = Number(product.discount || 0) > 0;
   const stockCount = Number(product.stock || 0);
 
@@ -123,7 +123,7 @@ function ProductDetail() {
       <main className="detail-wrapper">
         <section className="detail-media-panel">
           <div className="detail-image-box">
-            <img src={imageSrc} alt={product.name} />
+            {imageSrc ? <img src={imageSrc} alt={product.name} /> : <div className="detail-image-placeholder">No image selected</div>}
           </div>
           <div className="detail-media-strip">
             <span>{product.reference || "NO-REF"}</span>

@@ -240,12 +240,12 @@ function Products() {
                 filteredProducts.map((product) => {
                   const isAvailable = product.status === "active" && Number(product.is_available) !== 0;
                   const categoryLabel = product.category?.name || product.cat || "-";
-                  const imageSrc = resolveMediaUrl(product.image_url) || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=500";
+                  const imageSrc = resolveMediaUrl(product.image_url);
 
                   return (
                     <Link to={`/ProductDetail?productId=${product.id}`} className="product-item" key={product.id}>
                       <div className="product-img-holder">
-                        <img src={imageSrc} alt={product.name} />
+                        {imageSrc ? <img src={imageSrc} alt={product.name} /> : <div className="product-image-placeholder">No image</div>}
                       </div>
                       <div className="product-info">
                         <span className="product-category">{categoryLabel}</span>

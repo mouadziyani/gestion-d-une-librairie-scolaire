@@ -1,15 +1,10 @@
-import styloBleu from "../assets/products/stylo-a-bille-bleu-bic-cristal.jpg";
-import styloRouge from "../assets/products/stylo-a-bille-rouge-bic-cristal.jpg";
-import styloVert from "../assets/products/stylo-a-bille-vert-bic-cristal.jpg";
-import styloNoir from "../assets/products/stylos-a-bille-noir-bic-cristal.jpg";
-
 export const CATALOG = [
   {
     id: 1,
-    name: "Stylo à bille Bleu - BIC",
+    name: "Stylo a bille Bleu - BIC",
     price: 1.5,
     cat: "Supplies",
-    img: styloBleu,
+    img: "",
     status: "active",
     reference: "BIC-001",
     stock: 12,
@@ -18,10 +13,10 @@ export const CATALOG = [
   },
   {
     id: 2,
-    name: "Stylo à bille Rouge - BIC",
+    name: "Stylo a bille Rouge - BIC",
     price: 1.5,
     cat: "Supplies",
-    img: styloRouge,
+    img: "",
     status: "active",
     reference: "BIC-002",
     stock: 11,
@@ -30,10 +25,10 @@ export const CATALOG = [
   },
   {
     id: 3,
-    name: "Stylo à bille Vert - BIC",
+    name: "Stylo a bille Vert - BIC",
     price: 1.5,
     cat: "Supplies",
-    img: styloVert,
+    img: "",
     status: "active",
     reference: "BIC-003",
     stock: 10,
@@ -42,10 +37,10 @@ export const CATALOG = [
   },
   {
     id: 4,
-    name: "Stylo à bille Noir - BIC",
+    name: "Stylo a bille Noir - BIC",
     price: 1.5,
     cat: "Supplies",
-    img: styloNoir,
+    img: "",
     status: "active",
     reference: "BIC-004",
     stock: 9,
@@ -57,7 +52,7 @@ export const CATALOG = [
     name: "Mathematics Grade 6",
     price: 120,
     cat: "Textbooks",
-    img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=500",
+    img: "",
     status: "active",
     reference: "TXT-006",
     stock: 6,
@@ -68,7 +63,7 @@ export const CATALOG = [
     name: "Chemistry Starter Kit",
     price: 350,
     cat: "Supplies",
-    img: "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=500",
+    img: "",
     status: "inactive",
     reference: "KIT-201",
     stock: 0,
@@ -79,4 +74,3 @@ export const CATALOG = [
 export function formatDh(amount) {
   return `${Number(amount || 0).toFixed(2)} DH`;
 }
-

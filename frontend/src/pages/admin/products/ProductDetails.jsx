@@ -140,7 +140,7 @@ function ProductDetailsAdmin() {
     );
   }
 
-  const imageSrc = resolveMediaUrl(product.image_url) || "https://via.placeholder.com/600x600?text=No+Image";
+  const imageSrc = resolveMediaUrl(product.image_url);
 
   return (
     <div className="admin-detail-wrapper">
@@ -152,7 +152,7 @@ function ProductDetailsAdmin() {
       <div className="admin-card">
         <div className="admin-product-side">
           <div className="admin-product-img">
-            <img src={imageSrc} alt={product.name} />
+            {imageSrc ? <img src={imageSrc} alt={product.name} /> : <span>No image selected</span>}
           </div>
           <div className="admin-actions-bar" style={{ flexDirection: "column" }}>
             <Link

@@ -4,8 +4,6 @@ import { clearCart, getCartItems, getCartTotals, removeCartItem, updateCartItem 
 import { formatDh } from "../../data/catalog";
 import { resolveMediaUrl } from "../../utils/media";
 
-const fallbackProductImage = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=300";
-
 function Cart() {
   const navigate = useNavigate();
   const [cart, setCart] = useState(() => getCartItems());
@@ -59,14 +57,14 @@ function Cart() {
                 </thead>
                 <tbody>
                   {cart.map((item) => {
-                    const imageSrc = resolveMediaUrl(item.image_url || item.img || item.image) || fallbackProductImage;
+                    const imageSrc = resolveMediaUrl(item.image_url || item.img || item.image);
                     const stockLimitReached = Number(item.stock || 0) > 0 && Number(item.quantity || 0) >= Number(item.stock || 0);
 
                     return (
                     <tr className="cart-item-row" key={item.id}>
                       <td>
                         <div className="cart-product-info">
-                          <img src={imageSrc} alt={item.name} className="cart-img" />
+                          {imageSrc ? <img src={imageSrc} alt={item.name} className="cart-img" /> : <div className="cart-img cart-img-placeholder">No image</div>}
                           <div>
                             <h4 style={{ margin: 0 }}>{item.name}</h4>
                             <p style={{ fontSize: "12px", color: "#888", margin: "5px 0 0" }}>
