@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { clearCart, getCartItems, getCartTotals, removeCartItem, updateCartItem } from "../../services/cartService";
 import { formatDh } from "../../data/catalog";
+import { resolveMediaUrl } from "../../utils/media";
+
+const fallbackProductImage = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=300";
 
 function Cart() {
   const navigate = useNavigate();
@@ -55,16 +58,25 @@ function Cart() {
                   </tr>
                 </thead>
                 <tbody>
-                  {cart.map((item) => (
+                  {cart.map((item) => {
+                    const imageSrc = resolveMediaUrl(item.image_url || item.img || item.image) || fallbackProductImage;
+                    const stockLimitReached = Number(item.stock || 0) > 0 && Number(item.quantity || 0) >= Number(item.stock || 0);
+
+                    return (
                     <tr className="cart-item-row" key={item.id}>
                       <td>
                         <div className="cart-product-info">
-                          <img src={item.img} alt={item.name} className="cart-img" />
+                          <img src={imageSrc} alt={item.name} className="cart-img" />
                           <div>
                             <h4 style={{ margin: 0 }}>{item.name}</h4>
                             <p style={{ fontSize: "12px", color: "#888", margin: "5px 0 0" }}>
                               Ref: {item.reference || `#${item.id}`}
                             </p>
+                            {Number(item.stock || 0) > 0 ? (
+                              <p style={{ fontSize: "11px", color: "#aaa", margin: "4px 0 0" }}>
+                                Stock: {item.stock}
+                              </p>
+                            ) : null}
                           </div>
                         </div>
                       </td>
@@ -74,7 +86,7 @@ function Cart() {
                             -
                           </button>
                           <span>{item.quantity}</span>
-                          <button type="button" onClick={() => handleIncrease(item.id, item.quantity)}>
+                          <button type="button" onClick={() => handleIncrease(item.id, item.quantity)} disabled={stockLimitReached}>
                             +
                           </button>
                         </div>
@@ -90,7 +102,8 @@ function Cart() {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
 
