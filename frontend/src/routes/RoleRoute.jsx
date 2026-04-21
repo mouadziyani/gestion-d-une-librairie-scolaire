@@ -19,7 +19,7 @@ function RoleRoute({ children, allowedRoles = [] }) {
   const roleSlug = user?.role?.slug;
 
   if (!roleSlug) {
-    return null;
+    return loading ? null : <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (!hasAllowedRole(roleSlug, allowedRoles)) {

@@ -41,7 +41,7 @@ function useRegisterForm() {
 
         try {
             const response = await register(Form);
-            const roleSlug = response?.data?.user?.role?.slug;
+            const roleSlug = response?.data?.user?.role?.slug || response?.data?.data?.user?.role?.slug;
             navigate(getRoleHomePath(roleSlug));
         } catch (err) {
             setError(getErrorMessage(err, 'Registration failed.'));

@@ -24,7 +24,13 @@ function storeCachedUser(user) {
 }
 
 function readAuthPayload(response) {
-    return response?.data ?? response ?? {};
+    const payload = response?.data ?? response ?? {};
+    const data = payload?.data ?? payload;
+
+    return {
+        user: data?.user ?? null,
+        token: data?.token ?? null,
+    };
 }
 
 function AuthProvider({ children }) {
@@ -66,7 +72,9 @@ function AuthProvider({ children }) {
             const res = await authServices.registerUser(Form);
             const { user, token } = readAuthPayload(res);
 
-            localStorage.setItem('token', token);
+            if (token) {
+                localStorage.setItem('token', token);
+            }
             setUser(user);
             storeCachedUser(user);
 
@@ -81,7 +89,9 @@ function AuthProvider({ children }) {
             const res = await authServices.loginUser(Form);
             const { user, token } = readAuthPayload(res);
 
-            localStorage.setItem('token', token);
+            if (token) {
+                localStorage.setItem('token', token);
+            }
             setUser(user);
             storeCachedUser(user);
 

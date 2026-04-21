@@ -34,7 +34,7 @@ function useLoginForm() {
 
         try {
             const response = await login(Form);
-            const roleSlug = response?.data?.user?.role?.slug;
+            const roleSlug = response?.data?.user?.role?.slug || response?.data?.data?.user?.role?.slug;
             navigate(getRoleHomePath(roleSlug));
         } catch (err) {
             setError(getErrorMessage(err, 'Login failed.'));

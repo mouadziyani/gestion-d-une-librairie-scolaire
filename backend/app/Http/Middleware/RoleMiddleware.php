@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, string $roles)
+    public function handle(Request $request, Closure $next, string ...$roles)
     {
         $user = $request->user();
 
@@ -21,7 +21,7 @@ class RoleMiddleware
 
         $allowedRoles = array_values(array_filter(array_map(
             fn ($role) => strtolower(trim($role)),
-            explode(',', $roles)
+            preg_split('/,/', implode(',', $roles))
         )));
 
         $userRole = strtolower($user->role?->slug ?? '');
