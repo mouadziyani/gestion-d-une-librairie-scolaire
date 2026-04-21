@@ -4,13 +4,30 @@ function normalizeApiBaseUrl(url) {
   return String(url || "").replace(/\/+$/, "");
 }
 
-const defaultApiBaseUrl = import.meta.env.DEV
-  ? "http://3.126.51.205/api"
-  : `${window.location.origin}/api`;
+function sameOriginApiBaseUrl() {
+  return `${window.location.origin}/api`;
+}
 
-export const API_BASE_URL = normalizeApiBaseUrl(
-  import.meta.env.VITE_API_BASE_URL || defaultApiBaseUrl,
-);
+function resolveApiBaseUrl(url) {
+  const configuredUrl = normalizeApiBaseUrl(url);
+  const defaultApiBaseUrl = import.meta.env.DEV
+    ? "http://3.126.51.205/api"
+    : sameOriginApiBaseUrl();
+
+  const candidateUrl = configuredUrl || defaultApiBaseUrl;
+
+  if (window.location.protocol === "https:" && candidateUrl.startsWith("http://")) {
+    return sameOriginApiBaseUrl();
+  }
+
+  if (candidateUrl.startsWith("/")) {
+    return `${window.location.origin}${candidateUrl}`;
+  }
+
+  return candidateUrl;
+}
+
+export const API_BASE_URL = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
