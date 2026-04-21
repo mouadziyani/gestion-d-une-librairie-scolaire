@@ -32,7 +32,7 @@ function SupplierDetails() {
         <div>
           <span className="eyebrow-label">ADMIN / SUPPLIERS</span>
           <h1 className="page-shell-title">Supplier Details</h1>
-          <p className="page-shell-subtitle">View the supplier info stored locally in the browser.</p>
+          <p className="page-shell-subtitle">View supplier information from the central database.</p>
         </div>
         <Link to="/admin/suppliers" className="btn-archive">Back to list</Link>
       </header>

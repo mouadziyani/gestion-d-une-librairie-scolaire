@@ -44,6 +44,8 @@ class AuthController extends Controller
             'role_id' => $clientRole->id,
         ]);
 
+        $user->sendEmailVerificationNotification();
+
         return $this->tokenResponse($user, 'The operation was successful', 201);
     }
 

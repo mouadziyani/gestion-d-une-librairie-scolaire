@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SpecialOrderController;
 use App\Http\Controllers\Api\AdminUserController;
 use App\Http\Controllers\Api\SitePreferenceController;
+use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,23 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/user', [AuthController::class, 'me']);
+    Route::post('/email/verification-notification', function (\Illuminate\Http\Request $request) {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => true,
+                'data' => (object) [],
+                'message' => 'Email already verified.',
+            ]);
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return response()->json([
+            'success' => true,
+            'data' => (object) [],
+            'message' => 'Verification link sent.',
+        ]);
+    })->middleware('throttle:6,1')->name('verification.send');
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::delete('/profile', [AuthController::class, 'destroyProfile']);
 
@@ -81,6 +99,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/schools/{id}', [SchoolController::class, 'update']);
         Route::delete('/schools/{id}', [SchoolController::class, 'destroy']);
 
+        Route::get('/suppliers', [SupplierController::class, 'index']);
+        Route::post('/suppliers', [SupplierController::class, 'store']);
+        Route::get('/suppliers/{id}', [SupplierController::class, 'show']);
+        Route::put('/suppliers/{id}', [SupplierController::class, 'update']);
+        Route::patch('/suppliers/{id}', [SupplierController::class, 'update']);
+        Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy']);
+
         Route::post('/orders', [OrderController::class, 'store']);
         Route::get('/orders', [OrderController::class, 'index']);
         Route::get('/orders/{id}', [OrderController::class, 'show']);
@@ -110,7 +135,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/reports/sales/export', [SalesReportController::class, 'export']);
         Route::get('/reports/sales/pdf', [SalesReportController::class, 'exportPdf']);
 
+        Route::get('/invoices', [InvoiceController::class, 'index']);
         Route::post('/invoices', [InvoiceController::class, 'store']);
+        Route::get('/invoices/{id}', [InvoiceController::class, 'show']);
+        Route::put('/invoices/{id}', [InvoiceController::class, 'update']);
+        Route::patch('/invoices/{id}', [InvoiceController::class, 'update']);
+        Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy']);
     });
 
     Route::middleware('role:admin')->prefix('admin/users')->group(function () {

@@ -3,7 +3,7 @@ import React from "react";
 function Table({ columns = [], data = [], actions }) {
   return (
     <div className="table-container">
-      <table className="custom-table">
+      <table className="custom-table responsive-table">
         <thead>
           <tr>
             {columns.map((col, index) => (
@@ -17,10 +17,10 @@ function Table({ columns = [], data = [], actions }) {
             data.map((item, rowIndex) => (
               <tr key={rowIndex}>
                 {Object.values(item).map((val, colIndex) => (
-                  <td key={colIndex}>{val}</td>
+                  <td key={colIndex} data-label={columns[colIndex] || ""}>{val}</td>
                 ))}
                 {actions && (
-                  <td>
+                  <td data-label="Actions">
                     <div style={{ display: 'flex', gap: '10px' }}>
                       {actions(item)}
                     </div>

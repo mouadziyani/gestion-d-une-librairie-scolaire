@@ -8801,3 +8801,97 @@ textarea {
         min-height: 220px;
     }
 }
+
+/* Final mobile audit overrides */
+@media (max-width: 1023px) {
+    .summary-card {
+        position: static;
+        top: auto;
+    }
+
+    .checkout-wrapper {
+        margin: 24px auto 48px;
+        gap: 22px;
+    }
+
+    .payment-method-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .stripe-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 760px) {
+    .table-scroll,
+    .table-wrapper,
+    .table-container,
+    .admin-table-wrapper,
+    .data-table-container,
+    .admin-table-card,
+    .table-container-portal,
+    .dashboard-wrapper .table-container,
+    .dashboard-container .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-scroll:has(.responsive-table),
+    .table-wrapper:has(.responsive-table),
+    .table-container:has(.responsive-table),
+    .admin-table-card:has(.responsive-table),
+    .dashboard-wrapper .table-container:has(.responsive-table),
+    .dashboard-container .table-scroll:has(.responsive-table) {
+        overflow: visible;
+    }
+
+    .table-scroll table:not(.responsive-table),
+    .table-wrapper table:not(.responsive-table),
+    .table-container table:not(.responsive-table),
+    .admin-table-wrapper table:not(.responsive-table),
+    .data-table-container table:not(.responsive-table),
+    .admin-table-card table:not(.responsive-table),
+    .table-container-portal table:not(.responsive-table),
+    .dashboard-wrapper .table-container table:not(.responsive-table),
+    .dashboard-container .table-scroll table:not(.responsive-table) {
+        min-width: 680px;
+    }
+
+    .summary-card,
+    .checkout-form-section {
+        padding: 18px;
+        border-radius: 18px;
+    }
+
+    .checkout-form-section h2 {
+        margin-bottom: 20px;
+    }
+
+    .summary-row,
+    .summary-total {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .stripe-payment-panel,
+    .stripe-element-shell {
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 430px) {
+    .checkout-wrapper {
+        padding-inline: 12px;
+    }
+
+    .payment-method-card {
+        padding: 13px;
+    }
+
+    .stripe-actions .btn-elegant,
+    .stripe-actions .btn-wishlist {
+        width: 100%;
+    }
+}

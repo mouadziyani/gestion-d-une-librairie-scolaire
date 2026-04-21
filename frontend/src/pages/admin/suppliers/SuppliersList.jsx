@@ -12,10 +12,15 @@ function SuppliersList() {
     let active = true;
 
     async function loadSuppliers() {
-      const data = await listSuppliers();
-      if (active) {
-        setSuppliers(Array.isArray(data) ? data : []);
-        setLoading(false);
+      try {
+        const data = await listSuppliers();
+        if (active) {
+          setSuppliers(Array.isArray(data) ? data : []);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 

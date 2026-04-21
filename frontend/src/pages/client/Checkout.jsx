@@ -7,17 +7,12 @@ import { createStripePaymentIntent } from "../../services/stripeService";
 import { api } from "../../services/api";
 import { formatDh } from "../../data/catalog";
 import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 
 const stripePublishableKey =
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
   import.meta.env.VITE_APP_STRIPE_PUBLISHABLE_KEY ||
   import.meta.env.STRIPE_PUBLISHABLE_KEY ||
   "";
-
-const stripePromise = stripePublishableKey
-  ? loadStripe(stripePublishableKey)
-  : null;
 
 const stripeAppearance = {
   theme: "stripe",
@@ -164,6 +159,7 @@ function Checkout() {
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState("");
   const [stripeIntent, setStripeIntent] = useState(null);
+  const [stripePromise, setStripePromise] = useState(null);
   const [stripeLoading, setStripeLoading] = useState(false);
   const [stripeError, setStripeError] = useState("");
   const [schools, setSchools] = useState([]);
@@ -230,11 +226,24 @@ function Checkout() {
         return;
       }
 
-      if (!stripePromise) {
+      if (!stripePublishableKey) {
         setStripeIntent(null);
         setStripeError("Stripe is not configured yet. Please use cash.");
         setStripeLoading(false);
         return;
+      }
+
+      let activeStripePromise = stripePromise;
+
+      if (!activeStripePromise) {
+        const { loadStripe } = await import("@stripe/stripe-js");
+        activeStripePromise = loadStripe(stripePublishableKey);
+
+        if (!active) {
+          return;
+        }
+
+        setStripePromise(activeStripePromise);
       }
 
       try {
@@ -271,7 +280,7 @@ function Checkout() {
     return () => {
       active = false;
     };
-  }, [cart, form.payment_method, form.school_id]);
+  }, [cart, form.payment_method, form.school_id, stripePromise]);
 
   const totals = useMemo(() => getCartTotals(cart), [cart]);
   const successReference = success?.payment?.reference || (success?.order?.id ? `ORD-${success.order.id}` : "Validated successfully");

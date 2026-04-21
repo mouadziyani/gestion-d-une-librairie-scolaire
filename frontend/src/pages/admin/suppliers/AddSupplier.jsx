@@ -23,8 +23,14 @@ function AddSupplier() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    await createSupplier(form);
-    navigate("/admin/suppliers");
+    setError("");
+
+    try {
+      await createSupplier(form);
+      navigate("/admin/suppliers");
+    } catch (submitError) {
+      setError(submitError?.response?.data?.message || "Unable to create supplier.");
+    }
   }
 
   return (
@@ -33,7 +39,7 @@ function AddSupplier() {
         <div>
           <span className="eyebrow-label">ADMIN / SUPPLIERS</span>
           <h1 className="page-shell-title">Add Supplier</h1>
-          <p className="page-shell-subtitle">Create a supplier record stored locally for now.</p>
+          <p className="page-shell-subtitle">Create a supplier record in the central database.</p>
         </div>
       </header>
 

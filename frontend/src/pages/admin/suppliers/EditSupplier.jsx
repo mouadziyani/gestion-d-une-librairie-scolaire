@@ -15,6 +15,7 @@ function EditSupplier() {
     status: "active",
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -50,8 +51,14 @@ function EditSupplier() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    await updateSupplier(supplierId, form);
-    navigate("/admin/suppliers");
+    setError("");
+
+    try {
+      await updateSupplier(supplierId, form);
+      navigate("/admin/suppliers");
+    } catch (submitError) {
+      setError(submitError?.response?.data?.message || "Unable to update supplier.");
+    }
   }
 
   return (
@@ -60,7 +67,7 @@ function EditSupplier() {
         <div>
           <span className="eyebrow-label">ADMIN / SUPPLIERS</span>
           <h1 className="page-shell-title">Edit Supplier</h1>
-          <p className="page-shell-subtitle">Update the locally stored supplier record.</p>
+          <p className="page-shell-subtitle">Update this supplier record in the central database.</p>
         </div>
         <Link to="/admin/suppliers" className="btn-archive">Back to list</Link>
       </header>
@@ -99,6 +106,7 @@ function EditSupplier() {
               <button type="button" className="btn-archive" onClick={() => navigate("/admin/suppliers")}>Cancel</button>
               <button type="submit" className="btn-save">Save Changes</button>
             </div>
+            {error ? <p className="form-alert form-alert-error full-row">{error}</p> : null}
           </form>
         ) : null}
       </section>
