@@ -79,7 +79,7 @@ function Home() {
     async function loadData() {
       try {
         const [productData, categoryData] = await Promise.all([
-          getProducts({ page: 1, per_page: 8, status: "available", sort: "discount" }),
+          getProducts({ page: 1, per_page: 24, status: "available", sort: "discount" }),
           getCategories(),
         ]);
         if (!active) {
@@ -130,6 +130,17 @@ function Home() {
     [activeProducts],
   );
 
+  const landingProducts = useMemo(
+    () =>
+      [...activeProducts]
+        .sort((a, b) => {
+          const discountDelta = Number(b.discount || 0) - Number(a.discount || 0);
+          return discountDelta || Number(b.stock || 0) - Number(a.stock || 0);
+        })
+        .slice(0, 16),
+    [activeProducts],
+  );
+
   const highlightedCategories = useMemo(
     () =>
       [...categories]
@@ -150,57 +161,76 @@ function Home() {
   return (
     <div className="home-wrapper home-landing-page">
       {sections.hero ? (
-        <section className="home-hero-grid">
-          <div className="home-hero-copy">
-            <span className="eyebrow-label">Librairie BOUGDIM 2026</span>
-            <h1>Everything a school needs, in one calm place.</h1>
+        <section className="home-hero-grid home-desk-hero">
+          <div className="home-hero-copy home-desk-copy">
+            <span className="eyebrow-label">Librairie BOUGDIM</span>
+            <h1>School supplies, sorted like a clean desk.</h1>
             <p>
-              Browse books, stationery, and special orders through a clear experience built for parents,
-              students, and schools.
+              Pick textbooks, notebooks, writing tools, and custom requests from a catalogue designed
+              for quick school shopping.
             </p>
 
             <div className="home-hero-actions">
               <Link to="/products" className="home-btn home-btn-primary">
-                Browse Collection
+                Browse products
+              </Link>
+              <Link to="/categories" className="home-btn home-btn-secondary">
+                View categories
               </Link>
               <Link to="/special-order" className="home-btn home-btn-secondary">
-                Special Order
+                Special order
               </Link>
             </div>
 
             {hasCatalogueData ? (
-              <div className="home-hero-chips">
-                <span>{activeProductsCount} active products</span>
-                <span>{categories.length} categories</span>
-                <span>{discountedProductsCount} discounted items</span>
+              <div className="home-desk-metrics">
+                <div>
+                  <strong>{activeProductsCount}</strong>
+                  <span>active products</span>
+                </div>
+                <div>
+                  <strong>{categories.length}</strong>
+                  <span>categories</span>
+                </div>
+                <div>
+                  <strong>{discountedProductsCount}</strong>
+                  <span>discounts</span>
+                </div>
               </div>
             ) : null}
           </div>
 
-          <div className="home-hero-visual">
-            <div className="home-hero-frame">
-              <div className="home-hero-frame-top">
-                <span className="eyebrow-label">Live snapshot</span>
-                <h3>What is trending right now</h3>
-              </div>
-
-              <div className="home-hero-image-box">
+          <div className="home-desk-board" aria-label="Catalogue preview">
+            <div className="home-desk-feature">
+              <div className="home-desk-product-image">
                 <ProductVisual product={heroProduct} fallbackLabel="Featured product" />
               </div>
+              <div className="home-desk-product-copy">
+                <span>Featured item</span>
+                <h3>{heroProduct?.name || "Catalogue essentials"}</h3>
+                <p>{heroProduct ? formatMoney(heroProduct.price) : "Books, tools, bags, and more"}</p>
+              </div>
+            </div>
 
-              <div className="home-hero-meta-grid">
-                <div>
-                  <span>Featured item</span>
-                  <strong>{heroProduct?.name || "Catalogue"}</strong>
-                </div>
-                <div>
-                  <span>Top category</span>
-                  <strong>{heroCategory?.name || "Categories"}</strong>
-                </div>
-                <div>
-                  <span>Average discount</span>
-                  <strong>{hasCatalogueData ? `${averageDiscount}%` : "Offers"}</strong>
-                </div>
+            <div className="home-desk-side">
+              <div className="home-desk-note">
+                <span>Top category</span>
+                <strong>{heroCategory?.name || "School catalogue"}</strong>
+              </div>
+              <div className="home-desk-note home-desk-note-accent">
+                <span>Average discount</span>
+                <strong>{hasCatalogueData ? `${averageDiscount}%` : "Offers"}</strong>
+              </div>
+              <div className="home-desk-category-list">
+                {highlightedCategories.slice(0, 4).map((category) => (
+                  <Link
+                    key={category.id}
+                    to={`/products?category=${encodeURIComponent(category.slug || category.name || category.id)}`}
+                  >
+                    <span>{category.name}</span>
+                    <strong>{category.products_count || 0}</strong>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
@@ -273,6 +303,43 @@ function Home() {
                   <p>
                     {formatMoney(product.price)} {Number(product.discount || 0) > 0 ? `- ${product.discount}%` : ""}
                   </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {sections.featuredEssentials ? (
+        <section className="home-catalogue-wall">
+          <div className="home-section-head">
+            <div>
+              <span className="eyebrow-label">Full shelf</span>
+              <h2>Shop more school essentials</h2>
+            </div>
+            <Link to="/products" className="landing-section-link">
+              Open full catalogue
+            </Link>
+          </div>
+
+          <div className="home-catalogue-wall-grid">
+            {landingProducts.map((product) => (
+              <Link
+                key={product.id}
+                to={`/ProductDetail?productId=${product.id}`}
+                className="home-shelf-product"
+                aria-label={`Open product ${product.name}`}
+              >
+                <div className="home-shelf-thumb">
+                  <ProductVisual product={product} fallbackLabel="Item" />
+                </div>
+                <div className="home-shelf-body">
+                  <span>{product.category?.name || "School item"}</span>
+                  <h4>{product.name}</h4>
+                  <div>
+                    <strong>{formatMoney(product.price)}</strong>
+                    {Number(product.discount || 0) > 0 ? <em>{product.discount}% off</em> : null}
+                  </div>
                 </div>
               </Link>
             ))}

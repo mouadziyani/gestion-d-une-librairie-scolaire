@@ -61,13 +61,19 @@ class Product extends Model
         }
 
         if (str_starts_with($this->image, '/storage/')) {
-            return url($this->image);
+            $path = ltrim(substr($this->image, strlen('/storage/')), '/');
+
+            return Storage::disk('public')->exists($path) ? url($this->image) : null;
         }
 
         if (str_starts_with($this->image, 'storage/')) {
-            return url('/' . $this->image);
+            $path = ltrim(substr($this->image, strlen('storage/')), '/');
+
+            return Storage::disk('public')->exists($path) ? url('/' . $this->image) : null;
         }
 
-        return url(Storage::disk('public')->url($this->image));
+        return Storage::disk('public')->exists($this->image)
+            ? url(Storage::disk('public')->url($this->image))
+            : null;
     }
 }

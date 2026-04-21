@@ -90,7 +90,7 @@ function ProductDetail() {
     );
   }
 
-  const imageSrc = resolveMediaUrl(product.image_url || product.image) || "https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=500";
+  const imageSrc = resolveMediaUrl(product.image_url) || "https://images.unsplash.com/photo-1531346878377-a5be20888e57?q=80&w=500";
 
   return (
     <div className="product-detail-page">

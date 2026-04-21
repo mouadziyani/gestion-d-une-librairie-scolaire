@@ -140,7 +140,7 @@ function ProductDetailsAdmin() {
     );
   }
 
-  const imageSrc = resolveMediaUrl(product.image_url || product.image) || "https://via.placeholder.com/600x600?text=No+Image";
+  const imageSrc = resolveMediaUrl(product.image_url) || "https://via.placeholder.com/600x600?text=No+Image";
 
   return (
     <div className="admin-detail-wrapper">
@@ -197,13 +197,7 @@ function ProductDetailsAdmin() {
               <textarea rows="4" value={product.description || ""} readOnly />
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "20px",
-              }}
-            >
+            <div className="admin-product-fields-grid">
               <div className="admin-form-group">
                 <label>Category</label>
                 <input type="text" value={product.category?.name || "Uncategorized"} readOnly />
@@ -218,13 +212,7 @@ function ProductDetailsAdmin() {
             </div>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "20px",
-              }}
-            >
+            <div className="admin-product-fields-grid">
               <div className="admin-form-group">
                 <label>Min Stock</label>
                 <input type="text" value={product.min_stock ?? 0} readOnly />
