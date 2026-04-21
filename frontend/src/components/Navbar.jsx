@@ -261,7 +261,6 @@ function Navbar() {
             aria-controls="cart-drawer"
           >
             <ShoppingCart size={16} />
-            Cart
             {cartTotals.itemCount > 0 ? (
               <span className="nav-cart-badge" aria-label={`${cartTotals.itemCount} items in cart`}>
                 {cartTotals.itemCount > 9 ? "9+" : cartTotals.itemCount}
@@ -282,7 +281,7 @@ function Navbar() {
         ) : null}
 
         <div
-          className={`nav-dropdown ${profileOpen ? "open" : ""}`}
+          className={`nav-dropdown nav-profile-dropdown ${profileOpen ? "open" : ""}`}
           onMouseEnter={() => setProfileOpen(true)}
           onMouseLeave={() => setProfileOpen(false)}
         >
