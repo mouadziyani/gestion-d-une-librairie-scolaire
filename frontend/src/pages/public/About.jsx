@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Clock, MapPin, Phone, School, ShoppingBag } from "lucide-react";
 import aboutBackground from "../../assets/background/background1.png";
-import logo from "../../assets/logo/library.png";
 
 function About() {
   return (
@@ -30,29 +29,7 @@ function About() {
             className="about-visual about-brand-panel"
             style={{ "--about-background-image": `url(${aboutBackground})` }}
             aria-label="Library BOUGDIM overview"
-          >
-            <div className="about-logo-mark">
-              <img src={logo} alt="Library BOUGDIM" />
-            </div>
-            <div className="about-panel-copy">
-              <span>El Aioun Sidi Mellouk</span>
-              <strong>Local bookstore, digital catalogue, school-ready orders.</strong>
-            </div>
-            <div className="about-panel-metrics">
-              <div>
-                <BookOpen size={20} />
-                <span>Textbooks</span>
-              </div>
-              <div>
-                <ShoppingBag size={20} />
-                <span>Supplies</span>
-              </div>
-              <div>
-                <School size={20} />
-                <span>Schools</span>
-              </div>
-            </div>
-          </div>
+          />
         </section>
 
         <section className="about-story-band">
