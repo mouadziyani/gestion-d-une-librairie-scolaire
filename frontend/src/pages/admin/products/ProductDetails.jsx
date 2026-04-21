@@ -140,7 +140,7 @@ function ProductDetailsAdmin() {
     );
   }
 
-  const imageSrc = resolveMediaUrl(product.image) || "https://via.placeholder.com/600x600?text=No+Image";
+  const imageSrc = resolveMediaUrl(product.image_url || product.image) || "https://via.placeholder.com/600x600?text=No+Image";
 
   return (
     <div className="admin-detail-wrapper">

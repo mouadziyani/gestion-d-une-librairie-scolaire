@@ -66,7 +66,7 @@ function EditProductAdmin() {
             discount: productData.discount ?? "",
             level: productData.level || "",
           });
-          setImagePreview(resolveMediaUrl(productData.image) || "");
+          setImagePreview(resolveMediaUrl(productData.image_url || productData.image) || "");
         }
       } catch (err) {
         if (active) {

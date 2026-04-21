@@ -240,7 +240,7 @@ function Products() {
                 filteredProducts.map((product) => {
                   const isAvailable = product.status === "active" && Number(product.is_available) !== 0;
                   const categoryLabel = product.category?.name || product.cat || "-";
-                  const imageSrc = resolveMediaUrl(product.image) || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=500";
+                  const imageSrc = resolveMediaUrl(product.image_url || product.image) || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=500";
 
                   return (
                     <Link to={`/ProductDetail?productId=${product.id}`} className="product-item" key={product.id}>
