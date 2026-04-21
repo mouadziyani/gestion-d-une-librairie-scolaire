@@ -5,7 +5,7 @@ function normalizeApiBaseUrl(url) {
 }
 
 const defaultApiBaseUrl = import.meta.env.DEV
-  ? "http://localhost:8000/api"
+  ? "http://3.126.51.205/api"
   : `${window.location.origin}/api`;
 
 export const API_BASE_URL = normalizeApiBaseUrl(
