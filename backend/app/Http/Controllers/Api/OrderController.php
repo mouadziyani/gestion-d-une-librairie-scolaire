@@ -12,8 +12,11 @@ use App\Models\OrderItem;
 use App\Models\Payments;
 use App\Models\Product;
 use App\Models\Stock;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Stripe\PaymentIntent;
@@ -174,6 +177,8 @@ class OrderController extends Controller
             ];
         });
 
+        $this->notifyStaffAboutNewOrder($result['order'], $user);
+
         return response()->json([
             'success' => true,
             'data' => $result,
@@ -219,6 +224,82 @@ class OrderController extends Controller
         }
 
         return true;
+    }
+
+    private function notifyStaffAboutNewOrder(Order $order, ?User $customer): void
+    {
+        $order->loadMissing(['school', 'orderItems.product', 'payments']);
+
+        $staffUsers = User::query()
+            ->whereHas('role', function ($query) {
+                $query->whereIn('slug', ['admin', 'moderator']);
+            })
+            ->get();
+
+        if ($staffUsers->isEmpty()) {
+            return;
+        }
+
+        $customerName = $customer?->name ?: 'A customer';
+        $total = number_format((float) $order->total_price, 2);
+        $message = "{$customerName} placed order #{$order->id} for {$total} DH.";
+
+        foreach ($staffUsers as $staffUser) {
+            Notification::create([
+                'user_id' => $staffUser->id,
+                'type' => 'new_order',
+                'message' => $message,
+                'is_read' => false,
+                'order_id' => $order->id,
+            ]);
+
+            $this->sendStaffOrderEmail($staffUser, $order, $customerName);
+        }
+    }
+
+    private function sendStaffOrderEmail(User $staffUser, Order $order, string $customerName): void
+    {
+        try {
+            $items = $order->orderItems
+                ->map(function (OrderItem $item) {
+                    $productName = $item->product?->name ?: "Product #{$item->product_id}";
+                    $lineTotal = number_format((float) $item->price * (int) $item->quantity, 2);
+
+                    return "- {$productName} x {$item->quantity}: {$lineTotal} DH";
+                })
+                ->implode("\n");
+
+            $body = implode("\n", [
+                "Hello {$staffUser->name},",
+                '',
+                "A new order has been placed on Library BOUGDIM.",
+                '',
+                "Order: #{$order->id}",
+                "Customer: {$customerName}",
+                "Total: " . number_format((float) $order->total_price, 2) . ' DH',
+                "Payment method: {$order->payment_method}",
+                "Payment status: {$order->payment_status}",
+                "Delivery address: {$order->delivery_address}",
+                $order->school ? "School: {$order->school->name}" : null,
+                '',
+                "Items:",
+                $items ?: '- No items found',
+                '',
+                'Please check the admin dashboard for full details.',
+            ]);
+
+            Mail::raw($body, function ($message) use ($staffUser, $order) {
+                $message
+                    ->to($staffUser->email, $staffUser->name)
+                    ->subject("New order #{$order->id} - Library BOUGDIM");
+            });
+        } catch (\Throwable $throwable) {
+            Log::warning('Failed to email staff about new order.', [
+                'order_id' => $order->id,
+                'staff_user_id' => $staffUser->id,
+                'error' => $throwable->getMessage(),
+            ]);
+        }
     }
 
     public function show(string $id)
