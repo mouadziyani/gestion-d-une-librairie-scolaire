@@ -5628,7 +5628,13 @@ textarea::placeholder {
     color: #1a1a1a;
     background: transparent;
     border: none;
+    cursor: pointer;
+    font-family: inherit;
     text-align: left;
+}
+
+.nav-logout-button {
+    font-weight: 700;
 }
 
 .nav-dropdown-item:hover,

@@ -304,7 +304,7 @@ function Navbar() {
                 <Link to="/Profile" onClick={closeMenus} className="nav-dropdown-item">
                   My Profile
                 </Link>
-                <button type="button" onClick={handleLogout} className="nav-dropdown-item nav-dropdown-button">
+                <button type="button" onClick={handleLogout} className="nav-dropdown-item nav-dropdown-button nav-logout-button">
                   <LogOut size={14} />
                   Log out
                 </button>
@@ -317,13 +317,13 @@ function Navbar() {
           </div>
         </div>
 
-          <Link to="/about" className="nav-text-link" onClick={closeMenus}>
+          <Link to="/about" className="nav-action-button" onClick={closeMenus}>
             About
           </Link>
-          <Link to="/contact" className="nav-text-link" onClick={closeMenus}>
+          <Link to="/contact" className="nav-action-button" onClick={closeMenus}>
             Contact
           </Link>
-          <Link to="/faq" className="nav-text-link" onClick={closeMenus}>
+          <Link to="/faq" className="nav-action-button" onClick={closeMenus}>
             Support
           </Link>
         </div>
