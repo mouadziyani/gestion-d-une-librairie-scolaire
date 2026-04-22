@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { deleteProduct, getProducts } from "../../../services/productService";
 
@@ -28,7 +28,11 @@ function ProductsListAdmin() {
   async function loadProducts() {
     try {
       setLoading(true);
-      const data = await getProducts(page);
+      const data = await getProducts({
+        page,
+        search: search.trim() || undefined,
+        status: statusFilter,
+      });
       setProducts(Array.isArray(data?.data) ? data.data : []);
       setLastPage(data?.last_page || 1);
       setError("");
@@ -41,18 +45,7 @@ function ProductsListAdmin() {
 
   useEffect(() => {
     loadProducts();
-  }, [page]);
-
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesSearch = `${product.name || ""} ${product.reference || ""} ${product.category?.name || ""}`
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      const matchesStatus = statusFilter === "all" || product.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
-    });
-  }, [products, search, statusFilter]);
+  }, [page, search, statusFilter]);
 
   async function handleDelete(id) {
     const confirmed = window.confirm("Delete this product?");
@@ -94,13 +87,23 @@ function ProductsListAdmin() {
             id="search"
             placeholder="Search by name, reference, or category..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
           />
         </div>
 
         <div className="filter-field">
           <label htmlFor="status">Status</label>
-          <select id="status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <select
+            id="status"
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+          >
             <option value="all">All Items</option>
             <option value="active">Active Only</option>
             <option value="inactive">Inactive Only</option>
@@ -138,8 +141,8 @@ function ProductsListAdmin() {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.length ? (
-                filteredProducts.map((product) => {
+              {products.length ? (
+                products.map((product) => {
                   const isActive = product.status === "active" && Number(product.is_available) !== 0;
 
                   return (
