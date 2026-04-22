@@ -1,15 +1,67 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { clearCart, getCartItems, getCartTotals, removeCartItem, updateCartItem } from "../../services/cartService";
+import {
+  CART_CHANGED_EVENT,
+  clearCart,
+  getCartItems,
+  getCartTotals,
+  removeCartItem,
+  syncCartWithProducts,
+  updateCartItem,
+} from "../../services/cartService";
 import { formatDh } from "../../data/catalog";
 import { resolveMediaUrl } from "../../utils/media";
 
 function Cart() {
   const navigate = useNavigate();
   const [cart, setCart] = useState(() => getCartItems());
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState("");
 
   useEffect(() => {
-    setCart(getCartItems());
+    let active = true;
+
+    async function refreshCart() {
+      const previousCart = getCartItems();
+      setCart(previousCart);
+      setSyncing(true);
+      setSyncMessage("");
+
+      try {
+        const syncedCart = await syncCartWithProducts();
+        if (!active) {
+          return;
+        }
+
+        setCart(syncedCart);
+
+        if (JSON.stringify(previousCart) !== JSON.stringify(syncedCart)) {
+          setSyncMessage("Cart updated with the latest prices and stock.");
+        }
+      } catch {
+        if (active) {
+          setSyncMessage("Showing saved cart. Live stock could not be refreshed.");
+        }
+      } finally {
+        if (active) {
+          setSyncing(false);
+        }
+      }
+    }
+
+    function handleCartChange(event) {
+      setCart(Array.isArray(event?.detail?.items) ? event.detail.items : getCartItems());
+    }
+
+    refreshCart();
+    window.addEventListener(CART_CHANGED_EVENT, handleCartChange);
+    window.addEventListener("storage", handleCartChange);
+
+    return () => {
+      active = false;
+      window.removeEventListener(CART_CHANGED_EVENT, handleCartChange);
+      window.removeEventListener("storage", handleCartChange);
+    };
   }, []);
 
   const totals = useMemo(() => getCartTotals(cart), [cart]);
@@ -43,6 +95,8 @@ function Cart() {
       <main className="cart-wrapper">
         <section className="cart-items-section">
           <h2>Your Cart</h2>
+          {syncing ? <p className="cart-sync-note">Refreshing cart...</p> : null}
+          {syncMessage ? <p className="cart-sync-note">{syncMessage}</p> : null}
 
           {cart.length ? (
             <>

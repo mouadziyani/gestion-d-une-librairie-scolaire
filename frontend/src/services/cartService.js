@@ -1,3 +1,5 @@
+import { api } from "./api";
+
 const CART_KEY = "library_bougdim_cart";
 export const CART_CHANGED_EVENT = "library-bougdim:cart-changed";
 
@@ -44,8 +46,68 @@ function writeCart(items) {
   );
 }
 
+function isProductPurchasable(product) {
+  return product?.status === "active" && Number(product?.is_available) !== 0 && Number(product?.stock || 0) > 0;
+}
+
+function cartItemFromProduct(product, quantity) {
+  const stock = Number(product.stock || 0);
+  const nextQuantity = stock > 0 ? Math.min(Math.max(1, Number(quantity || 1)), stock) : Math.max(1, Number(quantity || 1));
+
+  return normalizeCartItem({
+    id: product.id,
+    name: product.name,
+    price: Number(product.price || 0),
+    cat: product.category?.name || product.category || "",
+    image_url: getProductImage(product),
+    img: getProductImage(product),
+    reference: product.reference || "",
+    stock,
+    status: product.status || "active",
+    quantity: nextQuantity,
+  });
+}
+
 export function getCartItems() {
   return readCart();
+}
+
+export async function syncCartWithProducts() {
+  const cart = readCart();
+
+  if (!cart.length) {
+    return [];
+  }
+
+  const refreshedItems = await Promise.all(
+    cart.map(async (item) => {
+      try {
+        const response = await api.get(`/products/${item.id}`);
+        const product = response.data?.data;
+
+        if (!isProductPurchasable(product)) {
+          return null;
+        }
+
+        return cartItemFromProduct(product, item.quantity);
+      } catch (error) {
+        if (error?.response?.status === 404) {
+          return null;
+        }
+
+        throw error;
+      }
+    }),
+  );
+
+  const nextCart = refreshedItems.filter(Boolean);
+  const changed = JSON.stringify(cart.map(normalizeCartItem)) !== JSON.stringify(nextCart);
+
+  if (changed) {
+    writeCart(nextCart);
+  }
+
+  return nextCart;
 }
 
 export function saveCartItems(items) {

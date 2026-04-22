@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Bell, ChevronDown, Minus, Plus, ShoppingCart, Trash2, LogOut, Menu, Search, UserRound, X } from "lucide-react";
 import logo from "../assets/logo/library.png";
 import { AuthContext } from "../context/AuthContext";
-import { CART_CHANGED_EVENT, getCartItems, getCartTotals, removeCartItem, updateCartItem } from "../services/cartService";
+import { CART_CHANGED_EVENT, getCartItems, getCartTotals, removeCartItem, syncCartWithProducts, updateCartItem } from "../services/cartService";
 import { getCategories } from "../services/categoryService";
 import { getUnreadNotificationCount } from "../services/notificationService";
 import { formatDh } from "../data/catalog";
@@ -60,15 +60,31 @@ function Navbar() {
   }, [location.pathname]);
 
   useEffect(() => {
+    let active = true;
+
+    async function refreshCart() {
+      try {
+        const syncedItems = await syncCartWithProducts();
+        if (active) {
+          setCartItems(syncedItems);
+        }
+      } catch {
+        if (active) {
+          setCartItems(getCartItems());
+        }
+      }
+    }
+
     function syncCart(event) {
       setCartItems(Array.isArray(event?.detail?.items) ? event.detail.items : getCartItems());
     }
 
-    syncCart();
+    refreshCart();
     window.addEventListener(CART_CHANGED_EVENT, syncCart);
     window.addEventListener("storage", syncCart);
 
     return () => {
+      active = false;
       window.removeEventListener(CART_CHANGED_EVENT, syncCart);
       window.removeEventListener("storage", syncCart);
     };

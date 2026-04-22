@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { clearCart, getCartItems, getCartTotals } from "../../services/cartService";
+import { clearCart, getCartItems, getCartTotals, syncCartWithProducts } from "../../services/cartService";
 import { submitCheckout } from "../../services/orderService";
 import { createStripePaymentIntent } from "../../services/stripeService";
 import { api } from "../../services/api";
@@ -181,7 +181,28 @@ function Checkout() {
   }, [user]);
 
   useEffect(() => {
-    setCart(getCartItems());
+    let active = true;
+
+    async function refreshCart() {
+      setCart(getCartItems());
+
+      try {
+        const syncedCart = await syncCartWithProducts();
+        if (active) {
+          setCart(syncedCart);
+        }
+      } catch {
+        if (active) {
+          setCart(getCartItems());
+        }
+      }
+    }
+
+    refreshCart();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
