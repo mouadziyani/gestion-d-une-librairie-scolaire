@@ -36,6 +36,7 @@ function Products() {
 
   useEffect(() => {
     setForm(getFiltersFromLocation(location.search));
+    setPage(1);
   }, [location.search]);
 
   useEffect(() => {

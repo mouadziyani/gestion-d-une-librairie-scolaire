@@ -16,17 +16,24 @@ class ProductController extends Controller
         $query = Product::with(['category', 'supplier'])->withCount('orderItems');
 
         if ($search = trim((string) $request->query('search', ''))) {
-            $query->where(function ($builder) use ($search) {
-                $builder
-                    ->where('name', 'like', "%{$search}%")
-                    ->orWhere('reference', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('level', 'like', "%{$search}%")
-                    ->orWhereHas('category', function ($categoryQuery) use ($search) {
-                        $categoryQuery
-                            ->where('name', 'like', "%{$search}%")
-                            ->orWhere('slug', 'like', "%{$search}%");
+            $terms = collect(preg_split('/[\s\-]+/u', $search, -1, PREG_SPLIT_NO_EMPTY))
+                ->map(fn ($term) => trim($term))
+                ->filter()
+                ->unique()
+                ->values();
+
+            $query->where(function ($builder) use ($search, $terms) {
+                $this->applyProductSearchTerm($builder, $search);
+
+                if ($terms->count() > 1) {
+                    $builder->orWhere(function ($termQuery) use ($terms) {
+                        $terms->each(function ($term) use ($termQuery) {
+                            $termQuery->where(function ($termBuilder) use ($term) {
+                                $this->applyProductSearchTerm($termBuilder, $term);
+                            });
+                        });
                     });
+                }
             });
         }
 
@@ -138,5 +145,26 @@ class ProductController extends Controller
             'data' => (object) [],
             'message' => 'The operation was successful',
         ]);
+    }
+
+    private function applyProductSearchTerm($query, string $term): void
+    {
+        $query
+            ->where('name', 'like', "%{$term}%")
+            ->orWhere('slug', 'like', "%{$term}%")
+            ->orWhere('reference', 'like', "%{$term}%")
+            ->orWhere('description', 'like', "%{$term}%")
+            ->orWhere('level', 'like', "%{$term}%")
+            ->orWhereHas('category', function ($categoryQuery) use ($term) {
+                $categoryQuery
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('slug', 'like', "%{$term}%");
+            })
+            ->orWhereHas('supplier', function ($supplierQuery) use ($term) {
+                $supplierQuery
+                    ->where('name', 'like', "%{$term}%")
+                    ->orWhere('company_name', 'like', "%{$term}%")
+                    ->orWhere('code', 'like', "%{$term}%");
+            });
     }
 }
