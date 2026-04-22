@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Rules\StrongPassword;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -28,7 +29,7 @@ class AdminUserRequest extends FormRequest
             'address' => 'nullable|string|max:255',
             'role_id' => $isUpdate ? 'required|integer|exists:roles,id' : 'nullable|integer|exists:roles,id',
             'role_slug' => $isUpdate ? 'prohibited' : 'required|string|in:client,user,moderator',
-            'password' => 'nullable|confirmed|min:8',
+            'password' => ['nullable', 'confirmed', new StrongPassword()],
             'profile_photo' => $isUpdate ? 'prohibited' : 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
         ];
     }

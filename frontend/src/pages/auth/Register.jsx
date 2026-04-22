@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo/library.png";
 import useRegisterForm from "../../hooks/useRegisterForm";
+import { PASSWORD_POLICY_TEXT } from "../../utils/passwordPolicy";
 
 function Register() {
   const { Form, handleChange, handleSubmit, error } = useRegisterForm();
@@ -58,11 +59,13 @@ function Register() {
               <input
                 type="password"
                 name="password"
-                placeholder="Minimum 8 characters"
+                placeholder="Strong password"
                 value={Form.password}
                 onChange={handleChange}
+                minLength={10}
                 required
               />
+              <small className="password-policy-note">{PASSWORD_POLICY_TEXT}</small>
             </div>
 
             <div className="input-stack">
@@ -73,6 +76,7 @@ function Register() {
                 placeholder="Repeat your password"
                 value={Form.password_confirmation}
                 onChange={handleChange}
+                minLength={10}
                 required
               />
             </div>

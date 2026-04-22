@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import logo from "../../assets/logo/library.png";
 import { api } from "../../services/api";
+import { PASSWORD_POLICY_TEXT, validatePasswordPolicy } from "../../utils/passwordPolicy";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -29,6 +30,18 @@ function ResetPassword() {
     event.preventDefault();
     setMessage("");
     setError("");
+
+    if (form.password !== form.password_confirmation) {
+      setError("Passwords don't match.");
+      return;
+    }
+
+    const passwordError = validatePasswordPolicy(form.password, { email });
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -92,9 +105,10 @@ function ResetPassword() {
                 placeholder="Enter new password"
                 value={form.password}
                 onChange={handleChange}
-                minLength={8}
+                minLength={10}
                 required
               />
+              <small className="password-policy-note">{PASSWORD_POLICY_TEXT}</small>
             </div>
 
             <div className="input-stack">
@@ -105,7 +119,7 @@ function ResetPassword() {
                 placeholder="Confirm new password"
                 value={form.password_confirmation}
                 onChange={handleChange}
-                minLength={8}
+                minLength={10}
                 required
               />
             </div>

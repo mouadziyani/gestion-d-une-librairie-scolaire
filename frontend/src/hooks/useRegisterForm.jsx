@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { getRoleHomePath } from "../utils/helpers";
+import { validatePasswordPolicy } from "../utils/passwordPolicy";
 
 function getErrorMessage(err, fallback) {
     if (typeof err === "string") {
@@ -36,6 +37,12 @@ function useRegisterForm() {
 
         if (Form.password !== Form.password_confirmation) {
             setError("Passwords don't match.");
+            return;
+        }
+
+        const passwordError = validatePasswordPolicy(Form.password, Form);
+        if (passwordError) {
+            setError(passwordError);
             return;
         }
 

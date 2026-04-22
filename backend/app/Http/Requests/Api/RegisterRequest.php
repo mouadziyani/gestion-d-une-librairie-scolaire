@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Rules\StrongPassword;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
@@ -24,7 +25,7 @@ class RegisterRequest extends FormRequest
         return [
             'name' => 'required|string|max:50',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|confirmed|min:8',
+            'password' => ['required', 'confirmed', new StrongPassword()],
         ];
     }
 }

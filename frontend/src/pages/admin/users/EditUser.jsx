@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getAdminUser, updateAdminUser } from "../../../services/adminUserService";
 import { getRoles } from "../../../services/roleService";
+import { PASSWORD_POLICY_TEXT, validatePasswordPolicy } from "../../../utils/passwordPolicy";
 
 function EditUser() {
   const navigate = useNavigate();
@@ -75,6 +76,21 @@ function EditUser() {
     setSaving(true);
     setError("");
 
+    if (form.password) {
+      if (form.password !== form.password_confirmation) {
+        setError("Passwords don't match.");
+        setSaving(false);
+        return;
+      }
+
+      const passwordError = validatePasswordPolicy(form.password, form);
+      if (passwordError) {
+        setError(passwordError);
+        setSaving(false);
+        return;
+      }
+    }
+
     try {
       const payload = {
         name: form.name,
@@ -92,7 +108,8 @@ function EditUser() {
       await updateAdminUser(userId, payload);
       navigate("/admin/users");
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to update user.");
+      const serverErrors = err?.response?.data?.errors || {};
+      setError(serverErrors?.password?.[0] || err?.response?.data?.message || "Failed to update user.");
     } finally {
       setSaving(false);
     }
@@ -151,7 +168,8 @@ function EditUser() {
 
           <div className="input-group">
             <label htmlFor="password">New Password</label>
-            <input id="password" name="password" type="password" value={form.password} onChange={handleChange} />
+            <input id="password" name="password" type="password" value={form.password} onChange={handleChange} minLength={10} />
+            <small className="password-policy-note">{PASSWORD_POLICY_TEXT}</small>
           </div>
 
           <div className="input-group">
@@ -162,6 +180,7 @@ function EditUser() {
               type="password"
               value={form.password_confirmation}
               onChange={handleChange}
+              minLength={10}
             />
           </div>
 

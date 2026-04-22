@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Rules\StrongPassword;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email', 'exists:users,email'],
-            'password' => ['required', 'confirmed', 'min:8'],
+            'password' => ['required', 'confirmed', new StrongPassword()],
         ]);
 
         $status = Password::reset(

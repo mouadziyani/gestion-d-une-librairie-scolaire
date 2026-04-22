@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ProfileImage from "../../assets/avatars/profile.jpg";
 import { AuthContext } from "../../context/AuthContext";
 import { resolveMediaUrl } from "../../utils/media";
+import { PASSWORD_POLICY_TEXT, validatePasswordPolicy } from "../../utils/passwordPolicy";
 
 function Profile() {
   const { user, loading, updateProfile, deleteProfile } = useContext(AuthContext);
@@ -59,6 +60,19 @@ function Profile() {
     e.preventDefault();
     setMessage("");
     setError("");
+
+    if (form.password) {
+      if (form.password !== form.password_confirmation) {
+        setError("Passwords don't match.");
+        return;
+      }
+
+      const passwordError = validatePasswordPolicy(form.password, form);
+      if (passwordError) {
+        setError(passwordError);
+        return;
+      }
+    }
 
     try {
       const payload = new FormData();
@@ -264,7 +278,9 @@ function Profile() {
                     value={form.password}
                     onChange={handleChange}
                     placeholder="New password"
+                    minLength={10}
                   />
+                  <small className="password-policy-note">{PASSWORD_POLICY_TEXT}</small>
                 </div>
                 <div>
                   <label className="profile-label">Confirm New</label>
@@ -275,6 +291,7 @@ function Profile() {
                     value={form.password_confirmation}
                     onChange={handleChange}
                     placeholder="Confirm password"
+                    minLength={10}
                   />
                 </div>
               </div>

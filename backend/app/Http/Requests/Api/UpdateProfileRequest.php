@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Rules\StrongPassword;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +26,7 @@ class UpdateProfileRequest extends FormRequest
             'address' => 'nullable|string|max:255',
             'profile_photo' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:10240',
             'current_password' => 'nullable|required_with:password',
-            'password' => 'nullable|confirmed|min:8',
+            'password' => ['nullable', 'confirmed', new StrongPassword()],
         ];
     }
 }

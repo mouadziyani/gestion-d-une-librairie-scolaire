@@ -6445,6 +6445,14 @@ textarea::placeholder {
     border: 1px solid #ffc9c9;
 }
 
+.password-policy-note {
+    display: block;
+    margin-top: 8px;
+    color: #777777;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 .settings-actions,
 .roles-card-actions {
     display: flex;
