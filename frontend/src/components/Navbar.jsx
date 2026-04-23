@@ -63,6 +63,13 @@ function Navbar() {
     let active = true;
 
     async function refreshCart() {
+      if (!isAuthenticated) {
+        if (active) {
+          setCartItems([]);
+        }
+        return;
+      }
+
       try {
         const syncedItems = await syncCartWithProducts();
         if (active) {
@@ -76,6 +83,11 @@ function Navbar() {
     }
 
     function syncCart(event) {
+      if (!isAuthenticated) {
+        setCartItems([]);
+        return;
+      }
+
       setCartItems(Array.isArray(event?.detail?.items) ? event.detail.items : getCartItems());
     }
 
@@ -88,7 +100,7 @@ function Navbar() {
       window.removeEventListener(CART_CHANGED_EVENT, syncCart);
       window.removeEventListener("storage", syncCart);
     };
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     function handlePreferencesChange() {
@@ -268,21 +280,23 @@ function Navbar() {
             Pages
           </Link>
 
-          <button
-            type="button"
-            className="nav-action-button nav-cart-trigger"
-            onClick={handleCartToggle}
-            aria-label={`Open cart with ${cartTotals.itemCount} items`}
-            aria-expanded={cartOpen}
-            aria-controls="cart-drawer"
-          >
-            <ShoppingCart size={16} />
-            {cartTotals.itemCount > 0 ? (
-              <span className="nav-cart-badge" aria-label={`${cartTotals.itemCount} items in cart`}>
-                {cartTotals.itemCount > 9 ? "9+" : cartTotals.itemCount}
-              </span>
-            ) : null}
-          </button>
+          {isAuthenticated ? (
+            <button
+              type="button"
+              className="nav-action-button nav-cart-trigger"
+              onClick={handleCartToggle}
+              aria-label={`Open cart with ${cartTotals.itemCount} items`}
+              aria-expanded={cartOpen}
+              aria-controls="cart-drawer"
+            >
+              <ShoppingCart size={16} />
+              {cartTotals.itemCount > 0 ? (
+                <span className="nav-cart-badge" aria-label={`${cartTotals.itemCount} items in cart`}>
+                  {cartTotals.itemCount > 9 ? "9+" : cartTotals.itemCount}
+                </span>
+              ) : null}
+            </button>
+          ) : null}
 
         {isAuthenticated ? (
           <Link to={notificationsPath} className="nav-action-button nav-notification-link" onClick={closeMenus}>
@@ -344,8 +358,9 @@ function Navbar() {
         </div>
       </nav>
 
-      {cartOpen ? <button className="cart-drawer-backdrop" type="button" aria-label="Close cart" onClick={closeAllOverlays} /> : null}
+      {isAuthenticated && cartOpen ? <button className="cart-drawer-backdrop" type="button" aria-label="Close cart" onClick={closeAllOverlays} /> : null}
 
+      {isAuthenticated ? (
       <aside id="cart-drawer" className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-hidden={!cartOpen}>
         <div className="cart-drawer-header">
           <div>
@@ -427,6 +442,7 @@ function Navbar() {
           </div>
         )}
       </aside>
+      ) : null}
     </>
   );
 }

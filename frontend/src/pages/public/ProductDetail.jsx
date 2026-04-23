@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { getProduct } from "../../services/productService";
 import { addToCart } from "../../services/cartService";
 import { addToWishlist, isInWishlist } from "../../services/wishlistService";
+import { AuthContext } from "../../context/AuthContext";
 import { resolveMediaUrl } from "../../utils/media";
 
 function formatMoney(value) {
@@ -14,7 +15,10 @@ function formatMoney(value) {
 }
 
 function ProductDetail() {
+  const { user } = useContext(AuthContext);
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
@@ -69,7 +73,18 @@ function ProductDetail() {
     return product.status === "active" && Number(product.is_available) !== 0 && Number(product.stock || 0) > 0;
   }, [product]);
 
+  const isAuthenticated = !!user;
+
   function handleAddToCart() {
+    if (!isAuthenticated) {
+      navigate("/login", {
+        state: {
+          from: `${location.pathname}${location.search}`,
+        },
+      });
+      return;
+    }
+
     if (!product || !canAddToCart) {
       return;
     }
@@ -163,15 +178,17 @@ function ProductDetail() {
             </div>
 
             <div className="detail-actions">
-              <button className="btn-cart" type="button" onClick={handleAddToCart} disabled={!canAddToCart}>
-                {canAddToCart ? (added ? `${quantity} Added` : "Add to Cart") : "Special Order"}
+              <button className="btn-cart" type="button" onClick={handleAddToCart} disabled={isAuthenticated && !canAddToCart}>
+                {!isAuthenticated ? "Login to Add" : canAddToCart ? (added ? `${quantity} Added` : "Add to Cart") : "Special Order"}
               </button>
               <button className="btn-wishlist" type="button" onClick={handleWishlist} disabled={wishlisted}>
                 {wishlisted ? "In Wishlist" : "Add to Wishlist"}
               </button>
-              <Link to="/Cart" className="btn-wishlist">
-                View Cart
-              </Link>
+              {isAuthenticated ? (
+                <Link to="/Cart" className="btn-wishlist">
+                  View Cart
+                </Link>
+              ) : null}
             </div>
           </div>
 
