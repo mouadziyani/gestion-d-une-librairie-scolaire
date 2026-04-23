@@ -23,8 +23,8 @@ class StrongPassword implements DataAwareRule, ValidationRule
         $lower = mb_strtolower($password, 'UTF-8');
         $compact = preg_replace('/[^a-z0-9]+/i', '', $lower) ?? $lower;
 
-        if (mb_strlen($password) < 10) {
-            $fail('The :attribute must be at least 10 characters.');
+        if (mb_strlen($password) < 8) {
+            $fail('The :attribute must be at least 8 characters.');
             return;
         }
 
