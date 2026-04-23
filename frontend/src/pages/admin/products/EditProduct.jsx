@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { getCategories } from "../../../services/categoryService";
 import { getProduct, updateProduct } from "../../../services/productService";
+import { optimizeImageUpload } from "../../../utils/optimizeImageUpload";
 import { resolveMediaUrl } from "../../../utils/media";
 
 const initialForm = {
@@ -89,12 +90,11 @@ function EditProductAdmin() {
     };
   }, [productId]);
 
-  function handleChange(event) {
+  async function handleChange(event) {
     const { name, value, type, checked, files } = event.target;
 
     if (name === "image_file") {
       const file = files?.[0] || null;
-      setImageFile(file);
 
       if (previewRef.current) {
         URL.revokeObjectURL(previewRef.current);
@@ -102,11 +102,21 @@ function EditProductAdmin() {
       }
 
       if (file) {
-        const previewUrl = URL.createObjectURL(file);
-        previewRef.current = previewUrl;
-        setImagePreview(previewUrl);
-        setForm((current) => ({ ...current, image: "" }));
+        try {
+          const optimizedFile = await optimizeImageUpload(file);
+          setImageFile(optimizedFile);
+          const previewUrl = URL.createObjectURL(optimizedFile);
+          previewRef.current = previewUrl;
+          setImagePreview(previewUrl);
+          setForm((current) => ({ ...current, image: "" }));
+          setError("");
+        } catch (processingError) {
+          setImageFile(null);
+          setImagePreview("");
+          setError(processingError?.message || "Failed to process image.");
+        }
       } else {
+        setImageFile(null);
         setImagePreview("");
       }
 
@@ -273,6 +283,9 @@ function EditProductAdmin() {
             <div className="edit-group full-row">
               <label htmlFor="image_file">Product Photo</label>
               <input id="image_file" name="image_file" type="file" accept="image/*" onChange={handleChange} />
+              <p style={{ fontSize: "10px", color: "#aaa", marginTop: "5px" }}>
+                Uploaded images are cropped to 1:1 and compressed automatically.
+              </p>
             </div>
 
             <div className="edit-group full-row">

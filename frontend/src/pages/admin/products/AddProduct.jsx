@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createProduct } from "../../../services/productService";
 import { createCategory, getCategories } from "../../../services/categoryService";
+import { optimizeImageUpload } from "../../../utils/optimizeImageUpload";
 import { resolveMediaUrl } from "../../../utils/media";
 
 const initialForm = {
@@ -68,12 +69,11 @@ function AddProductAdmin() {
     };
   }, []);
 
-  function handleChange(event) {
+  async function handleChange(event) {
     const { name, value, type, checked, files } = event.target;
 
     if (name === "image_file") {
       const file = files?.[0] || null;
-      setImageFile(file);
 
       if (previewRef.current) {
         URL.revokeObjectURL(previewRef.current);
@@ -81,11 +81,21 @@ function AddProductAdmin() {
       }
 
       if (file) {
-        const previewUrl = URL.createObjectURL(file);
-        previewRef.current = previewUrl;
-        setImagePreview(previewUrl);
-        setForm((current) => ({ ...current, image: "" }));
+        try {
+          const optimizedFile = await optimizeImageUpload(file);
+          setImageFile(optimizedFile);
+          const previewUrl = URL.createObjectURL(optimizedFile);
+          previewRef.current = previewUrl;
+          setImagePreview(previewUrl);
+          setForm((current) => ({ ...current, image: "" }));
+          setError("");
+        } catch (processingError) {
+          setImageFile(null);
+          setImagePreview("");
+          setError(processingError?.message || "Failed to process image.");
+        }
       } else {
+        setImageFile(null);
         setImagePreview("");
       }
 
@@ -324,7 +334,7 @@ function AddProductAdmin() {
               <label htmlFor="image_file">Product Photo</label>
               <input id="image_file" name="image_file" type="file" accept="image/*" onChange={handleChange} />
               <p style={{ fontSize: "10px", color: "#aaa", marginTop: "5px" }}>
-                Upload a product image. If no file is selected, you can still paste an image URL below.
+                Uploaded images are cropped to 1:1 and compressed automatically. If no file is selected, you can still paste an image URL below.
               </p>
             </div>
 
