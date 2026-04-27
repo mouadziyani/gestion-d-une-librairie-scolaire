@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import { AuthContext } from "../context/AuthContext";
-import { hasAllowedRole } from "../utils/helpers";
+import Sidebar from "@/layouts/components/Sidebar";
+import { AuthContext } from "@/features/auth/authContext";
+import { hasAllowedRole } from "@/shared/utils/common/helpers";
 
 function RoleRoute({ children, allowedRoles = [] }) {
   const { user, loading } = useContext(AuthContext);
