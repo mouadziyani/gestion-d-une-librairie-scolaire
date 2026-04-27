@@ -198,7 +198,7 @@ function Cart() {
               <span>{formatDh(totals.total)}</span>
             </div>
 
-            <button className="btn-checkout" type="button" onClick={() => navigate("/Checkout")} disabled={!cart.length}>
+            <button className="btn-checkout" type="button" onClick={() => navigate("/checkout")} disabled={!cart.length}>
               Proceed to Checkout
             </button>
 

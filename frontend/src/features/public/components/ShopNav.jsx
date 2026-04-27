@@ -22,7 +22,7 @@ function Shopnav() {
             </NavLink>
           </li>
           <li className="shop-nav-item">
-            <NavLink to="/Profile" className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to="/profile" className={({ isActive }) => isActive ? "active" : ""}>
               Settings
             </NavLink>
           </li>

@@ -18,7 +18,7 @@ function Header() {
           </div>
         </Link>
 
-        <Link to="/Profile" className="profile-link-header">
+        <Link to="/profile" className="profile-link-header">
           <Avatar size={40} />
         </Link>
         

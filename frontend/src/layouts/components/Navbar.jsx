@@ -25,7 +25,7 @@ function Navbar() {
 
   const isAuthenticated = !!user;
   const roleSlug = (user?.role?.slug || "").toLowerCase();
-  const notificationsPath = roleSlug === "client" ? "/client/notifications" : "/Notifications";
+  const notificationsPath = roleSlug === "client" ? "/client/notifications" : "/notifications";
 
   useEffect(() => {
     let active = true;
@@ -330,7 +330,7 @@ function Navbar() {
           <div className="nav-dropdown-menu nav-profile-menu">
             {isAuthenticated ? (
               <>
-                <Link to="/Profile" onClick={closeMenus} className="nav-dropdown-item">
+                <Link to="/profile" onClick={closeMenus} className="nav-dropdown-item">
                   My Profile
                 </Link>
                 <button type="button" onClick={handleLogout} className="nav-dropdown-item nav-dropdown-button nav-logout-button">
@@ -423,10 +423,10 @@ function Navbar() {
                 <span>Total</span>
                 <strong>{formatDh(cartTotals.total)}</strong>
               </div>
-              <button type="button" className="cart-drawer-checkout" onClick={() => goToCart("/Checkout")}>
+              <button type="button" className="cart-drawer-checkout" onClick={() => goToCart("/checkout")}>
                 Checkout
               </button>
-              <button type="button" className="cart-drawer-view" onClick={() => goToCart("/Cart")}>
+              <button type="button" className="cart-drawer-view" onClick={() => goToCart("/cart")}>
                 View full cart
               </button>
             </div>

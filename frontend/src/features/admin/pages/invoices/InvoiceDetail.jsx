@@ -70,7 +70,7 @@ function AdminInvoiceDetail() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const isModeratorRoute = location.pathname.startsWith("/moderator");
-  const listPath = isModeratorRoute ? "/moderator/invoices" : "/AdminInvoiceList";
+  const listPath = isModeratorRoute ? "/moderator/invoices" : "/admin/invoices";
   const reportPath = isModeratorRoute ? "/moderator/reports" : "/admin/reports/sales";
   const [order, setOrder] = useState(null);
   const [invoice, setInvoice] = useState(null);

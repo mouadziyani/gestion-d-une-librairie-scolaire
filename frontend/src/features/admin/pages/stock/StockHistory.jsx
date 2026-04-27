@@ -5,7 +5,7 @@ import { deleteStockEntry, getStockHistory } from "@/shared/services/stockServic
 function StockHistory() {
   const location = useLocation();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
-  const updatePath = isModeratorRoute ? "/moderator/update-stock" : "/UpdateStock";
+  const updatePath = isModeratorRoute ? "/moderator/update-stock" : "/admin/stock/update";
   const areaLabel = isModeratorRoute ? "MODERATOR / LOGS" : "ADMIN / LOGS";
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("product_id") || "";

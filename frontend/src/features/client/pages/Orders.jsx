@@ -89,7 +89,7 @@ function Orders() {
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
-        <Link to="/Checkout" className="btn-elegant">
+        <Link to="/checkout" className="btn-elegant">
           New checkout
         </Link>
       </div>
@@ -120,7 +120,7 @@ function Orders() {
                       <td>{order.status || "-"}</td>
                       <td>{formatMoney(order.total_price || 0)}</td>
                       <td>
-                        <Link to={`/OrderDetail?id=${order.id}`} className="action-link">
+                        <Link to={`/order-detail?id=${order.id}`} className="action-link">
                           View
                         </Link>
                       </td>

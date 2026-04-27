@@ -155,7 +155,7 @@ function MyInvoices() {
         </div>
 
         <div style={{ paddingBottom: "2px" }}>
-          <Link to="/Orders" className="btn-base btn-outline" style={{ textDecoration: "none" }}>
+          <Link to="/orders" className="btn-base btn-outline" style={{ textDecoration: "none" }}>
             Go to Orders
           </Link>
         </div>
@@ -186,7 +186,7 @@ function MyInvoices() {
                     <td>{invoice.status || "-"}</td>
                     <td>{formatMoney(invoice.total_amount || invoice.relatedOrder?.total_price || 0)}</td>
                     <td>
-                      <Link to={`/InvoiceDetail?id=${invoice.id}`} className="action-link">
+                      <Link to={`/invoice-detail?id=${invoice.id}`} className="action-link">
                         View
                       </Link>
                     </td>

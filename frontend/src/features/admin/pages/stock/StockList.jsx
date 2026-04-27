@@ -5,8 +5,8 @@ import { deleteStockEntry, getStockOverview } from "@/shared/services/stockServi
 function StockList() {
   const location = useLocation();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
-  const updatePath = isModeratorRoute ? "/moderator/update-stock" : "/UpdateStock";
-  const historyPath = isModeratorRoute ? "/moderator/stock-history" : "/StockHistory";
+  const updatePath = isModeratorRoute ? "/moderator/update-stock" : "/admin/stock/update";
+  const historyPath = isModeratorRoute ? "/moderator/stock-history" : "/admin/stock/history";
   const areaLabel = isModeratorRoute ? "MODERATOR AREA" : "ADMIN AREA";
   const [items, setItems] = useState([]);
   const [stats, setStats] = useState({ total_items: 0, low_stock_alerts: 0, out_of_stock: 0 });

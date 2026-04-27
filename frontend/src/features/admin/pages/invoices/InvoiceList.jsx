@@ -17,7 +17,7 @@ function getInvoiceFromOrder(order) {
 function AdminInvoiceList() {
   const location = useLocation();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
-  const detailPath = isModeratorRoute ? "/moderator/invoice-detail" : "/AdminInvoiceDetail";
+  const detailPath = isModeratorRoute ? "/moderator/invoice-detail" : "/admin/invoices/details";
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

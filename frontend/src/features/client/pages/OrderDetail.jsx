@@ -57,7 +57,7 @@ function OrderDetail() {
           <h1 className="page-shell-title">Order Details</h1>
           <p className="page-shell-subtitle">Follow the products, payment, and delivery state of your order.</p>
         </div>
-        <Link to="/Orders" className="btn-archive">
+        <Link to="/orders" className="btn-archive">
           Back to orders
         </Link>
       </header>

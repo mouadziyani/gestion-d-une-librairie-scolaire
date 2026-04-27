@@ -107,56 +107,49 @@ function AppRoutes() {
         <Route path="/password-reset/:token" element={<ResetPassword />} />
         <Route path="/products" element={<Products />} />
         <Route path="/categories" element={<Categories />} />
-        <Route path="/Categories" element={<Categories />} />
         <Route path="/pages" element={<Pages />} />
-        <Route path="/Pages" element={<Pages />} />
-        <Route path="/ProductDetail" element={<ProductDetail />} />
+        <Route path="/product-detail" element={<ProductDetail />} />
         <Route path="/special-order" element={<SpecialOrder />} />
-        <Route path="/SpecialOrder" element={<SpecialOrder />} />
-        <Route path="/About" element={<About />} />
         <Route path="/about" element={<About />} />
-        <Route path="/Contact" element={<Contact />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/FAQ" element={<FAQ />} />
         <Route path="/faq" element={<FAQ />} />
-        <Route path="/NotFound" element={<NotFound />} />
-        <Route path="/ServerError" element={<ServerError />} />
-        <Route path="/Unauthorized" element={<Unauthorized />} />
+        <Route path="/not-found" element={<NotFound />} />
+        <Route path="/server-error" element={<ServerError />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
-        <Route path="/Profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-        <Route path="/public/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        <Route path="/public/profile" element={<Navigate to="/profile" replace />} />
 
         <Route path="/client/dashboard" element={<RoleRoute allowedRoles={["client"]}><DashboardClient /></RoleRoute>} />
-        <Route path="/Cart" element={<RoleRoute allowedRoles={["client"]}><Cart /></RoleRoute>} />
-        <Route path="/Checkout" element={<RoleRoute allowedRoles={["client"]}><Checkout /></RoleRoute>} />
-        <Route path="/Wishlist" element={<RoleRoute allowedRoles={["client"]}><Wishlist /></RoleRoute>} />
-        <Route path="/MyInvoices" element={<RoleRoute allowedRoles={["client"]}><MyInvoices /></RoleRoute>} />
-        <Route path="/InvoiceDetail" element={<RoleRoute allowedRoles={["client"]}><ClientInvoiceDetail /></RoleRoute>} />
-        <Route path="/Orders" element={<RoleRoute allowedRoles={["client"]}><ClientOrders /></RoleRoute>} />
-        <Route path="/OrderDetail" element={<RoleRoute allowedRoles={["client"]}><ClientOrderDetail /></RoleRoute>} />
-        <Route path="/Notifications" element={<RoleRoute allowedRoles={["client", "admin", "moderator"]}><Notifications /></RoleRoute>} />
+        <Route path="/cart" element={<RoleRoute allowedRoles={["client"]}><Cart /></RoleRoute>} />
+        <Route path="/checkout" element={<RoleRoute allowedRoles={["client"]}><Checkout /></RoleRoute>} />
+        <Route path="/wishlist" element={<RoleRoute allowedRoles={["client"]}><Wishlist /></RoleRoute>} />
+        <Route path="/my-invoices" element={<RoleRoute allowedRoles={["client"]}><MyInvoices /></RoleRoute>} />
+        <Route path="/invoice-detail" element={<RoleRoute allowedRoles={["client"]}><ClientInvoiceDetail /></RoleRoute>} />
+        <Route path="/orders" element={<RoleRoute allowedRoles={["client"]}><ClientOrders /></RoleRoute>} />
+        <Route path="/order-detail" element={<RoleRoute allowedRoles={["client"]}><ClientOrderDetail /></RoleRoute>} />
+        <Route path="/notifications" element={<RoleRoute allowedRoles={["client", "admin", "moderator"]}><Notifications /></RoleRoute>} />
         <Route path="/client/notifications" element={<RoleRoute allowedRoles={["client"]}><ClientNotifications /></RoleRoute>} />
         <Route path="/client/special-order" element={<RoleRoute allowedRoles={["client"]}><ClientSpecialOrder /></RoleRoute>} />
 
         <Route path="/dashboard" element={<RoleRoute allowedRoles={["admin"]}><Dashboard /></RoleRoute>} />
         <Route path="/admin/dashboard" element={<RoleRoute allowedRoles={["admin"]}><Dashboard /></RoleRoute>} />
         <Route path="/admin/analytics" element={<RoleRoute allowedRoles={["admin"]}><Analytics /></RoleRoute>} />
-        <Route path="/ProductsListAdmin" element={<RoleRoute allowedRoles={["admin"]}><ProductsListAdmin /></RoleRoute>} />
-        <Route path="/AddProductAdmin" element={<RoleRoute allowedRoles={["admin"]}><AddProductAdmin /></RoleRoute>} />
-        <Route path="/CategoriesAdmin" element={<RoleRoute allowedRoles={["admin"]}><CategoriesAdmin /></RoleRoute>} />
-        <Route path="/EditProductAdmin" element={<RoleRoute allowedRoles={["admin"]}><EditProductAdmin /></RoleRoute>} />
-        <Route path="/ProductDetailsAdmin" element={<RoleRoute allowedRoles={["admin"]}><ProductDetailsAdmin /></RoleRoute>} />
-        <Route path="/StockList" element={<RoleRoute allowedRoles={["admin"]}><StockList /></RoleRoute>} />
-        <Route path="/UpdateStock" element={<RoleRoute allowedRoles={["admin"]}><UpdateStock /></RoleRoute>} />
-        <Route path="/StockHistory" element={<RoleRoute allowedRoles={["admin"]}><StockHistory /></RoleRoute>} />
-        <Route path="/SystemConfig" element={<RoleRoute allowedRoles={["admin"]}><SystemConfig /></RoleRoute>} />
-        <Route path="/RolesPermissions" element={<RoleRoute allowedRoles={["admin"]}><RolesPermissions /></RoleRoute>} />
-        <Route path="/GeneralSettings" element={<RoleRoute allowedRoles={["admin", "moderator"]}><GeneralSettings /></RoleRoute>} />
-        <Route path="/AdminInvoiceBySchool" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceBySchool /></RoleRoute>} />
-        <Route path="/AdminInvoiceCreate" element={<Navigate to="/admin/invoices/create" replace />} />
+        <Route path="/admin/products" element={<RoleRoute allowedRoles={["admin"]}><ProductsListAdmin /></RoleRoute>} />
+        <Route path="/admin/products/create" element={<RoleRoute allowedRoles={["admin"]}><AddProductAdmin /></RoleRoute>} />
+        <Route path="/admin/categories" element={<RoleRoute allowedRoles={["admin"]}><CategoriesAdmin /></RoleRoute>} />
+        <Route path="/admin/products/edit" element={<RoleRoute allowedRoles={["admin"]}><EditProductAdmin /></RoleRoute>} />
+        <Route path="/admin/products/details" element={<RoleRoute allowedRoles={["admin"]}><ProductDetailsAdmin /></RoleRoute>} />
+        <Route path="/admin/stock" element={<RoleRoute allowedRoles={["admin"]}><StockList /></RoleRoute>} />
+        <Route path="/admin/stock/update" element={<RoleRoute allowedRoles={["admin"]}><UpdateStock /></RoleRoute>} />
+        <Route path="/admin/stock/history" element={<RoleRoute allowedRoles={["admin"]}><StockHistory /></RoleRoute>} />
+        <Route path="/admin/settings/system" element={<RoleRoute allowedRoles={["admin"]}><SystemConfig /></RoleRoute>} />
+        <Route path="/admin/settings/roles" element={<RoleRoute allowedRoles={["admin"]}><RolesPermissions /></RoleRoute>} />
+        <Route path="/admin/settings/general" element={<RoleRoute allowedRoles={["admin", "moderator"]}><GeneralSettings /></RoleRoute>} />
+        <Route path="/admin/invoices/by-school" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceBySchool /></RoleRoute>} />
         <Route path="/admin/invoices/create" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceCreate /></RoleRoute>} />
-        <Route path="/AdminInvoiceDetail" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceDetail /></RoleRoute>} />
-        <Route path="/AdminInvoiceList" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceList /></RoleRoute>} />
+        <Route path="/admin/invoices/details" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceDetail /></RoleRoute>} />
+        <Route path="/admin/invoices" element={<RoleRoute allowedRoles={["admin"]}><AdminInvoiceList /></RoleRoute>} />
         <Route path="/admin/users" element={<RoleRoute allowedRoles={["admin"]}><AdminUsersList /></RoleRoute>} />
         <Route path="/admin/users/create" element={<RoleRoute allowedRoles={["admin"]}><AdminCreateUser /></RoleRoute>} />
         <Route path="/admin/users/edit" element={<RoleRoute allowedRoles={["admin"]}><AdminEditUser /></RoleRoute>} />
@@ -198,8 +191,43 @@ function AppRoutes() {
 
         <Route path="/school/invoices" element={<RoleRoute allowedRoles={["admin"]}><SchoolInvoices /></RoleRoute>} />
         <Route path="/school/invoice-detail" element={<RoleRoute allowedRoles={["admin"]}><SchoolInvoiceDetail /></RoleRoute>} />
-        <Route path="/SchoolInvoices" element={<RoleRoute allowedRoles={["admin"]}><SchoolInvoices /></RoleRoute>} />
-        <Route path="/SchoolInvoiceDetail" element={<RoleRoute allowedRoles={["admin"]}><SchoolInvoiceDetail /></RoleRoute>} />
+
+        <Route path="/Categories" element={<Navigate to="/categories" replace />} />
+        <Route path="/Pages" element={<Navigate to="/pages" replace />} />
+        <Route path="/ProductDetail" element={<Navigate to="/product-detail" replace />} />
+        <Route path="/SpecialOrder" element={<Navigate to="/special-order" replace />} />
+        <Route path="/About" element={<Navigate to="/about" replace />} />
+        <Route path="/Contact" element={<Navigate to="/contact" replace />} />
+        <Route path="/FAQ" element={<Navigate to="/faq" replace />} />
+        <Route path="/NotFound" element={<Navigate to="/not-found" replace />} />
+        <Route path="/ServerError" element={<Navigate to="/server-error" replace />} />
+        <Route path="/Unauthorized" element={<Navigate to="/unauthorized" replace />} />
+        <Route path="/Profile" element={<Navigate to="/profile" replace />} />
+        <Route path="/Cart" element={<Navigate to="/cart" replace />} />
+        <Route path="/Checkout" element={<Navigate to="/checkout" replace />} />
+        <Route path="/Wishlist" element={<Navigate to="/wishlist" replace />} />
+        <Route path="/MyInvoices" element={<Navigate to="/my-invoices" replace />} />
+        <Route path="/InvoiceDetail" element={<Navigate to="/invoice-detail" replace />} />
+        <Route path="/Orders" element={<Navigate to="/orders" replace />} />
+        <Route path="/OrderDetail" element={<Navigate to="/order-detail" replace />} />
+        <Route path="/Notifications" element={<Navigate to="/notifications" replace />} />
+        <Route path="/ProductsListAdmin" element={<Navigate to="/admin/products" replace />} />
+        <Route path="/AddProductAdmin" element={<Navigate to="/admin/products/create" replace />} />
+        <Route path="/CategoriesAdmin" element={<Navigate to="/admin/categories" replace />} />
+        <Route path="/EditProductAdmin" element={<Navigate to="/admin/products/edit" replace />} />
+        <Route path="/ProductDetailsAdmin" element={<Navigate to="/admin/products/details" replace />} />
+        <Route path="/StockList" element={<Navigate to="/admin/stock" replace />} />
+        <Route path="/UpdateStock" element={<Navigate to="/admin/stock/update" replace />} />
+        <Route path="/StockHistory" element={<Navigate to="/admin/stock/history" replace />} />
+        <Route path="/SystemConfig" element={<Navigate to="/admin/settings/system" replace />} />
+        <Route path="/RolesPermissions" element={<Navigate to="/admin/settings/roles" replace />} />
+        <Route path="/GeneralSettings" element={<Navigate to="/admin/settings/general" replace />} />
+        <Route path="/AdminInvoiceBySchool" element={<Navigate to="/admin/invoices/by-school" replace />} />
+        <Route path="/AdminInvoiceCreate" element={<Navigate to="/admin/invoices/create" replace />} />
+        <Route path="/AdminInvoiceDetail" element={<Navigate to="/admin/invoices/details" replace />} />
+        <Route path="/AdminInvoiceList" element={<Navigate to="/admin/invoices" replace />} />
+        <Route path="/SchoolInvoices" element={<Navigate to="/school/invoices" replace />} />
+        <Route path="/SchoolInvoiceDetail" element={<Navigate to="/school/invoice-detail" replace />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

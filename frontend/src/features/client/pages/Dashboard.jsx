@@ -133,7 +133,7 @@ function DashboardClient() {
             <p style={{ color: "#888", fontSize: "14px", marginBottom: "20px" }}>
               Our team in El Aaioun is available from 09:00 to 19:00.
             </p>
-            <Link to="/Contact" className="btn-update-profile" style={{ display: "inline-block", textDecoration: "none", width: "100%" }}>
+            <Link to="/contact" className="btn-update-profile" style={{ display: "inline-block", textDecoration: "none", width: "100%" }}>
               Contact Library
             </Link>
           </div>

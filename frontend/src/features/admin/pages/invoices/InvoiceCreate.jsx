@@ -102,7 +102,7 @@ function AdminInvoiceCreate() {
       };
 
       await api.post("/invoices", payload);
-      navigate("/AdminInvoiceList");
+      navigate("/admin/invoices");
     } catch (err) {
       const validationErrors = err?.response?.data?.errors;
       const firstValidationError = validationErrors ? Object.values(validationErrors).flat()[0] : null;

@@ -185,7 +185,7 @@ function ProductDetail() {
                 {wishlisted ? "In Wishlist" : "Add to Wishlist"}
               </button>
               {isAuthenticated ? (
-                <Link to="/Cart" className="btn-wishlist">
+                <Link to="/cart" className="btn-wishlist">
                   View Cart
                 </Link>
               ) : null}

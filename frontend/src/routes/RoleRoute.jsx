@@ -23,7 +23,7 @@ function RoleRoute({ children, allowedRoles = [] }) {
   }
 
   if (!hasAllowedRole(roleSlug, allowedRoles)) {
-    return <Navigate to="/Unauthorized" replace />;
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return (

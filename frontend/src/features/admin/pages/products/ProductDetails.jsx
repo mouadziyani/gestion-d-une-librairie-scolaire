@@ -17,8 +17,8 @@ function ProductDetailsAdmin() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
-  const listPath = isModeratorRoute ? "/moderator/products" : "/ProductsListAdmin";
-  const editPath = isModeratorRoute ? "/moderator/edit-product" : "/EditProductAdmin";
+  const listPath = isModeratorRoute ? "/moderator/products" : "/admin/products";
+  const editPath = isModeratorRoute ? "/moderator/edit-product" : "/admin/products/edit";
   const productId = searchParams.get("id");
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);

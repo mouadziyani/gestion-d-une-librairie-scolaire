@@ -57,7 +57,7 @@ function Sidebar() {
 
         <p className="nav-group-title">System</p>
         {(roleSlug === "admin" || roleSlug === "moderator") && (
-          <NavLink to="/GeneralSettings" className="sidebar-link">
+          <NavLink to="/admin/settings/general" className="sidebar-link">
             <Settings size={18} />
             <span>Home Settings</span>
           </NavLink>

@@ -291,7 +291,7 @@ function Home() {
             {featuredProducts.map((product) => (
               <Link
                 key={product.id}
-                to={`/ProductDetail?productId=${product.id}`}
+                to={`/product-detail?productId=${product.id}`}
                 className="home-product-card"
                 aria-label={`Open product ${product.name}`}
               >
@@ -326,7 +326,7 @@ function Home() {
             {landingProducts.map((product) => (
               <Link
                 key={product.id}
-                to={`/ProductDetail?productId=${product.id}`}
+                to={`/product-detail?productId=${product.id}`}
                 className="home-shelf-product"
                 aria-label={`Open product ${product.name}`}
               >
@@ -363,7 +363,7 @@ function Home() {
             {bestSellerProducts.map((product) => (
               <Link
                 key={product.id}
-                to={`/ProductDetail?productId=${product.id}`}
+                to={`/product-detail?productId=${product.id}`}
                 className="home-product-card"
                 aria-label={`Open product ${product.name}`}
               >

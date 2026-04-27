@@ -244,7 +244,7 @@ function Products() {
                   const imageSrc = resolveMediaUrl(product.image_url);
 
                   return (
-                    <Link to={`/ProductDetail?productId=${product.id}`} className="product-item" key={product.id}>
+                    <Link to={`/product-detail?productId=${product.id}`} className="product-item" key={product.id}>
                       <div className="product-img-holder">
                         {imageSrc ? <img src={imageSrc} alt={product.name} /> : <div className="product-image-placeholder">No image</div>}
                       </div>

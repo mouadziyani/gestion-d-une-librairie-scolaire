@@ -188,7 +188,7 @@ function AddProductAdmin() {
 
     try {
       await createProduct(buildPayload());
-      navigate("/ProductsListAdmin");
+      navigate("/admin/products");
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to create product.");
     } finally {

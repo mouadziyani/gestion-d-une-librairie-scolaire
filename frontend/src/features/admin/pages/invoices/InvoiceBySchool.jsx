@@ -85,7 +85,7 @@ function AdminInvoiceBySchool() {
           <h1 className="page-shell-title">Invoices by School</h1>
           <p className="page-shell-subtitle">See how invoices and orders are distributed across partner schools.</p>
         </div>
-        <Link to="/AdminInvoiceList" className="btn-add-role">
+        <Link to="/admin/invoices" className="btn-add-role">
           Back to invoices
         </Link>
       </header>

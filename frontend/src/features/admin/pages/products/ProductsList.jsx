@@ -14,9 +14,9 @@ function formatMoney(value) {
 function ProductsListAdmin() {
   const location = useLocation();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
-  const addPath = isModeratorRoute ? null : "/AddProductAdmin";
-  const detailsPath = isModeratorRoute ? "/moderator/product-details" : "/ProductDetailsAdmin";
-  const editPath = isModeratorRoute ? "/moderator/edit-product" : "/EditProductAdmin";
+  const addPath = isModeratorRoute ? null : "/admin/products/create";
+  const detailsPath = isModeratorRoute ? "/moderator/product-details" : "/admin/products/details";
+  const editPath = isModeratorRoute ? "/moderator/edit-product" : "/admin/products/edit";
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

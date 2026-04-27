@@ -15,7 +15,7 @@ function UpdateStock() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
-  const successPath = isModeratorRoute ? "/moderator/stock-history" : "/StockHistory";
+  const successPath = isModeratorRoute ? "/moderator/stock-history" : "/admin/stock/history";
   const areaLabel = isModeratorRoute ? "MODERATOR / STOCK CONTROL" : "ADMIN / STOCK CONTROL";
   const productIdFromQuery = searchParams.get("id");
   const movementId = searchParams.get("movement_id");

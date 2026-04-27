@@ -25,7 +25,7 @@ function EditProductAdmin() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("id");
-  const listPath = location.pathname.startsWith("/moderator") ? "/moderator/products" : "/ProductsListAdmin";
+  const listPath = location.pathname.startsWith("/moderator") ? "/moderator/products" : "/admin/products";
   const [form, setForm] = useState(initialForm);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
