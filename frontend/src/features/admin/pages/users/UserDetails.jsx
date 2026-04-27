@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { deleteAdminUser, getAdminUser } from "@/features/admin/services/adminUserService";
+import DefaultProfileImage from "@/assets/avatars/profile.jpg";
+import { resolveMediaUrl } from "@/shared/utils/common/media";
 
 function UserDetails() {
   const [searchParams] = useSearchParams();
@@ -8,6 +10,7 @@ function UserDetails() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -17,6 +20,7 @@ function UserDetails() {
         const data = await getAdminUser(userId);
         if (active) {
           setUser(data);
+          setPhotoFailed(false);
         }
       } catch (err) {
         if (active) {
@@ -56,6 +60,10 @@ function UserDetails() {
     }
   }
 
+  const profilePhotoSrc = !photoFailed
+    ? resolveMediaUrl(user?.profile_photo_url || user?.profile_photo || "") || DefaultProfileImage
+    : DefaultProfileImage;
+
   if (loading) {
     return null;
   }
@@ -84,11 +92,11 @@ function UserDetails() {
 
       <section className="admin-card" style={{ gridTemplateColumns: "220px 1fr" }}>
         <div className="admin-product-img">
-          {user?.profile_photo_url ? (
-            <img src={user.profile_photo_url} alt={user.name} />
-          ) : (
-            <span style={{ color: "#bbb", fontSize: "0.9rem" }}>No photo</span>
-          )}
+          <img
+            src={profilePhotoSrc}
+            alt={user?.name || "User"}
+            onError={() => setPhotoFailed(true)}
+          />
         </div>
 
         <div className="admin-detail-content">
