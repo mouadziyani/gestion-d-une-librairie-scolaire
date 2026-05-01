@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { deleteAdminUser, getAdminUsers } from "@/features/admin/services/adminUserService";
 import { getRoles } from "@/features/admin/services/roleService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function UsersList() {
   const navigate = useNavigate();
+  const { t } = useUiPreferences();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -24,7 +26,7 @@ function UsersList() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load users.");
+          setError(err?.response?.data?.message || t("pages.failedLoadUsers"));
         }
       } finally {
         if (active) {
@@ -66,7 +68,7 @@ function UsersList() {
   }, [users, search, roleFilter]);
 
   async function handleDelete(id) {
-    const confirmed = window.confirm("Delete this user permanently?");
+    const confirmed = window.confirm(t("pages.deleteUserConfirm"));
     if (!confirmed) {
       return;
     }
@@ -75,7 +77,7 @@ function UsersList() {
       await deleteAdminUser(id);
       setUsers((current) => current.filter((user) => user.id !== id));
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to delete user.");
+      setError(err?.response?.data?.message || t("pages.failedDeleteUser"));
     }
   }
 
@@ -87,30 +89,30 @@ function UsersList() {
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span className="eyebrow-label">ADMIN / USERS</span>
-          <h2>Users List</h2>
+          <span className="eyebrow-label">{t("pages.adminArea")} / {t("sidebar.users")}</span>
+          <h2>{t("pages.usersList")}</h2>
         </div>
         <button type="button" className="btn-add-role" onClick={() => navigate("/admin/users/create")}>
-          + Add User
+          + {t("pages.addUser")}
         </button>
       </header>
 
       <div className="filter-bar-admin">
         <div className="filter-field">
-          <label htmlFor="user-search">Search</label>
+          <label htmlFor="user-search">{t("common.search")}</label>
           <input
             id="user-search"
             type="search"
-            placeholder="Search by name, email, role..."
+            placeholder={t("pages.searchUsersPlaceholder")}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
 
         <div className="filter-field">
-          <label htmlFor="role-filter">Role</label>
+          <label htmlFor="role-filter">{t("pages.role")}</label>
           <select id="role-filter" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
-            <option value="all">All roles</option>
+            <option value="all">{t("pages.allRoles")}</option>
             {roleOptions.map((role) => (
               <option key={role.slug} value={role.slug}>
                 {role.name}
@@ -128,11 +130,11 @@ function UsersList() {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Phone</th>
-                <th>Actions</th>
+                <th>{t("pages.name")}</th>
+                <th>{t("auth.email")}</th>
+                <th>{t("pages.role")}</th>
+                <th>{t("pages.phone")}</th>
+                <th>{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -142,24 +144,24 @@ function UsersList() {
                     <td>#{user.id}</td>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
-                    <td>{user.role?.name || "Unknown"}</td>
+                    <td>{user.role?.name || t("pages.unknown")}</td>
                     <td>{user.phone || "-"}</td>
                     <td>
                       <Link to={`/admin/users/details?id=${user.id}`} className="action-link">
-                        View
+                        {t("common.view")}
                       </Link>
                       <Link to={`/admin/users/edit?id=${user.id}`} className="action-link">
-                        Edit
+                        {t("common.edit")}
                       </Link>
                       <button type="button" className="action-link delete-link action-button-link" onClick={() => handleDelete(user.id)}>
-                        Delete
+                        {t("common.delete")}
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6">No users match your filters.</td>
+                  <td colSpan="6">{t("pages.noUsersMatch")}</td>
                 </tr>
               )}
             </tbody>

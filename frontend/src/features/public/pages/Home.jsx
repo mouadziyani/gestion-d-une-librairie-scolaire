@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getProducts } from "@/shared/services/productService";
 import { getCategories } from "@/shared/services/categoryService";
 import { getSitePreferences } from "@/shared/services/sitePreferencesService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
 
 const HOME_CACHE_KEY = "bougdim_home_catalogue";
@@ -48,12 +49,13 @@ function ProductVisual({ product, fallbackLabel }) {
   return (
     <div className="home-visual-placeholder">
       <span>{fallbackLabel}</span>
-      <strong>{product?.name || "Catalogue"}</strong>
+      <strong>{product?.name || fallbackLabel}</strong>
     </div>
   );
 }
 
 function Home() {
+  const { t } = useUiPreferences();
   const [catalogue, setCatalogue] = useState(() => readHomeCache());
   const [preferences, setPreferences] = useState(() => getSitePreferences());
   const sections = preferences.landingSections || {};
@@ -163,22 +165,19 @@ function Home() {
       {sections.hero ? (
         <section className="home-hero-grid home-desk-hero">
           <div className="home-hero-copy home-desk-copy">
-            <span className="eyebrow-label">Librairie BOUGDIM</span>
-            <h1>School supplies, sorted like a clean desk.</h1>
-            <p>
-              Pick textbooks, notebooks, writing tools, and custom requests from a catalogue designed
-              for quick school shopping.
-            </p>
+            <span className="eyebrow-label">{t("common.brandName")}</span>
+            <h1>{t("home.heroTitle")}</h1>
+            <p>{t("home.heroDescription")}</p>
 
             <div className="home-hero-actions">
               <Link to="/products" className="home-btn home-btn-primary">
-                Browse products
+                {t("home.browseProducts")}
               </Link>
               <Link to="/categories" className="home-btn home-btn-secondary">
-                View categories
+                {t("home.viewCategories")}
               </Link>
               <Link to="/special-order" className="home-btn home-btn-secondary">
-                Special order
+                {t("home.specialOrder")}
               </Link>
             </div>
 
@@ -186,40 +185,40 @@ function Home() {
               <div className="home-desk-metrics">
                 <div>
                   <strong>{activeProductsCount}</strong>
-                  <span>active products</span>
+                  <span>{t("home.activeProducts")}</span>
                 </div>
                 <div>
                   <strong>{categories.length}</strong>
-                  <span>categories</span>
+                  <span>{t("home.categories")}</span>
                 </div>
                 <div>
                   <strong>{discountedProductsCount}</strong>
-                  <span>discounts</span>
+                  <span>{t("home.discounts")}</span>
                 </div>
               </div>
             ) : null}
           </div>
 
-          <div className="home-desk-board" aria-label="Catalogue preview">
+          <div className="home-desk-board" aria-label={t("home.cataloguePreview")}>
             <div className="home-desk-feature">
               <div className="home-desk-product-image">
-                <ProductVisual product={heroProduct} fallbackLabel="Featured product" />
+                <ProductVisual product={heroProduct} fallbackLabel={t("home.featuredProduct")} />
               </div>
               <div className="home-desk-product-copy">
-                <span>Featured item</span>
-                <h3>{heroProduct?.name || "Catalogue essentials"}</h3>
-                <p>{heroProduct ? formatMoney(heroProduct.price) : "Books, tools, bags, and more"}</p>
+                <span>{t("home.featuredItem")}</span>
+                <h3>{heroProduct?.name || t("home.catalogueEssentials")}</h3>
+                <p>{heroProduct ? formatMoney(heroProduct.price) : t("home.booksToolsMore")}</p>
               </div>
             </div>
 
             <div className="home-desk-side">
               <div className="home-desk-note">
-                <span>Top category</span>
-                <strong>{heroCategory?.name || "School catalogue"}</strong>
+                <span>{t("home.topCategory")}</span>
+                <strong>{heroCategory?.name || t("home.schoolCatalogue")}</strong>
               </div>
               <div className="home-desk-note home-desk-note-accent">
-                <span>Average discount</span>
-                <strong>{hasCatalogueData ? `${averageDiscount}%` : "Offers"}</strong>
+                <span>{t("home.averageDiscount")}</span>
+                <strong>{hasCatalogueData ? `${averageDiscount}%` : t("home.offers")}</strong>
               </div>
               <div className="home-desk-category-list">
                 {highlightedCategories.slice(0, 4).map((category) => (
@@ -241,23 +240,23 @@ function Home() {
         <section className="home-feature-grid">
           <article className="home-feature-card">
             <span>01</span>
-            <h3>Fast Delivery</h3>
-            <p>Service de livraison rapide pour toutes les ecoles partenaires et les particuliers.</p>
+            <h3>{t("home.fastDelivery")}</h3>
+            <p>{t("home.fastDeliveryDescription")}</p>
           </article>
           <article className="home-feature-card">
             <span>02</span>
-            <h3>Special Orders</h3>
-            <p>Passer une commande speciale pour des produits non disponibles en stock.</p>
+            <h3>{t("home.specialOrders")}</h3>
+            <p>{t("home.specialOrdersDescription")}</p>
           </article>
           <article className="home-feature-card">
             <span>03</span>
-            <h3>Secure Payment</h3>
-            <p>Choisissez entre paiement en ligne securise ou especes a la livraison.</p>
+            <h3>{t("home.securePayment")}</h3>
+            <p>{t("home.securePaymentDescription")}</p>
           </article>
           <article className="home-feature-card">
             <span>04</span>
-            <h3>School Partners</h3>
-            <p>Gestion optimisee des listes scolaires pour nos etablissements partenaires.</p>
+            <h3>{t("home.schoolPartners")}</h3>
+            <p>{t("home.schoolPartnersDescription")}</p>
           </article>
         </section>
       ) : null}
@@ -265,12 +264,12 @@ function Home() {
       {sections.discountBanner ? (
         <section className="home-promo-strip">
           <div>
-            <span className="eyebrow-label">Current offer</span>
-            <h2>Save more on essential school items.</h2>
-            <p>Admin can enable or disable this banner from General Settings.</p>
+            <span className="eyebrow-label">{t("home.currentOffer")}</span>
+            <h2>{t("home.saveMoreTitle")}</h2>
+            <p>{t("home.saveMoreDescription")}</p>
           </div>
           <Link to="/products?status=active" className="home-btn home-btn-dark">
-            Shop offers
+            {t("home.shopOffers")}
           </Link>
         </section>
       ) : null}
@@ -279,11 +278,11 @@ function Home() {
         <section className="home-section-block">
           <div className="home-section-head">
             <div>
-              <span className="eyebrow-label">Featured selection</span>
-              <h2>Featured Essentials</h2>
+              <span className="eyebrow-label">{t("home.featuredSelection")}</span>
+              <h2>{t("home.featuredEssentials")}</h2>
             </div>
             <Link to="/products" className="landing-section-link">
-              View all products
+              {t("home.viewAllProducts")}
             </Link>
           </div>
 
@@ -293,10 +292,10 @@ function Home() {
                 key={product.id}
                 to={`/product-detail?productId=${product.id}`}
                 className="home-product-card"
-                aria-label={`Open product ${product.name}`}
+                aria-label={t("home.openProduct", { name: product.name })}
               >
                 <div className="home-product-media">
-                  <ProductVisual product={product} fallbackLabel="No image" />
+                  <ProductVisual product={product} fallbackLabel={t("public.noImage")} />
                 </div>
                 <div className="home-product-body">
                   <h4>{product.name}</h4>
@@ -314,11 +313,11 @@ function Home() {
         <section className="home-catalogue-wall">
           <div className="home-section-head">
             <div>
-              <span className="eyebrow-label">Full shelf</span>
-              <h2>Shop more school essentials</h2>
+              <span className="eyebrow-label">{t("home.fullShelf")}</span>
+              <h2>{t("home.shopMoreEssentials")}</h2>
             </div>
             <Link to="/products" className="landing-section-link">
-              Open full catalogue
+              {t("home.openFullCatalogue")}
             </Link>
           </div>
 
@@ -328,17 +327,17 @@ function Home() {
                 key={product.id}
                 to={`/product-detail?productId=${product.id}`}
                 className="home-shelf-product"
-                aria-label={`Open product ${product.name}`}
+                aria-label={t("home.openProduct", { name: product.name })}
               >
                 <div className="home-shelf-thumb">
-                  <ProductVisual product={product} fallbackLabel="Item" />
+                  <ProductVisual product={product} fallbackLabel={t("home.item")} />
                 </div>
                 <div className="home-shelf-body">
-                  <span>{product.category?.name || "School item"}</span>
+                  <span>{product.category?.name || t("home.schoolItem")}</span>
                   <h4>{product.name}</h4>
                   <div>
                     <strong>{formatMoney(product.price)}</strong>
-                    {Number(product.discount || 0) > 0 ? <em>{product.discount}% off</em> : null}
+                    {Number(product.discount || 0) > 0 ? <em>{t("home.percentOff", { count: product.discount })}</em> : null}
                   </div>
                 </div>
               </Link>
@@ -351,11 +350,11 @@ function Home() {
         <section className="home-section-block">
           <div className="home-section-head">
             <div>
-              <span className="eyebrow-label">Best sellers</span>
-              <h2>Most requested products</h2>
+              <span className="eyebrow-label">{t("home.bestSellers")}</span>
+              <h2>{t("home.mostRequestedProducts")}</h2>
             </div>
             <Link to="/products?sort=best-sellers" className="landing-section-link">
-              See popular items
+              {t("home.seePopularItems")}
             </Link>
           </div>
 
@@ -365,15 +364,15 @@ function Home() {
                 key={product.id}
                 to={`/product-detail?productId=${product.id}`}
                 className="home-product-card"
-                aria-label={`Open product ${product.name}`}
+                aria-label={t("home.openProduct", { name: product.name })}
               >
                 <div className="home-product-media">
-                  <ProductVisual product={product} fallbackLabel="No image" />
+                  <ProductVisual product={product} fallbackLabel={t("public.noImage")} />
                 </div>
                 <div className="home-product-body">
                   <h4>{product.name}</h4>
                   <p>{formatMoney(product.price)}</p>
-                  <span className="home-product-meta">{product.order_items_count || 0} orders</span>
+                  <span className="home-product-meta">{t("home.ordersCount", { count: product.order_items_count || 0 })}</span>
                 </div>
               </Link>
             ))}
@@ -385,11 +384,11 @@ function Home() {
         <section className="home-section-block home-categories-block">
           <div className="home-section-head">
             <div>
-              <span className="eyebrow-label">Categories</span>
-              <h2>Browse by category</h2>
+              <span className="eyebrow-label">{t("home.categories")}</span>
+              <h2>{t("home.browseByCategory")}</h2>
             </div>
             <Link to="/categories" className="landing-section-link">
-              Open categories
+              {t("home.openCategories")}
             </Link>
           </div>
 
@@ -401,7 +400,7 @@ function Home() {
                 className="home-category-card"
               >
                 <span>{category.name}</span>
-                <strong>{category.products_count || 0} items</strong>
+                <strong>{t("home.itemsCount", { count: category.products_count || 0 })}</strong>
               </Link>
             ))}
           </div>
@@ -411,20 +410,17 @@ function Home() {
       {sections.brandStory ? (
         <section className="home-story-grid">
           <article className="home-story-copy">
-            <span className="eyebrow-label">About the store</span>
-            <h2>Built for school life, from books to delivery.</h2>
-            <p>
-              Our library platform keeps products, stock, and school orders visible in one place so parents,
-              students, and staff can move faster with fewer errors.
-            </p>
+            <span className="eyebrow-label">{t("home.aboutStore")}</span>
+            <h2>{t("home.builtForSchoolLife")}</h2>
+            <p>{t("home.builtForSchoolLifeDescription")}</p>
           </article>
           <article className="home-story-card">
-            <span className="eyebrow-label">Why it works</span>
+            <span className="eyebrow-label">{t("home.whyItWorks")}</span>
             <ul>
-              <li>Real-time product browsing</li>
-              <li>Clear stock visibility</li>
-              <li>Special orders when items are missing</li>
-              <li>Simple mobile-friendly shopping</li>
+              <li>{t("home.realtimeBrowsing")}</li>
+              <li>{t("home.clearStockVisibility")}</li>
+              <li>{t("home.specialOrdersMissing")}</li>
+              <li>{t("home.mobileFriendlyShopping")}</li>
             </ul>
           </article>
         </section>
@@ -433,18 +429,15 @@ function Home() {
       {sections.schoolPartners ? (
         <section className="home-partner-grid">
           <article className="home-partner-copy">
-            <span className="eyebrow-label">School partners</span>
-            <h2>Partner schools get a cleaner supply workflow.</h2>
-            <p>
-              We keep books, supply lists, and special orders aligned so partner schools can update their
-              needs without back-and-forth every week.
-            </p>
+            <span className="eyebrow-label">{t("home.schoolPartnersLabel")}</span>
+            <h2>{t("home.cleanerSupplyWorkflow")}</h2>
+            <p>{t("home.cleanerSupplyWorkflowDescription")}</p>
           </article>
           <div className="home-partner-pills">
-            <span>School lists</span>
-            <span>Bulk orders</span>
-            <span>Special requests</span>
-            <span>Fast invoicing</span>
+            <span>{t("home.schoolLists")}</span>
+            <span>{t("home.bulkOrders")}</span>
+            <span>{t("home.specialRequests")}</span>
+            <span>{t("home.fastInvoicing")}</span>
           </div>
         </section>
       ) : null}
@@ -452,14 +445,12 @@ function Home() {
       {sections.callToAction ? (
         <section className="home-cta-grid">
           <div>
-            <span className="eyebrow-label">Need a custom order?</span>
-            <h2>Request items that are not in stock and track them from the same account.</h2>
-            <p>
-              Submit a special order, follow its status, and keep everything linked to the same customer profile.
-            </p>
+            <span className="eyebrow-label">{t("home.customOrder")}</span>
+            <h2>{t("home.customOrderTitle")}</h2>
+            <p>{t("home.customOrderDescription")}</p>
           </div>
           <Link to="/special-order" className="home-btn home-btn-primary">
-            Start Special Order
+            {t("home.startSpecialOrder")}
           </Link>
         </section>
       ) : null}

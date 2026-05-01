@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { deleteProduct, getProduct } from "@/shared/services/productService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
 
 function formatPrice(value) {
@@ -13,6 +14,7 @@ function formatPrice(value) {
 }
 
 function ProductDetailsAdmin() {
+  const { t } = useUiPreferences();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -44,7 +46,7 @@ function ProductDetailsAdmin() {
         setProduct(data);
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load product.");
+          setError(err?.response?.data?.message || t("adminProducts.failedLoadProduct"));
         }
       } finally {
         if (active) {
@@ -58,22 +60,22 @@ function ProductDetailsAdmin() {
     return () => {
       active = false;
     };
-  }, [productId]);
+  }, [productId, t]);
 
   const statusLabel = useMemo(() => {
     if (!product) {
-      return "Unknown";
+      return t("adminProducts.statusUnknown");
     }
 
-    return product.status === "active" && Number(product.is_available) !== 0 ? "Active" : "Inactive";
-  }, [product]);
+    return product.status === "active" && Number(product.is_available) !== 0 ? t("adminProducts.available") : t("adminProducts.unavailable");
+  }, [product, t]);
 
   async function handleDelete() {
     if (!product) {
       return;
     }
 
-    const confirmed = window.confirm(`Delete product "${product.name}"?`);
+    const confirmed = window.confirm(t("adminProducts.deleteProductConfirmNamed", { name: product.name }));
 
     if (!confirmed) {
       return;
@@ -86,7 +88,7 @@ function ProductDetailsAdmin() {
       await deleteProduct(product.id);
       navigate(listPath);
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to delete product.");
+      setError(err?.response?.data?.message || t("adminProducts.failedDeleteProduct"));
     } finally {
       setDeleting(false);
     }
@@ -97,8 +99,8 @@ function ProductDetailsAdmin() {
       <div className="admin-detail-wrapper">
         <div className="admin-card">
           <div className="admin-detail-content">
-            <h2>Missing Product ID</h2>
-            <p>Please open this page from the products list.</p>
+            <h2>{t("adminProducts.missingProductId")}</h2>
+            <p>{t("adminProducts.openFromProductsList")}</p>
           </div>
         </div>
       </div>
@@ -114,10 +116,10 @@ function ProductDetailsAdmin() {
       <div className="admin-detail-wrapper">
         <div className="admin-card">
           <div className="admin-detail-content">
-            <h2>Product Details</h2>
+            <h2>{t("adminProducts.productDetails")}</h2>
             <p style={{ color: "#b91c1c" }}>{error}</p>
             <button type="button" className="btn-save" onClick={() => navigate(listPath)}>
-              Back to Products
+              {t("adminProducts.backToProducts")}
             </button>
           </div>
         </div>
@@ -130,9 +132,9 @@ function ProductDetailsAdmin() {
       <div className="admin-detail-wrapper">
         <div className="admin-card">
           <div className="admin-detail-content">
-            <h2>Product not found</h2>
+            <h2>{t("public.productNotFound")}</h2>
             <button type="button" className="btn-save" onClick={() => navigate(listPath)}>
-              Back to Products
+              {t("adminProducts.backToProducts")}
             </button>
           </div>
         </div>
@@ -145,14 +147,14 @@ function ProductDetailsAdmin() {
   return (
     <div className="admin-detail-wrapper">
       <header style={{ marginBottom: "30px" }}>
-        <p style={{ fontSize: "12px", letterSpacing: "2px", color: "#888" }}>ADMIN / INVENTORY / DETAILS</p>
-        <h1 style={{ fontFamily: "Fraunces, serif" }}>Manage Product</h1>
+        <p style={{ fontSize: "12px", letterSpacing: "2px", color: "#888" }}>{`${t("pages.adminArea")} / ${t("pages.inventoryList")} / ${t("adminProducts.productDetails")}`}</p>
+        <h1 style={{ fontFamily: "Fraunces, serif" }}>{t("adminProducts.manageProduct")}</h1>
       </header>
 
       <div className="admin-card">
         <div className="admin-product-side">
           <div className="admin-product-img">
-            {imageSrc ? <img src={imageSrc} alt={product.name} /> : <span>No image selected</span>}
+            {imageSrc ? <img src={imageSrc} alt={product.name} /> : <span>{t("adminProducts.noImageSelected")}</span>}
           </div>
           <div className="admin-actions-bar" style={{ flexDirection: "column" }}>
             <Link
@@ -160,10 +162,10 @@ function ProductDetailsAdmin() {
               className="btn-save"
               style={{ textDecoration: "none", display: "inline-flex", justifyContent: "center" }}
             >
-              Edit Product
+              {t("adminProducts.editProduct")}
             </Link>
             <button type="button" className="btn-archive" onClick={handleDelete} disabled={deleting}>
-              {deleting ? "Deleting..." : "Delete Product"}
+              {deleting ? t("adminProducts.deleting") : t("adminProducts.deleteProduct")}
             </button>
           </div>
         </div>
@@ -171,16 +173,16 @@ function ProductDetailsAdmin() {
         <div className="admin-detail-content">
           <div className="admin-stats-strip">
             <div className="stat-item">
-              <span>Current Stock</span>
-              <strong>{Number(product.stock || 0)} Units</strong>
+              <span>{t("adminProducts.currentStock")}</span>
+              <strong>{t("adminProducts.unitsLabel", { count: Number(product.stock || 0) })}</strong>
             </div>
             <div className="stat-item">
-              <span>Price</span>
+              <span>{t("pages.price")}</span>
               <strong>{formatPrice(product.price)}</strong>
             </div>
             <div className="stat-item">
-              <span>Status</span>
-              <strong style={{ color: statusLabel === "Active" ? "#0ca678" : "#e74c3c" }}>
+              <span>{t("common.status")}</span>
+              <strong style={{ color: statusLabel === t("adminProducts.available") ? "#0ca678" : "#e74c3c" }}>
                 {statusLabel}
               </strong>
             </div>
@@ -188,47 +190,47 @@ function ProductDetailsAdmin() {
 
           <form>
             <div className="admin-form-group">
-              <label>Product Name</label>
+              <label>{t("adminProducts.productName")}</label>
               <input type="text" value={product.name || ""} readOnly />
             </div>
 
             <div className="admin-form-group">
-              <label>Description</label>
+              <label>{t("adminProducts.description")}</label>
               <textarea rows="4" value={product.description || ""} readOnly />
             </div>
 
             <div className="admin-product-fields-grid">
               <div className="admin-form-group">
-                <label>Category</label>
-                <input type="text" value={product.category?.name || "Uncategorized"} readOnly />
+                <label>{t("adminProducts.category")}</label>
+                <input type="text" value={product.category?.name || t("adminProducts.categoryFallback")} readOnly />
               </div>
             <div className="admin-form-group">
-              <label>Reference / Barcode</label>
+              <label>{t("adminProducts.referenceBarcode")}</label>
               <input type="text" value={product.reference || "-"} readOnly />
               <div className="barcode-preview">
-                <span>Barcode / Reference</span>
-                <strong>{product.reference || "AUTO-REF"}</strong>
+                <span>{t("adminProducts.barcodeReference")}</span>
+                <strong>{product.reference || t("adminProducts.autoReference")}</strong>
               </div>
             </div>
             </div>
 
             <div className="admin-product-fields-grid">
               <div className="admin-form-group">
-                <label>Min Stock</label>
+                <label>{t("adminProducts.minStock")}</label>
                 <input type="text" value={product.min_stock ?? 0} readOnly />
               </div>
               <div className="admin-form-group">
-                <label>Availability</label>
+                <label>{t("adminProducts.availability")}</label>
                 <input
                   type="text"
-                  value={Number(product.is_available) !== 0 ? "Available" : "Unavailable"}
+                  value={Number(product.is_available) !== 0 ? t("adminProducts.available") : t("adminProducts.unavailable")}
                   readOnly
                 />
               </div>
             </div>
 
             <div className="admin-form-group">
-              <label>Slug</label>
+              <label>{t("adminProducts.slug")}</label>
               <input type="text" value={product.slug || "-"} readOnly />
             </div>
           </form>

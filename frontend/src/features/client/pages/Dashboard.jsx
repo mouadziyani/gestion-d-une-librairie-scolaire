@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Box, CreditCard, FileText, ShoppingBag } from "lucide-react";
 import { AuthContext } from "@/features/auth/authContext";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   const amount = Number(value || 0);
@@ -15,6 +16,7 @@ function formatMoney(value) {
 
 function DashboardClient() {
   const { user } = useContext(AuthContext);
+  const { t } = useUiPreferences();
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,7 +37,7 @@ function DashboardClient() {
           return;
         }
 
-        setError(err?.response?.data?.message || "Failed to load dashboard.");
+        setError(err?.response?.data?.message || t("pages.failedLoadDashboard"));
       } finally {
         if (active) {
           setLoading(false);
@@ -64,19 +66,19 @@ function DashboardClient() {
   const recentSpecialOrders = dashboard?.recent_special_orders ?? [];
 
   const clientStats = [
-    { title: "Current Orders", value: stats.current_orders ?? 0, icon: <Box size={20} />, color: "#1a1a1a" },
-    { title: "Pending Invoices", value: stats.pending_invoices ?? 0, icon: <FileText size={20} />, color: "#ff4757" },
-    { title: "Total Spent", value: formatMoney(stats.total_spent ?? 0), icon: <CreditCard size={20} />, color: "#2ecc71" },
-    { title: "Special Orders", value: stats.pending_special_orders ?? 0, icon: <ShoppingBag size={20} />, color: "#e67e22" },
+    { title: t("dashboard.currentOrders"), value: stats.current_orders ?? 0, icon: <Box size={20} />, color: "#1a1a1a" },
+    { title: t("dashboard.pendingInvoices"), value: stats.pending_invoices ?? 0, icon: <FileText size={20} />, color: "#ff4757" },
+    { title: t("dashboard.totalSpent"), value: formatMoney(stats.total_spent ?? 0), icon: <CreditCard size={20} />, color: "#2ecc71" },
+    { title: t("dashboard.specialOrders"), value: stats.pending_special_orders ?? 0, icon: <ShoppingBag size={20} />, color: "#e67e22" },
   ];
 
   return (
     <>
       <header style={{ marginBottom: "40px" }}>
         <p style={{ color: "#888", fontSize: "12px", fontWeight: "bold", textTransform: "uppercase" }}>
-          Welcome back, {user?.name || "Client"}
+          {t("dashboard.welcomeBack")}, {user?.name || t("dashboard.clientTitle")}
         </p>
-        <h1 style={{ fontFamily: "Fraunces", fontSize: "2.5rem" }}>Client Space.</h1>
+        <h1 style={{ fontFamily: "Fraunces", fontSize: "2.5rem" }}>{t("dashboard.clientTitle")}.</h1>
       </header>
 
       <section className="stats-grid">
@@ -92,19 +94,19 @@ function DashboardClient() {
       <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "30px" }}>
         <section>
           <div className="section-title">
-            My Recent Orders
+            {t("dashboard.recentOrders")}
             <Link to="/products" style={{ fontSize: "13px", textDecoration: "none" }}>
-              Continue Shopping
+              {t("dashboard.continueShopping")}
             </Link>
           </div>
           <div className="table-scroll">
             <table>
               <thead>
                 <tr>
-                  <th>Order ID</th>
-                  <th>School</th>
-                  <th>Status</th>
-                  <th>Total</th>
+                  <th>{t("pages.orderId")}</th>
+                  <th>{t("pages.school")}</th>
+                  <th>{t("common.status")}</th>
+                  <th>{t("cart.total")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -117,7 +119,7 @@ function DashboardClient() {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="4">No orders yet.</td>
+                    <td colSpan="4">{t("dashboard.noOrdersYet")}</td>
                   </tr>
                 )}
               </tbody>
@@ -126,15 +128,15 @@ function DashboardClient() {
         </section>
 
         <section>
-          <div className="section-title">Support & Help</div>
+          <div className="section-title">{t("dashboard.supportHelp")}</div>
           <div className="stat-card" style={{ textAlign: "center", padding: "40px 20px" }}>
             <ShoppingBag size={40} color="#eee" style={{ marginBottom: "15px" }} />
-            <h3 style={{ marginBottom: "10px" }}>Need help with an order?</h3>
+            <h3 style={{ marginBottom: "10px" }}>{t("dashboard.needHelpOrder")}</h3>
             <p style={{ color: "#888", fontSize: "14px", marginBottom: "20px" }}>
-              Our team in El Aaioun is available from 09:00 to 19:00.
+              {t("dashboard.supportHours")}
             </p>
             <Link to="/contact" className="btn-update-profile" style={{ display: "inline-block", textDecoration: "none", width: "100%" }}>
-              Contact Library
+              {t("dashboard.contactLibrary")}
             </Link>
           </div>
         </section>
@@ -142,13 +144,13 @@ function DashboardClient() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "30px", marginTop: "30px" }}>
         <section className="table-container">
-          <h3>Recent Invoices</h3>
+          <h3>{t("dashboard.recentInvoices")}</h3>
           <table>
             <thead>
               <tr>
-                <th>Number</th>
-                <th>Status</th>
-                <th>Total</th>
+                <th>{t("pages.number")}</th>
+                <th>{t("common.status")}</th>
+                <th>{t("cart.total")}</th>
               </tr>
             </thead>
             <tbody>
@@ -158,23 +160,23 @@ function DashboardClient() {
                   <td>{invoice.status}</td>
                   <td>{formatMoney(invoice.total_amount)}</td>
                 </tr>
-              )) : (
-                <tr>
-                  <td colSpan="3">No invoices yet.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )) : (
+                  <tr>
+                    <td colSpan="3">{t("dashboard.noInvoices")}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
         </section>
 
         <section className="table-container">
-          <h3>Special Orders</h3>
+          <h3>{t("dashboard.specialOrders")}</h3>
           <table>
             <thead>
               <tr>
-                <th>Item</th>
-                <th>School</th>
-                <th>Status</th>
+                <th>{t("pages.item")}</th>
+                <th>{t("pages.school")}</th>
+                <th>{t("common.status")}</th>
               </tr>
             </thead>
             <tbody>
@@ -184,12 +186,12 @@ function DashboardClient() {
                   <td>{item.school?.name || "-"}</td>
                   <td>{item.status}</td>
                 </tr>
-              )) : (
-                <tr>
-                  <td colSpan="3">No special orders yet.</td>
-                </tr>
-              )}
-            </tbody>
+                )) : (
+                  <tr>
+                    <td colSpan="3">{t("dashboard.noSpecialOrders")}</td>
+                  </tr>
+                )}
+              </tbody>
           </table>
         </section>
       </div>

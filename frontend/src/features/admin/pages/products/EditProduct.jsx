@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { getCategories } from "@/shared/services/categoryService";
 import { getProduct, updateProduct } from "@/shared/services/productService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 import { optimizeImageUpload } from "@/shared/utils/common/optimizeImageUpload";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
 
@@ -21,6 +22,7 @@ const initialForm = {
 };
 
 function EditProductAdmin() {
+  const { t } = useUiPreferences();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -71,7 +73,7 @@ function EditProductAdmin() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load product.");
+          setError(err?.response?.data?.message || t("adminProducts.failedLoadProduct"));
         }
       } finally {
         if (active) {
@@ -88,7 +90,7 @@ function EditProductAdmin() {
         URL.revokeObjectURL(previewRef.current);
       }
     };
-  }, [productId]);
+  }, [productId, t]);
 
   async function handleChange(event) {
     const { name, value, type, checked, files } = event.target;
@@ -113,7 +115,7 @@ function EditProductAdmin() {
         } catch (processingError) {
           setImageFile(null);
           setImagePreview("");
-          setError(processingError?.message || "Failed to process image.");
+          setError(processingError?.message || t("adminProducts.failedProcessImage"));
         }
       } else {
         setImageFile(null);
@@ -161,7 +163,7 @@ function EditProductAdmin() {
       await updateProduct(productId, buildPayload());
       navigate(listPath);
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to update product.");
+      setError(err?.response?.data?.message || t("adminProducts.failedUpdateProduct"));
     } finally {
       setSaving(false);
     }
@@ -171,8 +173,8 @@ function EditProductAdmin() {
     return (
       <div className="edit-admin-wrapper">
         <div className="edit-card">
-          <h2>Missing Product ID</h2>
-          <p>Please open this page from the products list.</p>
+          <h2>{t("adminProducts.missingProductId")}</h2>
+          <p>{t("adminProducts.openFromProductsList")}</p>
         </div>
       </div>
     );
@@ -188,12 +190,12 @@ function EditProductAdmin() {
     <div className="edit-admin-wrapper">
       <header style={{ marginBottom: "30px", textAlign: "center" }}>
         <span style={{ fontSize: "12px", letterSpacing: "2px", color: "#888", fontWeight: "bold" }}>
-          LIBRARY BOUGDIM ADMIN
+          {t("adminProducts.adminHeader")}
         </span>
       </header>
 
       <div className="edit-card">
-        <h2>Edit Product</h2>
+        <h2>{t("adminProducts.editProductTitle")}</h2>
 
         {error && (
           <div style={{ marginBottom: "16px", color: "#b91c1c", fontSize: "14px" }}>
@@ -204,29 +206,29 @@ function EditProductAdmin() {
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="edit-group full-row">
-              <label htmlFor="name">Product Name</label>
+              <label htmlFor="name">{t("adminProducts.productName")}</label>
               <input id="name" name="name" value={form.name} onChange={handleChange} required />
             </div>
 
             <div className="edit-group full-row">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">{t("adminProducts.description")}</label>
               <textarea id="description" name="description" rows="4" value={form.description} onChange={handleChange} />
             </div>
 
             <div className="edit-group">
-              <label htmlFor="price">Price (DH)</label>
+              <label htmlFor="price">{t("adminProducts.priceDh")}</label>
               <input id="price" name="price" type="number" step="0.01" min="0" value={form.price} onChange={handleChange} required />
             </div>
 
             <div className="edit-group">
-              <label htmlFor="stock">Stock</label>
+              <label htmlFor="stock">{t("adminProducts.stock")}</label>
               <input id="stock" name="stock" type="number" min="0" value={form.stock} onChange={handleChange} required />
             </div>
 
             <div className="edit-group">
-              <label htmlFor="category_id">Category</label>
+              <label htmlFor="category_id">{t("adminProducts.category")}</label>
               <select id="category_id" name="category_id" value={form.category_id} onChange={handleChange} required>
-                <option value="">Select category</option>
+                <option value="">{t("adminProducts.selectCategory")}</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -236,79 +238,79 @@ function EditProductAdmin() {
             </div>
 
             <div className="edit-group">
-              <label htmlFor="status">Status</label>
+              <label htmlFor="status">{t("adminProducts.status")}</label>
               <select id="status" name="status" value={form.status} onChange={handleChange}>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="active">{t("common.active")}</option>
+                <option value="inactive">{t("common.inactive")}</option>
               </select>
             </div>
 
             <div className="edit-group">
-              <label htmlFor="is_available">Availability</label>
+              <label htmlFor="is_available">{t("adminProducts.availability")}</label>
               <select
                 id="is_available"
                 name="is_available"
                 value={form.is_available ? "1" : "0"}
                 onChange={(e) => setForm((current) => ({ ...current, is_available: e.target.value === "1" }))}
               >
-                <option value="1">Available</option>
-                <option value="0">Unavailable</option>
+                <option value="1">{t("adminProducts.available")}</option>
+                <option value="0">{t("adminProducts.unavailable")}</option>
               </select>
             </div>
 
             <div className="edit-group">
-              <label htmlFor="reference">Reference / Barcode</label>
-              <input id="reference" name="reference" value={form.reference} onChange={handleChange} placeholder="e.g. BIC-001" />
+              <label htmlFor="reference">{t("adminProducts.referenceBarcode")}</label>
+              <input id="reference" name="reference" value={form.reference} onChange={handleChange} placeholder={t("adminProducts.referencePlaceholder")} />
               <div className="barcode-preview">
-                <span>Barcode / Reference</span>
-                <strong>{form.reference || "AUTO-REF"}</strong>
+                <span>{t("adminProducts.barcodeReference")}</span>
+                <strong>{form.reference || t("adminProducts.autoReference")}</strong>
               </div>
             </div>
 
             <div className="edit-group">
-              <label htmlFor="min_stock">Min Stock</label>
+              <label htmlFor="min_stock">{t("adminProducts.minStock")}</label>
               <input id="min_stock" name="min_stock" type="number" min="0" value={form.min_stock} onChange={handleChange} required />
             </div>
 
             <div className="edit-group">
-              <label htmlFor="discount">Discount</label>
+              <label htmlFor="discount">{t("adminProducts.discount")}</label>
               <input id="discount" name="discount" type="number" step="0.01" min="0" value={form.discount} onChange={handleChange} />
             </div>
 
             <div className="edit-group">
-              <label htmlFor="level">Level</label>
+              <label htmlFor="level">{t("adminProducts.level")}</label>
               <input id="level" name="level" value={form.level} onChange={handleChange} />
             </div>
 
             <div className="edit-group full-row">
-              <label htmlFor="image_file">Product Photo</label>
+              <label htmlFor="image_file">{t("adminProducts.productPhoto")}</label>
               <input id="image_file" name="image_file" type="file" accept="image/*" onChange={handleChange} />
               <p style={{ fontSize: "10px", color: "#aaa", marginTop: "5px" }}>
-                Uploaded images are cropped to 1:1 and compressed automatically.
+                {t("adminProducts.imageUploadHint")}
               </p>
             </div>
 
             <div className="edit-group full-row">
-              <label htmlFor="image">Image URL / Path</label>
+              <label htmlFor="image">{t("adminProducts.imageUrlPath")}</label>
               <input id="image" name="image" value={form.image} onChange={handleChange} />
             </div>
 
             <div className="edit-group full-row">
-              <label>Preview</label>
+              <label>{t("adminProducts.preview")}</label>
               <div className="product-preview-card">
-                {imageSrc ? <img src={imageSrc} alt="Product preview" /> : <span>No image selected</span>}
+                {imageSrc ? <img src={imageSrc} alt={t("adminProducts.productPreview")} /> : <span>{t("adminProducts.noImageSelected")}</span>}
               </div>
             </div>
           </div>
 
           <button type="submit" className="update-btn" disabled={saving}>
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? t("adminProducts.saving") : t("adminProducts.saveChanges")}
           </button>
         </form>
       </div>
 
       <p style={{ textAlign: "center", marginTop: "20px", fontSize: "12px", color: "#aaa" }}>
-        Product ID: {productId}
+        {t("adminProducts.productIdLabel", { id: productId })}
       </p>
     </div>
   );

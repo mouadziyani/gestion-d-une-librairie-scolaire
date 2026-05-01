@@ -2,16 +2,18 @@ import { Link } from "react-router-dom";
 
 import logo from "@/assets/logo/library.png";
 import useLoginForm from "@/features/auth/hooks/useLoginForm";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function Login() {
   const { Form, handleChange, handleSubmit, error } = useLoginForm();
+  const { t } = useUiPreferences();
 
   return (
     <div className="auth-wrapper auth-login">
       <div className="auth-panel">
         <div className="panel-overlay-text">
-          <span>Student supply hub</span>
-          <h2>Read <br /> More.</h2>
+          <span>{t("auth.loginPanelKicker")}</span>
+          <h2>{t("auth.loginPanelTitle")}</h2>
         </div>
       </div>
 
@@ -22,16 +24,16 @@ function Login() {
           </div>
 
           <div className="hero-text">
-            <span className="auth-eyebrow">Welcome back</span>
-            <h1>Sign in</h1>
-            <p>Access your Library BOUGDIM account and keep your school essentials close.</p>
+            <span className="auth-eyebrow">{t("auth.welcomeBack")}</span>
+            <h1>{t("auth.signIn")}</h1>
+            <p>{t("auth.loginDescription")}</p>
           </div>
 
           <form onSubmit={handleSubmit}>
             {error ? <p className="auth-alert auth-alert-error">{error}</p> : null}
 
             <div className="input-stack">
-              <label>EMAIL</label>
+              <label>{t("auth.email").toUpperCase()}</label>
               <input
                 type="email"
                 name="email"
@@ -43,23 +45,23 @@ function Login() {
             </div>
 
             <div className="input-stack">
-              <label>PASSWORD</label>
+              <label>{t("auth.password").toUpperCase()}</label>
               <input
                 type="password"
                 name="password"
-                placeholder="Enter your password"
+                placeholder={t("auth.password")}
                 required
                 onChange={handleChange}
                 value={Form.password}
               />
             </div>
 
-            <button type="submit" className="btn-elegant">Continue</button>
+            <button type="submit" className="btn-elegant">{t("auth.continue")}</button>
           </form>
 
           <div className="footer-nav">
-            <Link to="/register">Create account</Link>
-            <Link to="/forgot-password">Forgot password</Link>
+            <Link to="/register">{t("auth.createAccount")}</Link>
+            <Link to="/forgot-password">{t("auth.forgotPassword")}</Link>
           </div>
         </div>
       </main>

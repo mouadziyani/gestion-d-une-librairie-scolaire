@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function SpecialOrdersList() {
   const location = useLocation();
+  const { t } = useUiPreferences();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
   const detailsPath = isModeratorRoute ? "/moderator/special-order-details" : "/admin/special-orders/details";
   const [items, setItems] = useState([]);
@@ -23,7 +25,7 @@ function SpecialOrdersList() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load special orders.");
+          setError(err?.response?.data?.message || t("pages.failedLoadSpecialOrders"));
         }
       } finally {
         if (active) {
@@ -56,27 +58,27 @@ function SpecialOrdersList() {
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / SPECIAL ORDERS</span>
-          <h2>Special Orders</h2>
+          <span className="eyebrow-label">{isModeratorRoute ? t("pages.moderatorArea") : t("pages.adminArea")} / {t("sidebar.specialOrders")}</span>
+          <h2>{t("pages.specialOrders")}</h2>
         </div>
         <Link to="/special-order" className="btn-add-role">
-          Public request form
+          {t("pages.publicRequestForm")}
         </Link>
       </header>
 
       <div className="filter-bar-admin">
         <div className="filter-field">
-          <label htmlFor="special-search">Search</label>
-          <input id="special-search" type="search" placeholder="Search by item or school..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <label htmlFor="special-search">{t("common.search")}</label>
+          <input id="special-search" type="search" placeholder={t("pages.searchSpecialOrdersPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <div className="filter-field">
-          <label htmlFor="special-status">Status</label>
+          <label htmlFor="special-status">{t("common.status")}</label>
           <select id="special-status" value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-            <option value="completed">Completed</option>
+            <option value="all">{t("common.allStatuses")}</option>
+            <option value="pending">{t("pages.pending")}</option>
+            <option value="approved">{t("pages.approved")}</option>
+            <option value="rejected">{t("pages.rejected")}</option>
+            <option value="completed">{t("pages.completed")}</option>
           </select>
         </div>
       </div>
@@ -89,10 +91,10 @@ function SpecialOrdersList() {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Item</th>
-                <th>School</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{t("pages.item")}</th>
+                <th>{t("pages.school")}</th>
+                <th>{t("common.status")}</th>
+                <th>{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -106,14 +108,14 @@ function SpecialOrdersList() {
                       <td>{item.status || "-"}</td>
                       <td>
                         <Link to={`${detailsPath}?id=${item.id}`} className="action-link">
-                          View
+                          {t("common.view")}
                         </Link>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5">No special orders match your filters.</td>
+                    <td colSpan="5">{t("pages.noSpecialOrdersMatch")}</td>
                   </tr>
                 )
               ) : null}

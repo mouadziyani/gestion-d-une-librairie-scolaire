@@ -2,9 +2,11 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "@/features/auth/authContext";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function SpecialOrder() {
   const { user } = useContext(AuthContext);
+  const { t } = useUiPreferences();
   const [schools, setSchools] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +33,7 @@ function SpecialOrder() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load special order form data.");
+          setError(err?.response?.data?.message || t("specialOrderPage.failedLoadForm"));
         }
       } finally {
         if (active) {
@@ -45,7 +47,7 @@ function SpecialOrder() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
 
   const canSubmit = useMemo(() => Boolean(user?.id), [user]);
 
@@ -68,7 +70,7 @@ function SpecialOrder() {
         quantity: Number(form.quantity || 1),
         details: form.details || null,
       });
-      setSuccess("Your special request has been submitted successfully.");
+      setSuccess(t("specialOrderPage.success"));
       setForm({
         item_name: "",
         category_id: "",
@@ -77,7 +79,7 @@ function SpecialOrder() {
         details: "",
       });
     } catch (submitError) {
-      setError(submitError?.response?.data?.message || "Failed to submit special order.");
+      setError(submitError?.response?.data?.message || t("specialOrderPage.failedSubmit"));
     } finally {
       setSubmitting(false);
     }
@@ -87,10 +89,10 @@ function SpecialOrder() {
     return (
       <div className="special-order-wrapper">
         <div className="special-order-header">
-          <h1>Special Request</h1>
-          <p>Please log in to submit a special order request.</p>
+          <h1>{t("specialOrderPage.title")}</h1>
+          <p>{t("specialOrderPage.loginPrompt")}</p>
           <Link to="/login" className="btn-elegant" style={{ display: "inline-flex", width: "auto", marginTop: "20px", textDecoration: "none" }}>
-            Log in
+            {t("specialOrderPage.login")}
           </Link>
         </div>
       </div>
@@ -101,20 +103,20 @@ function SpecialOrder() {
     <div className="special-order-page">
       <main className="special-order-wrapper">
         <div className="special-order-header">
-          <h1>Special Request</h1>
-          <p>Can't find a specific book or supply? Tell us what you need and we'll source it for you.</p>
+          <h1>{t("specialOrderPage.title")}</h1>
+          <p>{t("specialOrderPage.subtitle")}</p>
         </div>
 
         <form className="order-form-grid" onSubmit={handleSubmit}>
           <div className="form-group full-width">
-            <label htmlFor="item_name">Item Name / Title</label>
-            <input id="item_name" name="item_name" type="text" placeholder="e.g. Advanced Physics Grade 12" value={form.item_name} onChange={handleChange} required />
+            <label htmlFor="item_name">{t("specialOrderPage.itemName")}</label>
+            <input id="item_name" name="item_name" type="text" placeholder={t("specialOrderPage.itemPlaceholder")} value={form.item_name} onChange={handleChange} required />
           </div>
 
           <div className="form-group">
-            <label htmlFor="category_id">Category</label>
+            <label htmlFor="category_id">{t("specialOrderPage.category")}</label>
             <select id="category_id" name="category_id" value={form.category_id} onChange={handleChange}>
-              <option value="">Select category</option>
+              <option value="">{t("specialOrderPage.selectCategory")}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -124,14 +126,14 @@ function SpecialOrder() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="quantity">Quantity</label>
+            <label htmlFor="quantity">{t("specialOrderPage.quantity")}</label>
             <input id="quantity" name="quantity" type="number" placeholder="1" min="1" value={form.quantity} onChange={handleChange} />
           </div>
 
           <div className="form-group full-width">
-            <label htmlFor="school_id">Associated School (Optional)</label>
+            <label htmlFor="school_id">{t("specialOrderPage.schoolOptional")}</label>
             <select id="school_id" name="school_id" value={form.school_id} onChange={handleChange}>
-              <option value="">Select school</option>
+              <option value="">{t("specialOrderPage.selectSchool")}</option>
               {schools.map((school) => (
                 <option key={school.id} value={school.id}>
                   {school.name}
@@ -141,12 +143,12 @@ function SpecialOrder() {
           </div>
 
           <div className="form-group full-width">
-            <label htmlFor="details">Additional Details (ISBN, Author, Edition...)</label>
+            <label htmlFor="details">{t("specialOrderPage.details")}</label>
             <textarea
               id="details"
               name="details"
               rows="4"
-              placeholder="The more info, the faster we find it..."
+              placeholder={t("specialOrderPage.detailsPlaceholder")}
               value={form.details}
               onChange={handleChange}
             />
@@ -156,12 +158,12 @@ function SpecialOrder() {
           {success ? <div className="checkout-success full-width">{success}</div> : null}
 
           <button type="submit" className="btn-submit-order" disabled={submitting || loading}>
-            {submitting ? "Submitting..." : "Submit Special Request"}
+            {submitting ? t("specialOrderPage.submitting") : t("specialOrderPage.submit")}
           </button>
         </form>
 
         <div style={{ textAlign: "center", marginTop: "40px" }}>
-          <p style={{ fontSize: "13px", color: "#888" }}>* Our team will notify you once the item status changes.</p>
+          <p style={{ fontSize: "13px", color: "#888" }}>{t("specialOrderPage.footnote")}</p>
         </div>
       </main>
     </div>

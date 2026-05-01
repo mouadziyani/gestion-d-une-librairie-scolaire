@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 import { ShoppingCart, Trash2 } from "lucide-react";
 import { addToCart } from "@/features/client/services/cartService";
 import { getWishlistItems, saveWishlistItems } from "@/features/client/services/wishlistService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
 
 function formatMoney(value) {
@@ -15,6 +16,7 @@ function formatMoney(value) {
 }
 
 function Wishlist() {
+  const { t } = useUiPreferences();
   const [wishlistItems, setWishlistItems] = useState([]);
 
   useEffect(() => {
@@ -35,8 +37,8 @@ function Wishlist() {
   return (
     <div className="wishlist-container">
       <header>
-        <p style={{ color: "#888", fontSize: "11px", fontWeight: "bold", textTransform: "uppercase" }}>Client Area</p>
-        <h2 style={{ fontFamily: "Fraunces", fontSize: "2.5rem" }}>Your Wishlist.</h2>
+        <p className="checkout-eyebrow">{t("wishlistPage.clientArea")}</p>
+        <h2 className="wishlist-title">{t("wishlistPage.title")}</h2>
       </header>
 
       {wishlistItems.length > 0 ? (
@@ -50,19 +52,19 @@ function Wishlist() {
                   {imageSrc ? <img src={imageSrc} alt={item.name} /> : null}
                 </div>
                 <div className="wishlist-content">
-                  <span className="category">{item.category?.name || item.cat || "Product"}</span>
+                  <span className="category">{item.category?.name || item.cat || t("wishlistPage.productFallback")}</span>
                   <h4>{item.name}</h4>
-                  <p style={{ fontWeight: "bold", fontSize: "1.1rem" }}>{formatMoney(item.price)}</p>
+                  <p className="wishlist-price">{formatMoney(item.price)}</p>
 
                   <div className="wishlist-actions">
                     <Button
                       type="button"
                       onClick={() => handleMoveToCart(item)}
-                      style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
+                      className="wishlist-move-button"
                     >
-                      <ShoppingCart size={16} /> Move to Cart
+                      <ShoppingCart size={16} /> {t("wishlistPage.moveToCart")}
                     </Button>
-                    <button className="btn-remove" title="Remove" type="button" onClick={() => handleRemove(item.id)}>
+                    <button className="btn-remove" title={t("wishlistPage.remove")} type="button" onClick={() => handleRemove(item.id)}>
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -72,10 +74,10 @@ function Wishlist() {
           })}
         </div>
       ) : (
-        <div style={{ textAlign: "center", padding: "100px 20px" }}>
-          <p style={{ color: "#888", fontSize: "1.2rem" }}>Your wishlist is empty.</p>
+        <div className="wishlist-empty-state">
+          <p className="wishlist-empty-copy">{t("wishlistPage.empty")}</p>
           <Link to="/products" style={{ textDecoration: "none" }}>
-            <Button variant="outline" style={{ marginTop: "20px" }}>Explore Library</Button>
+            <Button variant="outline" style={{ marginTop: "20px" }}>{t("wishlistPage.explore")}</Button>
           </Link>
         </div>
       )}

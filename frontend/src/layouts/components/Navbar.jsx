@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Bell, ChevronDown, Minus, Plus, ShoppingCart, Trash2, LogOut, Menu, Search, UserRound, X } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Menu, Minus, Plus, Search, ShoppingCart, Trash2, UserRound, X } from "lucide-react";
 import logo from "@/assets/logo/library.png";
 import { AuthContext } from "@/features/auth/authContext";
 import { CART_CHANGED_EVENT, getCartItems, getCartTotals, removeCartItem, syncCartWithProducts, updateCartItem } from "@/features/client/services/cartService";
@@ -8,6 +8,7 @@ import { getCategories } from "@/shared/services/categoryService";
 import { getUnreadNotificationCount } from "@/features/notifications/services/notificationService";
 import { formatDh } from "@/data/catalog";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function Navbar() {
   const [categories, setCategories] = useState([]);
@@ -22,6 +23,7 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useContext(AuthContext);
+  const { language, setLanguage, t } = useUiPreferences();
 
   const isAuthenticated = !!user;
   const roleSlug = (user?.role?.slug || "").toLowerCase();
@@ -33,11 +35,9 @@ function Navbar() {
     async function loadCategories() {
       try {
         const data = await getCategories();
-        if (!active) {
-          return;
+        if (active) {
+          setCategories(Array.isArray(data) ? data : []);
         }
-
-        setCategories(Array.isArray(data) ? data : []);
       } catch {
         if (active) {
           setCategories([]);
@@ -212,8 +212,8 @@ function Navbar() {
     <>
       <nav className={`main-nav ${mobileMenuOpen ? "mobile-open" : ""}`}>
         <div className="nav-logo">
-          <Link to="/" aria-label="Go to home">
-            <img src={logo} alt="Library BOUGDIM" />
+          <Link to="/" aria-label={t("navbar.goHome")}>
+            <img src={logo} alt={t("common.brandName")} />
           </Link>
         </div>
 
@@ -223,8 +223,8 @@ function Navbar() {
             type="search"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Search books, supplies, references..."
-            aria-label="Search products"
+            placeholder={t("navbar.searchPlaceholder")}
+            aria-label={t("navbar.searchProducts")}
           />
         </form>
 
@@ -232,52 +232,69 @@ function Navbar() {
           type="button"
           className="nav-menu-toggle"
           onClick={() => setMobileMenuOpen((current) => !current)}
-          aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-label={mobileMenuOpen ? t("navbar.closeMenu") : t("navbar.openMenu")}
           aria-expanded={mobileMenuOpen}
         >
           {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
 
         <div className="nav-actions">
-        <div
-          className={`nav-dropdown ${categoriesOpen ? "open" : ""}`}
-          onMouseEnter={() => setCategoriesOpen(true)}
-          onMouseLeave={() => setCategoriesOpen(false)}
-        >
-          <button
-            type="button"
-            className="nav-action-button"
-            onClick={() => setCategoriesOpen((current) => !current)}
-            aria-haspopup="menu"
-            aria-expanded={categoriesOpen}
-          >
-            Categories
-            <ChevronDown size={14} />
-          </button>
-
-          <div className="nav-dropdown-menu nav-categories-menu">
-            <Link to="/categories" onClick={closeMenus} className="nav-dropdown-item">
-              All Categories
-            </Link>
-            {categories.length ? (
-              categories.map((category) => (
-                <Link
-                  key={category.id}
-                  to={`/products?category=${encodeURIComponent(category.slug || category.name || category.id)}`}
-                  onClick={closeMenus}
-                  className="nav-dropdown-item"
-                >
-                  {category.name}
-                </Link>
-              ))
-            ) : (
-              <span className="nav-dropdown-empty">No categories found</span>
-            )}
+          <div className="nav-preference-group" aria-label={t("common.language")}>
+            <label className="nav-language-label" htmlFor="nav-language-select">
+              <span className="language-icon" aria-hidden="true">{t("common.languageIcon")}</span>
+            </label>
+            <select
+              id="nav-language-select"
+              className="nav-language-select"
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+              aria-label={t("common.language")}
+            >
+              <option value="en">🇺🇸</option>
+              <option value="fr">🇫🇷</option>
+              <option value="ar">🇲🇦</option>
+            </select>
           </div>
-        </div>
+
+          <div
+            className={`nav-dropdown ${categoriesOpen ? "open" : ""}`}
+            onMouseEnter={() => setCategoriesOpen(true)}
+            onMouseLeave={() => setCategoriesOpen(false)}
+          >
+            <button
+              type="button"
+              className="nav-action-button"
+              onClick={() => setCategoriesOpen((current) => !current)}
+              aria-haspopup="menu"
+              aria-expanded={categoriesOpen}
+            >
+              {t("navbar.categories")}
+              <ChevronDown size={14} />
+            </button>
+
+            <div className="nav-dropdown-menu nav-categories-menu">
+              <Link to="/categories" onClick={closeMenus} className="nav-dropdown-item">
+                {t("navbar.allCategories")}
+              </Link>
+              {categories.length ? (
+                categories.map((category) => (
+                  <Link
+                    key={category.id}
+                    to={`/products?category=${encodeURIComponent(category.slug || category.name || category.id)}`}
+                    onClick={closeMenus}
+                    className="nav-dropdown-item"
+                  >
+                    {category.name}
+                  </Link>
+                ))
+              ) : (
+                <span className="nav-dropdown-empty">{t("navbar.noCategories")}</span>
+              )}
+            </div>
+          </div>
 
           <Link to="/pages" className="nav-action-button nav-pages-link" onClick={closeMenus}>
-            Pages
+            {t("navbar.pages")}
           </Link>
 
           {isAuthenticated ? (
@@ -285,163 +302,165 @@ function Navbar() {
               type="button"
               className="nav-action-button nav-cart-trigger"
               onClick={handleCartToggle}
-              aria-label={`Open cart with ${cartTotals.itemCount} items`}
+              aria-label={`${t("navbar.cartLabel")} (${cartTotals.itemCount})`}
               aria-expanded={cartOpen}
               aria-controls="cart-drawer"
             >
               <ShoppingCart size={16} />
               {cartTotals.itemCount > 0 ? (
-                <span className="nav-cart-badge" aria-label={`${cartTotals.itemCount} items in cart`}>
+                <span className="nav-cart-badge" aria-label={t("navbar.itemsInCart", { count: cartTotals.itemCount })}>
                   {cartTotals.itemCount > 9 ? "9+" : cartTotals.itemCount}
                 </span>
               ) : null}
             </button>
           ) : null}
 
-        {isAuthenticated ? (
-          <Link to={notificationsPath} className="nav-action-button nav-notification-link" onClick={closeMenus}>
-            <Bell size={16} />
-            Notifications
-            {unreadNotifications > 0 ? (
-              <span className="nav-notification-badge" aria-label={`${unreadNotifications} unread notifications`}>
-                {unreadNotifications > 9 ? "9+" : unreadNotifications}
-              </span>
-            ) : null}
-          </Link>
-        ) : null}
+          {isAuthenticated ? (
+            <Link to={notificationsPath} className="nav-action-button nav-notification-link" onClick={closeMenus}>
+              <Bell size={16} />
+              {t("navbar.notifications")}
+              {unreadNotifications > 0 ? (
+                <span className="nav-notification-badge" aria-label={t("navbar.unreadNotifications", { count: unreadNotifications })}>
+                  {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
 
-        <div
-          className={`nav-dropdown nav-profile-dropdown ${profileOpen ? "open" : ""}`}
-          onMouseEnter={() => setProfileOpen(true)}
-          onMouseLeave={() => setProfileOpen(false)}
-        >
-          <button
-            type="button"
-            className="nav-action-button"
-            onClick={() => setProfileOpen((current) => !current)}
-            aria-haspopup="menu"
-            aria-expanded={profileOpen}
+          <div
+            className={`nav-dropdown nav-profile-dropdown ${profileOpen ? "open" : ""}`}
+            onMouseEnter={() => setProfileOpen(true)}
+            onMouseLeave={() => setProfileOpen(false)}
           >
-            <UserRound size={16} />
-            Profile
-            <ChevronDown size={14} />
-          </button>
+            <button
+              type="button"
+              className="nav-action-button"
+              onClick={() => setProfileOpen((current) => !current)}
+              aria-haspopup="menu"
+              aria-expanded={profileOpen}
+            >
+              <UserRound size={16} />
+              {t("navbar.profile")}
+              <ChevronDown size={14} />
+            </button>
 
-          <div className="nav-dropdown-menu nav-profile-menu">
-            {isAuthenticated ? (
-              <>
-                <Link to="/profile" onClick={closeMenus} className="nav-dropdown-item">
-                  My Profile
+            <div className="nav-dropdown-menu nav-profile-menu">
+              {isAuthenticated ? (
+                <>
+                  <Link to="/profile" onClick={closeMenus} className="nav-dropdown-item">
+                    {t("navbar.myProfile")}
+                  </Link>
+                  <button type="button" onClick={handleLogout} className="nav-dropdown-item nav-dropdown-button nav-logout-button">
+                    <LogOut size={14} />
+                    {t("common.logout")}
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" onClick={closeMenus} className="nav-dropdown-item">
+                  {t("navbar.login")}
                 </Link>
-                <button type="button" onClick={handleLogout} className="nav-dropdown-item nav-dropdown-button nav-logout-button">
-                  <LogOut size={14} />
-                  Log out
-                </button>
-              </>
-            ) : (
-              <Link to="/login" onClick={closeMenus} className="nav-dropdown-item">
-                Login
-              </Link>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
           <Link to="/about" className="nav-action-button" onClick={closeMenus}>
-            About
+            {t("navbar.about")}
           </Link>
           <Link to="/contact" className="nav-action-button" onClick={closeMenus}>
-            Contact
+            {t("navbar.contact")}
           </Link>
           <Link to="/faq" className="nav-action-button" onClick={closeMenus}>
-            Support
+            {t("navbar.support")}
           </Link>
         </div>
       </nav>
 
-      {isAuthenticated && cartOpen ? <button className="cart-drawer-backdrop" type="button" aria-label="Close cart" onClick={closeAllOverlays} /> : null}
+      {isAuthenticated && cartOpen ? (
+        <button className="cart-drawer-backdrop" type="button" aria-label={t("common.close")} onClick={closeAllOverlays} />
+      ) : null}
 
       {isAuthenticated ? (
-      <aside id="cart-drawer" className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-hidden={!cartOpen}>
-        <div className="cart-drawer-header">
-          <div>
-            <span className="cart-drawer-kicker">Shopping cart</span>
-            <h2>Selected items</h2>
-          </div>
-          <button type="button" className="cart-drawer-close" onClick={() => setCartOpen(false)} aria-label="Close cart">
-            <X size={20} />
-          </button>
-        </div>
-
-        {cartItems.length ? (
-          <>
-            <div className="cart-drawer-list">
-              {cartItems.map((item) => {
-                const imageSrc = resolveMediaUrl(item.image_url || item.img || item.image);
-                const stockLimitReached = Number(item.stock || 0) > 0 && Number(item.quantity || 0) >= Number(item.stock || 0);
-
-                return (
-                  <article className="cart-drawer-item" key={item.id}>
-                    {imageSrc ? <img src={imageSrc} alt={item.name} /> : <div className="cart-drawer-image-placeholder">No image</div>}
-                    <div className="cart-drawer-item-body">
-                      <div className="cart-drawer-item-head">
-                        <h3>{item.name}</h3>
-                        <button type="button" onClick={() => handleCartRemove(item.id)} aria-label={`Remove ${item.name}`}>
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                      <span>{formatDh(Number(item.price || 0))}</span>
-                      <div className="cart-drawer-qty">
-                        <button type="button" onClick={() => handleCartQuantity(item.id, item.quantity - 1)} aria-label={`Decrease ${item.name}`}>
-                          <Minus size={14} />
-                        </button>
-                        <strong>{item.quantity}</strong>
-                        <button
-                          type="button"
-                          onClick={() => handleCartQuantity(item.id, item.quantity + 1)}
-                          disabled={stockLimitReached}
-                          aria-label={`Increase ${item.name}`}
-                        >
-                          <Plus size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+        <aside id="cart-drawer" className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-hidden={!cartOpen}>
+          <div className="cart-drawer-header">
+            <div>
+              <span className="cart-drawer-kicker">{t("cart.title")}</span>
+              <h2>{t("cart.selectedItems")}</h2>
             </div>
-
-            <div className="cart-drawer-summary">
-              <div>
-                <span>Subtotal</span>
-                <strong>{formatDh(cartTotals.subtotal)}</strong>
-              </div>
-              <div>
-                <span>Delivery</span>
-                <strong>FREE</strong>
-              </div>
-              <div className="cart-drawer-total">
-                <span>Total</span>
-                <strong>{formatDh(cartTotals.total)}</strong>
-              </div>
-              <button type="button" className="cart-drawer-checkout" onClick={() => goToCart("/checkout")}>
-                Checkout
-              </button>
-              <button type="button" className="cart-drawer-view" onClick={() => goToCart("/cart")}>
-                View full cart
-              </button>
-            </div>
-          </>
-        ) : (
-          <div className="cart-drawer-empty">
-            <ShoppingCart size={42} />
-            <h3>Your cart is empty.</h3>
-            <p>Add products from the catalogue and they will show up here.</p>
-            <button type="button" onClick={() => goToCart("/products")}>
-              Browse products
+            <button type="button" className="cart-drawer-close" onClick={() => setCartOpen(false)} aria-label={t("common.close")}>
+              <X size={20} />
             </button>
           </div>
-        )}
-      </aside>
+
+          {cartItems.length ? (
+            <>
+              <div className="cart-drawer-list">
+                {cartItems.map((item) => {
+                  const imageSrc = resolveMediaUrl(item.image_url || item.img || item.image);
+                  const stockLimitReached = Number(item.stock || 0) > 0 && Number(item.quantity || 0) >= Number(item.stock || 0);
+
+                  return (
+                    <article className="cart-drawer-item" key={item.id}>
+                      {imageSrc ? <img src={imageSrc} alt={item.name} /> : <div className="cart-drawer-image-placeholder">{t("cart.noImage")}</div>}
+                      <div className="cart-drawer-item-body">
+                        <div className="cart-drawer-item-head">
+                          <h3>{item.name}</h3>
+                          <button type="button" onClick={() => handleCartRemove(item.id)} aria-label={`${t("common.delete")} ${item.name}`}>
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                        <span>{formatDh(Number(item.price || 0))}</span>
+                        <div className="cart-drawer-qty">
+                          <button type="button" onClick={() => handleCartQuantity(item.id, item.quantity - 1)} aria-label={`${t("common.previous")} ${item.name}`}>
+                            <Minus size={14} />
+                          </button>
+                          <strong>{item.quantity}</strong>
+                          <button
+                            type="button"
+                            onClick={() => handleCartQuantity(item.id, item.quantity + 1)}
+                            disabled={stockLimitReached}
+                            aria-label={`${t("common.next")} ${item.name}`}
+                          >
+                            <Plus size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              <div className="cart-drawer-summary">
+                <div>
+                  <span>{t("cart.subtotal")}</span>
+                  <strong>{formatDh(cartTotals.subtotal)}</strong>
+                </div>
+                <div>
+                  <span>{t("cart.delivery")}</span>
+                  <strong>{t("cart.free")}</strong>
+                </div>
+                <div className="cart-drawer-total">
+                  <span>{t("cart.total")}</span>
+                  <strong>{formatDh(cartTotals.total)}</strong>
+                </div>
+                <button type="button" className="cart-drawer-checkout" onClick={() => goToCart("/checkout")}>
+                  {t("cart.checkout")}
+                </button>
+                <button type="button" className="cart-drawer-view" onClick={() => goToCart("/cart")}>
+                  {t("cart.viewCart")}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="cart-drawer-empty">
+              <ShoppingCart size={42} />
+              <h3>{t("cart.emptyTitle")}</h3>
+              <p>{t("cart.emptyDescription")}</p>
+              <button type="button" onClick={() => goToCart("/products")}>
+                {t("cart.browseProducts")}
+              </button>
+            </div>
+          )}
+        </aside>
       ) : null}
     </>
   );

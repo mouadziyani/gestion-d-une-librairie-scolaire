@@ -10,9 +10,11 @@ import {
   updateCartItem,
 } from "@/features/client/services/cartService";
 import { formatDh } from "@/data/catalog";
+import { useUiPreferences } from "@/shared/context/UIContext";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
 
 function Cart() {
+  const { t } = useUiPreferences();
   const navigate = useNavigate();
   const [cart, setCart] = useState(() => getCartItems());
   const [syncing, setSyncing] = useState(false);
@@ -36,11 +38,11 @@ function Cart() {
         setCart(syncedCart);
 
         if (JSON.stringify(previousCart) !== JSON.stringify(syncedCart)) {
-          setSyncMessage("Cart updated with the latest prices and stock.");
+          setSyncMessage(t("cartPage.updatedMessage"));
         }
       } catch {
         if (active) {
-          setSyncMessage("Showing saved cart. Live stock could not be refreshed.");
+          setSyncMessage(t("cartPage.savedCartMessage"));
         }
       } finally {
         if (active) {
@@ -62,7 +64,7 @@ function Cart() {
       window.removeEventListener(CART_CHANGED_EVENT, handleCartChange);
       window.removeEventListener("storage", handleCartChange);
     };
-  }, []);
+  }, [t]);
 
   const totals = useMemo(() => getCartTotals(cart), [cart]);
 
@@ -94,8 +96,8 @@ function Cart() {
     <div className="cart-page">
       <main className="cart-wrapper">
         <section className="cart-items-section">
-          <h2>Your Cart</h2>
-          {syncing ? <p className="cart-sync-note">Refreshing cart...</p> : null}
+          <h2>{t("cartPage.title")}</h2>
+          {syncing ? <p className="cart-sync-note">{t("cartPage.refreshing")}</p> : null}
           {syncMessage ? <p className="cart-sync-note">{syncMessage}</p> : null}
 
           {cart.length ? (
@@ -103,9 +105,9 @@ function Cart() {
               <table className="cart-table">
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
+                    <th>{t("cartPage.product")}</th>
+                    <th>{t("cartPage.quantity")}</th>
+                    <th>{t("cartPage.price")}</th>
                     <th />
                   </tr>
                 </thead>
@@ -118,15 +120,15 @@ function Cart() {
                     <tr className="cart-item-row" key={item.id}>
                       <td>
                         <div className="cart-product-info">
-                          {imageSrc ? <img src={imageSrc} alt={item.name} className="cart-img" /> : <div className="cart-img cart-img-placeholder">No image</div>}
+                          {imageSrc ? <img src={imageSrc} alt={item.name} className="cart-img" /> : <div className="cart-img cart-img-placeholder">{t("cartPage.noImage")}</div>}
                           <div>
-                            <h4 style={{ margin: 0 }}>{item.name}</h4>
-                            <p style={{ fontSize: "12px", color: "#888", margin: "5px 0 0" }}>
-                              Ref: {item.reference || `#${item.id}`}
+                            <h4 className="cart-item-title">{item.name}</h4>
+                            <p className="cart-item-meta">
+                              {t("cartPage.reference")}: {item.reference || `#${item.id}`}
                             </p>
                             {Number(item.stock || 0) > 0 ? (
-                              <p style={{ fontSize: "11px", color: "#aaa", margin: "4px 0 0" }}>
-                                Stock: {item.stock}
+                              <p className="cart-item-stock">
+                                {t("cartPage.stock")}: {item.stock}
                               </p>
                             ) : null}
                           </div>
@@ -143,12 +145,12 @@ function Cart() {
                           </button>
                         </div>
                       </td>
-                      <td style={{ fontWeight: "600" }}>{formatDh(item.price * item.quantity)}</td>
-                      <td style={{ textAlign: "right" }}>
+                      <td className="table-strong-cell">{formatDh(item.price * item.quantity)}</td>
+                      <td className="table-align-end">
                         <button
                           type="button"
                           onClick={() => handleRemove(item.id)}
-                          style={{ background: "none", border: "none", color: "#ff6b6b", cursor: "pointer", fontWeight: "bold" }}
+                          className="cart-remove-button"
                         >
                           ×
                         </button>
@@ -159,21 +161,21 @@ function Cart() {
                 </tbody>
               </table>
 
-              <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
+              <div className="cart-actions-row">
                 <button className="btn-wishlist" type="button" onClick={handleClear}>
-                  Clear cart
+                  {t("cartPage.clearCart")}
                 </button>
                 <Link to="/products" className="btn-wishlist">
-                  Continue shopping
+                  {t("cartPage.continueShopping")}
                 </Link>
               </div>
             </>
           ) : (
             <div className="cart-empty-state">
-              <h3>Your cart is empty.</h3>
-              <p>Add products from the catalog to validate your order.</p>
+              <h3>{t("cartPage.emptyTitle")}</h3>
+              <p>{t("cartPage.emptyDescription")}</p>
               <Link to="/products" className="btn-elegant" style={{ display: "inline-flex", width: "auto" }}>
-                Browse products
+                {t("cartPage.browseProducts")}
               </Link>
             </div>
           )}
@@ -181,29 +183,29 @@ function Cart() {
 
         <section className="cart-summary-side">
           <div className="cart-summary-card">
-            <h3 style={{ marginBottom: "25px" }}>Order Summary</h3>
+            <h3 className="cart-summary-title">{t("cartPage.orderSummary")}</h3>
 
             <div className="summary-row">
-              <span>Subtotal</span>
+              <span>{t("cartPage.subtotal")}</span>
               <span>{formatDh(totals.subtotal)}</span>
             </div>
 
             <div className="summary-row">
-              <span>Delivery</span>
-              <span style={{ color: "#27ae60", fontWeight: "600" }}>FREE</span>
+              <span>{t("cartPage.delivery")}</span>
+              <span className="checkout-success-text">{t("cartPage.free")}</span>
             </div>
 
             <div className="summary-row summary-total">
-              <span>Total</span>
+              <span>{t("cartPage.total")}</span>
               <span>{formatDh(totals.total)}</span>
             </div>
 
             <button className="btn-checkout" type="button" onClick={() => navigate("/checkout")} disabled={!cart.length}>
-              Proceed to Checkout
+              {t("cartPage.proceedToCheckout")}
             </button>
 
-            <p style={{ textAlign: "center", fontSize: "11px", color: "#aaa", marginTop: "15px" }}>
-              Tax included. Secure payment guaranteed.
+            <p className="cart-summary-note">
+              {t("cartPage.note")}
             </p>
           </div>
         </section>

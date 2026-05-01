@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("fr-MA", {
@@ -34,6 +35,7 @@ function downloadCsv(filename, rows) {
 }
 
 function InvoiceDetail() {
+  const { t } = useUiPreferences();
   const [searchParams] = useSearchParams();
   const invoiceId = searchParams.get("id");
   const [invoice, setInvoice] = useState(null);
@@ -54,7 +56,7 @@ function InvoiceDetail() {
 
         if (!matchedInvoice) {
           if (active) {
-            setError("Invoice not found.");
+            setError(t("public.productNotFound"));
             setLoading(false);
           }
           return;
@@ -71,7 +73,7 @@ function InvoiceDetail() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load invoice details.");
+          setError(err?.response?.data?.message || t("clientInvoices.failedLoadInvoices"));
         }
       } finally {
         if (active) {
@@ -85,7 +87,7 @@ function InvoiceDetail() {
     return () => {
       active = false;
     };
-  }, [invoiceId]);
+  }, [invoiceId, t]);
 
   const items = useMemo(() => order?.orderItems || order?.order_items || [], [order]);
   const subtotal = Number(invoice?.total_amount || order?.total_price || 0);
@@ -119,15 +121,15 @@ function InvoiceDetail() {
     <div className="invoice-wrapper">
       <div className="invoice-header">
         <div className="brand-info">
-          <h1>Library BOUGDIM</h1>
-          <p>Client Area / Invoicing</p>
+          <h1>{t("common.brandName")}</h1>
+          <p>{`${t("clientInvoices.clientArea")} / ${t("clientInvoices.title")}`}</p>
         </div>
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        <div className="invoice-paper-actions">
           <button type="button" className="btn-base btn-outline btn-sm" onClick={handlePrint}>
-            Print Invoice
+            {t("clientInvoices.print")}
           </button>
           <button type="button" className="btn-base btn-primary btn-sm" onClick={handleExport}>
-            Export CSV
+            {t("clientInvoices.exportCsv")}
           </button>
         </div>
       </div>
@@ -166,15 +168,15 @@ function InvoiceDetail() {
               </div>
             </section>
 
-            <section style={{ marginBottom: "40px" }}>
-              <h3 style={{ marginBottom: "20px", fontFamily: "Fraunces" }}>Invoice Lines</h3>
+            <section className="invoice-paper-section">
+              <h3 className="invoice-paper-section-title invoice-paper-section-title-plain">Invoice Lines</h3>
               <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>Item</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Total</th>
+                      <th>{t("clientOrders.item")}</th>
+                      <th>{t("clientOrders.qty")}</th>
+                      <th>{t("clientOrders.price")}</th>
+                      <th>{t("clientOrders.total")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -189,35 +191,35 @@ function InvoiceDetail() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4">No invoice items found.</td>
+                      <td colSpan="4">{t("clientOrders.noItemsFound")}</td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </section>
 
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <div style={{ width: "100%", maxWidth: "300px", borderTop: "2px solid #1a1a1a", paddingTop: "20px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                  <span style={{ color: "#888" }}>Subtotal</span>
+            <div className="invoice-paper-footer">
+              <div className="invoice-paper-summary">
+                <div className="invoice-paper-row">
+                  <span className="invoice-paper-subtitle">{t("cartPage.subtotal")}</span>
                   <strong>{formatMoney(subtotal)}</strong>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
-                  <span style={{ color: "#888" }}>Payment</span>
+                <div className="invoice-paper-row invoice-paper-row-spaced">
+                  <span className="invoice-paper-subtitle">{t("clientOrders.payment")}</span>
                   <strong>{order?.payment_status || "-"}</strong>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "1.2rem" }}>
-                  <span>Total</span>
-                  <span style={{ fontFamily: "Fraunces" }}>{formatMoney(subtotal)}</span>
+                <div className="invoice-paper-row invoice-paper-row-total">
+                  <span>{t("clientOrders.total")}</span>
+                  <span className="checkout-total-amount">{formatMoney(subtotal)}</span>
                 </div>
               </div>
             </div>
           </>
         ) : (
-          <p>No invoice selected.</p>
+          <p>{t("clientOrders.noOrderSelected")}</p>
         )
       ) : (
-        <p>Loading invoice...</p>
+        <p>{t("clientInvoices.loadingInvoices")}</p>
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import { submitCheckout } from "@/shared/services/orderService";
 import { createStripePaymentIntent } from "@/shared/services/stripeService";
 import { api } from "@/shared/services/api";
 import { formatDh } from "@/data/catalog";
+import { useUiPreferences } from "@/shared/context/UIContext";
 import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
 
 const stripePublishableKey =
@@ -14,20 +15,23 @@ const stripePublishableKey =
   import.meta.env.STRIPE_PUBLISHABLE_KEY ||
   "";
 
-const stripeAppearance = {
-  theme: "stripe",
-  variables: {
-    colorPrimary: "#1a1a1a",
-    colorBackground: "#fcfcfc",
-    colorText: "#1a1a1a",
-    colorDanger: "#c53030",
-    fontFamily: "Plus Jakarta Sans, sans-serif",
-    borderRadius: "10px",
-    spacingUnit: "4px",
-  },
-};
+function buildStripeAppearance() {
+  return {
+    theme: "stripe",
+    variables: {
+      colorPrimary: "#5b2501",
+      colorBackground: "#fcfcfc",
+      colorText: "#1a1a1a",
+      colorDanger: "#c53030",
+      fontFamily: "Plus Jakarta Sans, sans-serif",
+      borderRadius: "10px",
+      spacingUnit: "4px",
+    },
+  };
+}
 
 function StripePaymentForm({ onConfirmCheckout, onBack, totals, amountLabel, billingName, clientSecret }) {
+  const { t } = useUiPreferences();
   const stripe = useStripe();
   const elements = useElements();
   const [paying, setPaying] = useState(false);
@@ -40,14 +44,14 @@ function StripePaymentForm({ onConfirmCheckout, onBack, totals, amountLabel, bil
     setError("");
 
     if (!stripe || !elements) {
-      setError("Stripe is still loading.");
+      setError(t("checkout.stripeLoading"));
       return;
     }
 
     const cardElement = elements.getElement(CardElement);
 
     if (!cardElement || !paymentComplete) {
-      setError("Please complete the card details before continuing.");
+      setError(t("checkout.completeCardDetails"));
       return;
     }
 
@@ -64,18 +68,18 @@ function StripePaymentForm({ onConfirmCheckout, onBack, totals, amountLabel, bil
       });
 
       if (result.error) {
-        setError(result.error.message || "Stripe payment failed.");
+        setError(result.error.message || t("checkout.stripePaymentFailed"));
         return;
       }
 
       if (!result.paymentIntent) {
-        setError("Stripe payment could not be confirmed.");
+        setError(t("checkout.stripePaymentUnconfirmed"));
         return;
       }
 
       await onConfirmCheckout(result.paymentIntent);
     } catch (submitError) {
-      setError(submitError?.message || "Stripe payment failed.");
+      setError(submitError?.message || t("checkout.stripePaymentFailed"));
     } finally {
       setPaying(false);
     }
@@ -83,14 +87,10 @@ function StripePaymentForm({ onConfirmCheckout, onBack, totals, amountLabel, bil
 
   return (
     <div className="stripe-payment-panel">
-      <div style={{ marginBottom: "16px" }}>
-        <h3 style={{ fontFamily: "Fraunces", marginBottom: "8px" }}>Pay with card</h3>
-        <p style={{ color: "#666", fontSize: "13px" }}>
-          Complete the secure Stripe payment for {amountLabel}.
-        </p>
-        <p style={{ color: "#888", fontSize: "12px", marginTop: "6px" }}>
-          Enter the test card number, expiry date, and CVC in the Stripe form below.
-        </p>
+      <div className="checkout-copy-block">
+        <h3 className="checkout-section-title">{t("checkout.payWithCard")}</h3>
+        <p className="checkout-copy-text">{t("checkout.securePaymentFor", { amount: amountLabel })}</p>
+        <p className="checkout-copy-note">{t("checkout.stripeTestHint")}</p>
       </div>
 
       <form onSubmit={handleStripeSubmit}>
@@ -123,27 +123,27 @@ function StripePaymentForm({ onConfirmCheckout, onBack, totals, amountLabel, bil
         </div>
 
         {fieldError ? (
-          <div className="checkout-field-hint" style={{ marginTop: "12px" }} role="status" aria-live="polite">
+          <div className="checkout-field-hint checkout-field-spacing" role="status" aria-live="polite">
             {fieldError}
           </div>
         ) : (
-          <div className="checkout-field-hint" style={{ marginTop: "12px" }}>
-            For test mode, use 4242 4242 4242 4242 with any future date and any CVC.
+          <div className="checkout-field-hint checkout-field-spacing">
+            {t("checkout.stripeTestCardHint")}
           </div>
         )}
 
         {error ? (
-          <div className="checkout-error" style={{ marginTop: "14px" }} role="alert" aria-live="polite">
+          <div className="checkout-error checkout-error-spacing" role="alert" aria-live="polite">
             {error}
           </div>
         ) : null}
 
         <div className="stripe-actions">
           <button type="button" className="btn-wishlist" onClick={onBack}>
-            Back to payment methods
+            {t("checkout.backToPaymentMethods")}
           </button>
           <button type="submit" className="btn-elegant" disabled={!stripe || !elements || paying || !paymentComplete}>
-            {paying ? "Processing payment..." : `Pay ${formatDh(totals.total)}`}
+            {paying ? t("checkout.processingPayment") : t("checkout.payAmount", { amount: formatDh(totals.total) })}
           </button>
         </div>
       </form>
@@ -152,6 +152,7 @@ function StripePaymentForm({ onConfirmCheckout, onBack, totals, amountLabel, bil
 }
 
 function Checkout() {
+  const { t } = useUiPreferences();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [cart, setCart] = useState(() => getCartItems());
@@ -242,14 +243,14 @@ function Checkout() {
 
       if (!cart.length) {
         setStripeIntent(null);
-        setStripeError("Add products to your cart before paying with card.");
+        setStripeError(t("checkout.addProductsBeforeCard"));
         setStripeLoading(false);
         return;
       }
 
       if (!stripePublishableKey) {
         setStripeIntent(null);
-        setStripeError("Stripe is not configured yet. Please use cash.");
+        setStripeError(t("checkout.stripeNotConfigured"));
         setStripeLoading(false);
         return;
       }
@@ -287,7 +288,7 @@ function Checkout() {
       } catch (intentError) {
         if (active) {
           setStripeIntent(null);
-          setStripeError(intentError?.response?.data?.message || "Unable to initialize Stripe payment.");
+          setStripeError(intentError?.response?.data?.message || t("checkout.stripeInitFailed"));
         }
       } finally {
         if (active) {
@@ -301,10 +302,10 @@ function Checkout() {
     return () => {
       active = false;
     };
-  }, [cart, form.payment_method, form.school_id, stripePromise]);
+  }, [cart, form.payment_method, form.school_id, stripePromise, t]);
 
   const totals = useMemo(() => getCartTotals(cart), [cart]);
-  const successReference = success?.payment?.reference || (success?.order?.id ? `ORD-${success.order.id}` : "Validated successfully");
+  const successReference = success?.payment?.reference || (success?.order?.id ? `ORD-${success.order.id}` : t("checkout.validatedFallback"));
 
   const checkoutPayload = useMemo(
     () => ({
@@ -355,7 +356,7 @@ function Checkout() {
     setError("");
 
     if (!cart.length) {
-      setError("Your cart is empty. Please add products before validating the order.");
+      setError(t("checkout.emptyCartError"));
       return;
     }
 
@@ -365,7 +366,7 @@ function Checkout() {
       await finalizeCheckout();
     } catch (checkoutError) {
       const response = checkoutError?.response?.data;
-      const message = response?.message || response?.errors?.items?.[0] || "Unable to validate the order right now.";
+      const message = response?.message || response?.errors?.items?.[0] || t("checkout.validateFailed");
       setError(message);
     } finally {
       setSubmitting(false);
@@ -376,19 +377,19 @@ function Checkout() {
     return (
       <div className="checkout-wrapper">
         <section className="checkout-form-section">
-          <p style={{ color: "#888", fontSize: "11px", fontWeight: "bold", textTransform: "uppercase" }}>Client Area</p>
-          <h2>Checkout.</h2>
+          <p className="checkout-eyebrow">{t("checkout.clientArea")}</p>
+          <h2>{t("checkout.title")}</h2>
           <div className="cart-empty-state">
-            <h3>Your cart is empty.</h3>
-            <p>Go back to the catalog and add products before validating your order.</p>
+            <h3>{t("checkout.emptyTitle")}</h3>
+            <p>{t("checkout.emptyDescription")}</p>
             <Link to="/products" className="btn-elegant" style={{ display: "inline-flex", width: "auto" }}>
-              Browse products
+              {t("checkout.browseProducts")}
             </Link>
           </div>
         </section>
         <aside className="summary-card">
-          <h3 style={{ fontFamily: "Fraunces", marginBottom: "20px" }}>Order Summary</h3>
-          <p style={{ color: "#888" }}>No items in cart.</p>
+          <h3 className="checkout-section-title">{t("checkout.orderSummary")}</h3>
+          <p className="checkout-muted-text">{t("checkout.noItems")}</p>
         </aside>
       </div>
     );
@@ -398,31 +399,31 @@ function Checkout() {
     return (
       <div className="checkout-wrapper">
         <section className="checkout-form-section">
-          <p style={{ color: "#888", fontSize: "11px", fontWeight: "bold", textTransform: "uppercase" }}>Client Area</p>
-          <h2>Checkout.</h2>
+          <p className="checkout-eyebrow">{t("checkout.clientArea")}</p>
+          <h2>{t("checkout.title")}</h2>
           <div className="checkout-success">
-            <h3>Your order has been validated.</h3>
-            <p>Reference: {successReference}</p>
-            <p>Total: {formatDh(success.summary?.total || 0)}</p>
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "24px" }}>
+            <h3>{t("checkout.successTitle")}</h3>
+            <p>{t("checkout.reference")}: {successReference}</p>
+            <p>{t("checkout.total")}: {formatDh(success.summary?.total || 0)}</p>
+            <div className="checkout-success-actions">
               <button className="btn-elegant" type="button" onClick={() => navigate("/products")} style={{ width: "auto" }}>
-                Continue shopping
+                {t("checkout.continueShopping")}
               </button>
               <button className="btn-wishlist" type="button" onClick={() => setSuccess(null)}>
-                New checkout
+                {t("checkout.newCheckout")}
               </button>
             </div>
           </div>
         </section>
         <aside className="summary-card">
-          <h3 style={{ fontFamily: "Fraunces", marginBottom: "20px" }}>Validated Order</h3>
+          <h3 className="checkout-section-title">{t("checkout.validatedOrder")}</h3>
           <div className="summary-row">
-            <span style={{ color: "#888" }}>Items</span>
+            <span className="checkout-muted-text">{t("checkout.items")}</span>
             <span>{success.summary?.item_count || 0}</span>
           </div>
           <div className="summary-row summary-total">
             <span>Total</span>
-            <span style={{ fontFamily: "Fraunces" }}>{formatDh(success.summary?.total || 0)}</span>
+            <span className="checkout-total-amount">{formatDh(success.summary?.total || 0)}</span>
           </div>
         </aside>
       </div>
@@ -432,43 +433,43 @@ function Checkout() {
   return (
     <div className="checkout-wrapper">
       <section className="checkout-form-section">
-        <p style={{ color: "#888", fontSize: "11px", fontWeight: "bold", textTransform: "uppercase" }}>Client Area</p>
-        <h2>Checkout.</h2>
+        <p className="checkout-eyebrow">{t("checkout.clientArea")}</p>
+        <h2>{t("checkout.title")}</h2>
 
         <form onSubmit={form.payment_method === "stripe" ? (event) => event.preventDefault() : handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Cardholder Name</label>
+            <label htmlFor="name">{t("checkout.cardholderName")}</label>
             <input
               type="text"
               id="name"
               name="customer_name"
               value={form.customer_name}
               onChange={handleChange}
-              placeholder="Enter cardholder name"
+              placeholder={t("checkout.cardholderPlaceholder")}
               autoComplete="name"
               required
             />
-            <p className="checkout-field-hint">This name will be used for billing and card verification.</p>
+            <p className="checkout-field-hint">{t("checkout.cardholderHint")}</p>
           </div>
 
           <div className="form-group">
-            <label htmlFor="delivery_address">Delivery Address</label>
+            <label htmlFor="delivery_address">{t("checkout.deliveryAddress")}</label>
             <input
               type="text"
               id="delivery_address"
               name="delivery_address"
               value={form.delivery_address}
               onChange={handleChange}
-              placeholder="Enter delivery address"
+              placeholder={t("checkout.deliveryAddressPlaceholder")}
               autoComplete="street-address"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="school_id">Associated School (Optional)</label>
+            <label htmlFor="school_id">{t("checkout.associatedSchoolOptional")}</label>
             <select id="school_id" name="school_id" value={form.school_id} onChange={handleChange}>
-              <option value="">No school selected</option>
+              <option value="">{t("checkout.noSchoolSelected")}</option>
               {schools.map((school) => (
                 <option key={school.id} value={school.id}>
                   {school.name}
@@ -478,8 +479,8 @@ function Checkout() {
           </div>
 
           <div className="form-group">
-            <label>Payment Method</label>
-            <div className="payment-method-grid" role="radiogroup" aria-label="Payment method">
+            <label>{t("checkout.paymentMethod")}</label>
+            <div className="payment-method-grid" role="radiogroup" aria-label={t("checkout.paymentMethod")}>
               <label className={`payment-method-card ${form.payment_method === "cash" ? "is-active" : ""}`}>
                 <input
                   type="radio"
@@ -489,8 +490,8 @@ function Checkout() {
                   onChange={handleChange}
                 />
                 <span>
-                  <strong>Cash</strong>
-                  <small>Pay on delivery or in store.</small>
+                  <strong>{t("checkout.cash")}</strong>
+                  <small>{t("checkout.cashHint")}</small>
                 </span>
               </label>
               <label className={`payment-method-card ${form.payment_method === "stripe" ? "is-active" : ""}`}>
@@ -502,21 +503,21 @@ function Checkout() {
                   onChange={handleChange}
                 />
                 <span>
-                  <strong>Card / Stripe</strong>
-                  <small>Enter your bank card details securely.</small>
+                  <strong>{t("checkout.cardStripe")}</strong>
+                  <small>{t("checkout.cardStripeHint")}</small>
                 </span>
               </label>
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="note">Order Note</label>
+            <label htmlFor="note">{t("checkout.orderNote")}</label>
             <textarea
               id="note"
               name="note"
               value={form.note}
               onChange={handleChange}
-              placeholder="Optional note for the order"
+              placeholder={t("checkout.orderNotePlaceholder")}
               rows="4"
             />
           </div>
@@ -533,21 +534,21 @@ function Checkout() {
           ) : null}
 
           {form.payment_method !== "stripe" ? (
-            <button className="btn-elegant" type="submit" disabled={submitting} style={{ width: "100%", marginTop: "20px" }}>
-              {submitting ? "Validating order..." : "Complete Checkout"}
+            <button className="btn-elegant checkout-submit-button" type="submit" disabled={submitting}>
+              {submitting ? t("checkout.validatingOrder") : t("checkout.completeCheckout")}
             </button>
           ) : stripeLoading ? (
-            <button className="btn-elegant" type="button" disabled style={{ width: "100%", marginTop: "20px" }}>
-              Preparing secure payment...
+            <button className="btn-elegant checkout-submit-button" type="button" disabled>
+              {t("checkout.preparingSecurePayment")}
             </button>
           ) : stripeIntent && stripePromise ? (
-            <div style={{ marginTop: "20px" }}>
+            <div className="checkout-stripe-shell">
               <Elements
                 key={stripeIntent.payment_intent_id}
                 stripe={stripePromise}
                 options={{
                   clientSecret: stripeIntent.client_secret,
-                  appearance: stripeAppearance,
+                  appearance: buildStripeAppearance(),
                 }}
               >
                 <StripePaymentForm
@@ -566,7 +567,7 @@ function Checkout() {
                     } catch (checkoutError) {
                       const response = checkoutError?.response?.data;
                       const message =
-                        response?.message || response?.errors?.items?.[0] || "Unable to validate the order right now.";
+                        response?.message || response?.errors?.items?.[0] || t("checkout.validateFailed");
                       setError(message);
                     }
                   }}
@@ -578,7 +579,7 @@ function Checkout() {
       </section>
 
       <aside className="summary-card">
-        <h3 style={{ fontFamily: "Fraunces", marginBottom: "20px" }}>Order Summary</h3>
+        <h3 className="checkout-section-title">{t("checkout.orderSummary")}</h3>
 
         <div className="checkout-items">
           {cart.map((item) => (
@@ -595,25 +596,25 @@ function Checkout() {
         </div>
 
         <div className="summary-row">
-          <span style={{ color: "#888" }}>Subtotal ({totals.itemCount} items)</span>
+          <span className="checkout-muted-text">{t("checkout.subtotalItems", { count: totals.itemCount })}</span>
           <span>{formatDh(totals.subtotal)}</span>
         </div>
         <div className="summary-row">
-          <span style={{ color: "#888" }}>Shipping</span>
-          <span style={{ color: "#2ecc71", fontWeight: "600" }}>Free</span>
+          <span className="checkout-muted-text">{t("checkout.shipping")}</span>
+          <span className="checkout-success-text">{t("cartPage.free")}</span>
         </div>
         <div className="summary-row">
-          <span style={{ color: "#888" }}>Tax (0%)</span>
+          <span className="checkout-muted-text">{t("checkout.taxZero")}</span>
           <span>0.00 DH</span>
         </div>
 
         <div className="summary-total">
-          <span>Total</span>
-          <span style={{ fontFamily: "Fraunces" }}>{formatDh(totals.total)}</span>
+          <span>{t("checkout.total")}</span>
+          <span className="checkout-total-amount">{formatDh(totals.total)}</span>
         </div>
 
-        <p style={{ fontSize: "11px", color: "#bbb", marginTop: "20px", textAlign: "center" }}>
-          By completing this checkout, you agree to Library BOUGDIM's terms of service.
+        <p className="checkout-terms-note">
+          {t("checkout.termsNote")}
         </p>
       </aside>
     </div>

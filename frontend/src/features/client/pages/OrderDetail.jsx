@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("fr-MA", {
@@ -11,6 +12,7 @@ function formatMoney(value) {
 }
 
 function OrderDetail() {
+  const { t } = useUiPreferences();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const [order, setOrder] = useState(null);
@@ -31,7 +33,7 @@ function OrderDetail() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load the order.");
+          setError(err?.response?.data?.message || t("clientOrders.failedLoadOrder"));
         }
       } finally {
         if (active) {
@@ -45,7 +47,7 @@ function OrderDetail() {
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, t]);
 
   const items = useMemo(() => order?.order_items || order?.orderItems || [], [order]);
 
@@ -53,12 +55,12 @@ function OrderDetail() {
     <div className="dashboard-container">
       <header className="page-shell-header">
         <div>
-          <span className="eyebrow-label">CLIENT / ORDERS</span>
-          <h1 className="page-shell-title">Order Details</h1>
-          <p className="page-shell-subtitle">Follow the products, payment, and delivery state of your order.</p>
+          <span className="eyebrow-label">{t("clientOrders.eyebrow")}</span>
+          <h1 className="page-shell-title">{t("clientOrders.detailsTitle")}</h1>
+          <p className="page-shell-subtitle">{t("clientOrders.detailsSubtitle")}</p>
         </div>
         <Link to="/orders" className="btn-archive">
-          Back to orders
+          {t("clientOrders.backToOrders")}
         </Link>
       </header>
 
@@ -73,28 +75,28 @@ function OrderDetail() {
                   <h2 style={{ fontFamily: "Fraunces, serif", fontSize: "2rem", marginBottom: "8px" }}>
                     Order #{order.id}
                   </h2>
-                  <p>{order.school?.name || "No school selected"}</p>
+                  <p>{order.school?.name || t("clientOrders.noSchoolSelected")}</p>
                 </div>
                 <div className="status-pill status-pending" style={{ height: "fit-content" }}>
-                  {order.status || "pending"}
+                  {order.status ? t(`pages.${String(order.status).toLowerCase()}`) : t("pages.pending")}
                 </div>
               </div>
 
               <div className="admin-stats-strip">
                 <div className="stat-item">
-                  <span>Payment</span>
+                  <span>{t("clientOrders.payment")}</span>
                   <strong>{order.payment_status || "-"}</strong>
                 </div>
                 <div className="stat-item">
-                  <span>Method</span>
+                  <span>{t("clientOrders.method")}</span>
                   <strong>{order.payment_method || "-"}</strong>
                 </div>
                 <div className="stat-item">
-                  <span>Total</span>
+                  <span>{t("clientOrders.total")}</span>
                   <strong>{formatMoney(order.total_price || 0)}</strong>
                 </div>
                 <div className="stat-item">
-                  <span>Created</span>
+                  <span>{t("clientOrders.created")}</span>
                   <strong>{order.created_at || "-"}</strong>
                 </div>
               </div>
@@ -103,10 +105,10 @@ function OrderDetail() {
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Item</th>
-                      <th>Qty</th>
-                      <th>Unit</th>
-                      <th>Line total</th>
+                      <th>{t("clientOrders.item")}</th>
+                      <th>{t("clientOrders.qty")}</th>
+                      <th>{t("clientOrders.unit")}</th>
+                      <th>{t("clientOrders.lineTotal")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -121,7 +123,7 @@ function OrderDetail() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="4">No items found.</td>
+                        <td colSpan="4">{t("clientOrders.noItemsFound")}</td>
                       </tr>
                     )}
                   </tbody>
@@ -129,10 +131,10 @@ function OrderDetail() {
               </div>
             </>
           ) : (
-            <p>No order selected.</p>
+            <p>{t("clientOrders.noOrderSelected")}</p>
           )
         ) : (
-          <p>Loading order details...</p>
+          <p>{t("clientOrders.loadingOrderDetails")}</p>
         )}
       </section>
     </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function Button({ 
   children, 
@@ -8,21 +9,25 @@ function Button({
   isLoading = false, 
   disabled = false,
   onClick,
-  icon
+  icon,
+  className = "",
+  ...rest
 }) {
-  const className = `btn-base btn-${variant} btn-${size}`;
+  const { t } = useUiPreferences();
+  const buttonClassName = `btn-base btn-${variant} btn-${size} ${className}`.trim();
 
   return (
     <button 
       type={type} 
-      className={className} 
+      className={buttonClassName} 
       onClick={onClick} 
       disabled={disabled || isLoading}
+      {...rest}
     >
       {isLoading ? (
         <>
           <div className="spinner"></div>
-          <span>Loading...</span>
+          <span>{t("ui.loading")}</span>
         </>
       ) : (
         <>

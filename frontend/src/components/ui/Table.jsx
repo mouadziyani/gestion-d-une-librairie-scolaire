@@ -21,7 +21,7 @@ function Table({ columns = [], data = [], actions }) {
                 ))}
                 {actions && (
                   <td data-label="Actions">
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div className="table-actions">
                       {actions(item)}
                     </div>
                   </td>
@@ -30,7 +30,7 @@ function Table({ columns = [], data = [], actions }) {
             ))
           ) : (
             <tr>
-              <td colSpan={columns.length + (actions ? 1 : 0)} style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
+              <td colSpan={columns.length + (actions ? 1 : 0)} className="table-empty-cell">
                 No data available in this section.
               </td>
             </tr>

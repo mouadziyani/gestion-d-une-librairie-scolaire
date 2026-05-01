@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/features/auth/authContext";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   const amount = Number(value || 0);
@@ -13,6 +14,7 @@ function formatMoney(value) {
 
 function AdminDashboard() {
   const { user } = useContext(AuthContext);
+  const { t } = useUiPreferences();
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -33,7 +35,7 @@ function AdminDashboard() {
           return;
         }
 
-        setError(err?.response?.data?.message || "Failed to load dashboard.");
+        setError(err?.response?.data?.message || t("pages.failedLoadDashboard"));
       } finally {
         if (active) {
           setLoading(false);
@@ -55,12 +57,12 @@ function AdminDashboard() {
   const recentSpecialOrders = dashboard?.recent_special_orders ?? [];
 
   const statCards = [
-    { label: "Total Users", value: stats.total_users ?? 0 },
-    { label: "Total Products", value: stats.total_products ?? 0 },
-    { label: "Total Orders", value: stats.total_orders ?? 0 },
-    { label: "Pending Orders", value: stats.pending_orders ?? 0 },
-    { label: "Low Stock", value: stats.low_stock ?? 0 },
-    { label: "Total Revenue", value: formatMoney(stats.total_revenue ?? 0) },
+    { label: t("dashboard.totalUsers"), value: stats.total_users ?? 0 },
+    { label: t("dashboard.totalProducts"), value: stats.total_products ?? 0 },
+    { label: t("dashboard.totalOrders"), value: stats.total_orders ?? 0 },
+    { label: t("dashboard.pendingOrders"), value: stats.pending_orders ?? 0 },
+    { label: t("dashboard.lowStock"), value: stats.low_stock ?? 0 },
+    { label: t("dashboard.totalRevenue"), value: formatMoney(stats.total_revenue ?? 0) },
   ];
 
   if (loading) {
@@ -74,15 +76,15 @@ function AdminDashboard() {
   return (
     <>
       <header className="dashboard-header">
-        <h1>Library BOUGDIM</h1>
-        <p>Admin Overview & Analytics {user?.name ? `- ${user.name}` : ""}</p>
+        <h1>{t("dashboard.adminTitle")}</h1>
+        <p>{t("dashboard.adminSubtitle")} {user?.name ? `- ${user.name}` : ""}</p>
       </header>
 
       <div className="stats-grid">
         {statCards.map((card) => (
           <div className="stat-card" key={card.label}>
             <h4>{card.label}</h4>
-            <div className="value" style={{ color: card.label === "Low Stock" ? "#ff5e78" : undefined }}>
+            <div className="value" style={{ color: card.label === t("dashboard.lowStock") ? "#ff5e78" : undefined }}>
               {card.value}
             </div>
           </div>
@@ -90,15 +92,15 @@ function AdminDashboard() {
       </div>
 
       <section className="table-container">
-        <h3>Recent Orders</h3>
+        <h3>{t("dashboard.recentOrders")}</h3>
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Customer</th>
-              <th>School</th>
-              <th>Status</th>
-              <th>Total</th>
+              <th>{t("pages.customer")}</th>
+              <th>{t("pages.school")}</th>
+              <th>{t("common.status")}</th>
+              <th>{t("cart.total")}</th>
             </tr>
           </thead>
           <tbody>
@@ -112,7 +114,7 @@ function AdminDashboard() {
               </tr>
             )) : (
               <tr>
-                <td colSpan="5">No recent orders.</td>
+                <td colSpan="5">{t("dashboard.noRecentOrders")}</td>
               </tr>
             )}
           </tbody>
@@ -121,13 +123,13 @@ function AdminDashboard() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginTop: "24px" }}>
         <section className="table-container">
-          <h3>Recent Products</h3>
+          <h3>{t("dashboard.recentProducts")}</h3>
           <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Stock</th>
+                <th>{t("pages.name")}</th>
+                <th>{t("navbar.categories")}</th>
+                <th>{t("pages.stock")}</th>
               </tr>
             </thead>
             <tbody>
@@ -139,7 +141,7 @@ function AdminDashboard() {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="3">No products found.</td>
+                  <td colSpan="3">{t("dashboard.noProducts")}</td>
                 </tr>
               )}
             </tbody>
@@ -147,13 +149,13 @@ function AdminDashboard() {
         </section>
 
         <section className="table-container">
-          <h3>Low Stock Products</h3>
+          <h3>{t("dashboard.lowStockProducts")}</h3>
           <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Stock</th>
-                <th>Min</th>
+                <th>{t("pages.name")}</th>
+                <th>{t("pages.stock")}</th>
+                <th>{t("pages.min")}</th>
               </tr>
             </thead>
             <tbody>
@@ -165,7 +167,7 @@ function AdminDashboard() {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="3">Stock is healthy.</td>
+                  <td colSpan="3">{t("dashboard.stockHealthy")}</td>
                 </tr>
               )}
             </tbody>
@@ -174,14 +176,14 @@ function AdminDashboard() {
       </div>
 
       <section className="table-container" style={{ marginTop: "24px" }}>
-        <h3>Recent Special Orders</h3>
+        <h3>{t("dashboard.recentSpecialOrders")}</h3>
         <table>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Item</th>
-              <th>School</th>
-              <th>Status</th>
+              <th>{t("pages.item")}</th>
+              <th>{t("pages.school")}</th>
+              <th>{t("common.status")}</th>
             </tr>
           </thead>
           <tbody>
@@ -194,7 +196,7 @@ function AdminDashboard() {
               </tr>
             )) : (
               <tr>
-                <td colSpan="4">No special orders yet.</td>
+                <td colSpan="4">{t("dashboard.noSpecialOrders")}</td>
               </tr>
             )}
           </tbody>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("fr-MA", {
@@ -34,6 +35,7 @@ function downloadCsv(filename, rows) {
 }
 
 function MyInvoices() {
+  const { t } = useUiPreferences();
   const [invoices, setInvoices] = useState([]);
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,7 +57,7 @@ function MyInvoices() {
         setOrders(Array.isArray(ordersResponse.data?.data) ? ordersResponse.data.data : []);
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load invoices.");
+          setError(err?.response?.data?.message || t("clientInvoices.failedLoadInvoices"));
         }
       } finally {
         if (active) {
@@ -69,7 +71,7 @@ function MyInvoices() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
 
   const invoiceRows = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -100,7 +102,7 @@ function MyInvoices() {
 
   function handleExport() {
     const rows = [
-      ["ID", "Invoice Number", "School", "Status", "Total", "Issued At"],
+      [t("clientOrders.id"), t("clientInvoices.invoiceNumber"), t("clientOrders.school"), t("clientOrders.status"), t("clientOrders.total"), t("pages.date")],
       ...invoiceRows.map((invoice) => [
         invoice.id,
         invoice.invoice_number || `INV-${invoice.id}`,
@@ -118,26 +120,26 @@ function MyInvoices() {
     <div className="invoices-container">
       <header className="page-header">
         <div>
-          <p style={{ color: "#888", fontSize: "12px", fontWeight: "bold", textTransform: "uppercase" }}>Client Area</p>
-          <h2>My Invoices</h2>
+          <p style={{ color: "#888", fontSize: "12px", fontWeight: "bold", textTransform: "uppercase" }}>{t("clientInvoices.clientArea")}</p>
+          <h2>{t("clientInvoices.title")}</h2>
         </div>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           <button type="button" className="btn-export" onClick={handleExport}>
-            Export CSV
+            {t("clientInvoices.exportCsv")}
           </button>
           <button type="button" className="btn-base btn-primary" onClick={handlePrint}>
-            Print
+            {t("clientInvoices.print")}
           </button>
         </div>
       </header>
 
       <section className="filters-bar">
         <div className="filter-item">
-          <label htmlFor="invoice-search">Search Invoices</label>
+          <label htmlFor="invoice-search">{t("clientInvoices.search")}</label>
           <input
             id="invoice-search"
             type="text"
-            placeholder="Search by invoice, school, or status..."
+            placeholder={t("clientInvoices.searchPlaceholder")}
             className="search-input"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -145,18 +147,18 @@ function MyInvoices() {
         </div>
 
         <div className="filter-item">
-          <label htmlFor="invoice-status">Status</label>
+          <label htmlFor="invoice-status">{t("clientOrders.status")}</label>
           <select id="invoice-status" className="search-input" value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="all">All Status</option>
-            <option value="unpaid">Unpaid</option>
-            <option value="paid">Paid</option>
-            <option value="pending">Pending</option>
+            <option value="all">{t("clientInvoices.allStatus")}</option>
+            <option value="unpaid">{t("pages.unpaid")}</option>
+            <option value="paid">{t("pages.paid")}</option>
+            <option value="pending">{t("pages.pending")}</option>
           </select>
         </div>
 
         <div style={{ paddingBottom: "2px" }}>
           <Link to="/orders" className="btn-base btn-outline" style={{ textDecoration: "none" }}>
-            Go to Orders
+            {t("clientInvoices.goToOrders")}
           </Link>
         </div>
       </section>
@@ -168,12 +170,12 @@ function MyInvoices() {
           <table className="custom-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Invoice Number</th>
-                <th>School</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>Actions</th>
+                <th>{t("clientOrders.id")}</th>
+                <th>{t("clientInvoices.invoiceNumber")}</th>
+                <th>{t("clientOrders.school")}</th>
+                <th>{t("clientOrders.status")}</th>
+                <th>{t("clientOrders.total")}</th>
+                <th>{t("clientOrders.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -187,20 +189,20 @@ function MyInvoices() {
                     <td>{formatMoney(invoice.total_amount || invoice.relatedOrder?.total_price || 0)}</td>
                     <td>
                       <Link to={`/invoice-detail?id=${invoice.id}`} className="action-link">
-                        View
+                        {t("clientOrders.view")}
                       </Link>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6">No invoices match your filters.</td>
+                  <td colSpan="6">{t("clientInvoices.noInvoicesMatch")}</td>
                 </tr>
               )}
             </tbody>
           </table>
         ) : (
-          <p style={{ padding: "20px", color: "#888" }}>Loading invoices...</p>
+          <p style={{ padding: "20px", color: "#888" }}>{t("clientInvoices.loadingInvoices")}</p>
         )}
       </section>
     </div>

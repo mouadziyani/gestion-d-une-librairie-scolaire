@@ -2,25 +2,24 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Clock, MapPin, Phone, School, ShoppingBag } from "lucide-react";
 import aboutBackground from "@/assets/background/background1.png";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function About() {
+  const { t } = useUiPreferences();
   return (
     <div className="about-page">
       <main className="about-wrapper">
         <section className="about-hero about-brand-hero">
           <div className="about-text about-hero-copy">
-            <span className="eyebrow-label">Librairie BOUGDIM</span>
-            <h1>Books, school supplies, and local service in one place.</h1>
-            <p>
-              Library BOUGDIM helps families, students, and schools prepare faster with a curated catalogue
-              of textbooks, writing tools, office supplies, and special orders.
-            </p>
+            <span className="eyebrow-label">{t("common.brandName")}</span>
+            <h1>{t("aboutPage.title")}</h1>
+            <p>{t("aboutPage.subtitle")}</p>
             <div className="about-hero-actions">
               <Link to="/products" className="home-btn home-btn-primary">
-                Browse products
+                {t("aboutPage.browseProducts")}
               </Link>
               <Link to="/special-order" className="home-btn home-btn-secondary">
-                Special order
+                {t("aboutPage.specialOrder")}
               </Link>
             </div>
           </div>
@@ -28,61 +27,58 @@ function About() {
           <div
             className="about-visual about-brand-panel"
             style={{ "--about-background-image": `url(${aboutBackground})` }}
-            aria-label="Library BOUGDIM overview"
+            aria-label={t("aboutPage.overviewLabel")}
           />
         </section>
 
         <section className="about-story-band">
           <div>
-            <span className="eyebrow-label">What we do</span>
-            <h2>We make back-to-school shopping clear, quick, and reliable.</h2>
+            <span className="eyebrow-label">{t("aboutPage.whatWeDo")}</span>
+            <h2>{t("aboutPage.storyTitle")}</h2>
           </div>
-          <p>
-            From daily stationery to requested books, the shop connects local advice with online ordering
-            so customers can find what they need without wasting time.
-          </p>
+          <p>{t("aboutPage.storyCopy")}</p>
         </section>
 
-        <section className="about-service-grid" aria-label="About Library BOUGDIM services">
+        <section className="about-service-grid" aria-label={t("aboutPage.servicesLabel")}>
           <article>
             <BookOpen size={24} />
-            <h3>Curated catalogue</h3>
-            <p>Books and supplies organized by category for faster browsing and cleaner school lists.</p>
+            <h3>{t("aboutPage.curatedCatalogue")}</h3>
+            <p>{t("aboutPage.curatedCatalogueCopy")}</p>
           </article>
           <article>
             <School size={24} />
-            <h3>School support</h3>
-            <p>Orders can be prepared around school needs, invoices, and classroom essentials.</p>
+            <h3>{t("aboutPage.schoolSupport")}</h3>
+            <p>{t("aboutPage.schoolSupportCopy")}</p>
           </article>
           <article>
             <ShoppingBag size={24} />
-            <h3>Special orders</h3>
-            <p>Customers can request items that are not currently visible in the catalogue.</p>
+            <h3>{t("aboutPage.specialOrders")}</h3>
+            <p>{t("aboutPage.specialOrdersCopy")}</p>
           </article>
         </section>
 
         <section className="contact-info-grid about-contact-grid">
           <div className="info-block">
             <MapPin size={20} />
-            <h4>Location</h4>
+            <h4>{t("aboutPage.location")}</h4>
             <p>El Aioun Sidi Mellouk<br />Oujda, Morocco</p>
           </div>
           <div className="info-block">
             <Phone size={20} />
-            <h4>Contact</h4>
+            <h4>{t("aboutPage.contact")}</h4>
             <p>contact@bougdim.com<br />+212 566 66 66 66</p>
           </div>
           <div className="info-block">
             <Clock size={20} />
-            <h4>Hours</h4>
+            <h4>{t("aboutPage.hours")}</h4>
             <p>Mon - Sun<br />09:00 - 19:00</p>
           </div>
         </section>
 
         <section className="about-map-section">
           <div className="about-map-head">
-            <span className="eyebrow-label">Find us</span>
-            <h2>Visit Library BOUGDIM</h2>
+            <span className="eyebrow-label">{t("aboutPage.findUs")}</span>
+            <h2>{t("aboutPage.visitTitle")}</h2>
           </div>
           <div className="map-container">
             <iframe
@@ -93,7 +89,7 @@ function About() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="map"
+              title={t("aboutPage.mapTitle")}
             ></iframe>
           </div>
         </section>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("fr-MA", {
@@ -66,6 +67,7 @@ function parsePaymentNoteItems(order, invoiceTotal) {
 }
 
 function AdminInvoiceDetail() {
+  const { t } = useUiPreferences();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
@@ -162,12 +164,12 @@ function AdminInvoiceDetail() {
   return (
     <div className="admin-detail-container">
       <main className="invoice-paper">
-        <header style={{ display: "flex", justifyContent: "space-between", marginBottom: "50px", gap: "20px", flexWrap: "wrap" }}>
+        <header className="invoice-paper-header">
           <div>
-            <h1 style={{ fontFamily: "Fraunces", fontSize: "2rem", margin: 0 }}>Library BOUGDIM</h1>
-            <p style={{ color: "#888" }}>Invoice #{invoice?.invoice_number || invoice?.id || "-"}</p>
+            <h1 className="invoice-paper-title">{t("common.brandName")}</h1>
+            <p className="invoice-paper-subtitle">Invoice #{invoice?.invoice_number || invoice?.id || "-"}</p>
           </div>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <div className="invoice-paper-actions">
             <button type="button" className="btn-base btn-outline btn-sm" onClick={handlePrint}>
               Print Invoice
             </button>
@@ -182,18 +184,18 @@ function AdminInvoiceDetail() {
         {!loading ? (
           order ? (
             <>
-              <section style={{ marginBottom: "40px" }}>
-                <h3 style={{ fontFamily: "Fraunces", fontSize: "1.2rem", borderBottom: "1px solid #eee", paddingBottom: "10px" }}>
+              <section className="invoice-paper-section">
+                <h3 className="invoice-paper-section-title">
                   Billing Details
                 </h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "15px" }}>
+                <div className="invoice-paper-meta-grid">
                   <div>
-                    <p style={{ fontSize: "12px", color: "#888", fontWeight: "bold" }}>CLIENT</p>
+                    <p className="invoice-paper-label">CLIENT</p>
                     <p>{order.user?.name || "-"}</p>
                     <p>{order.user?.email || "-"}</p>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <p style={{ fontSize: "12px", color: "#888", fontWeight: "bold" }}>DATE</p>
+                  <div className="invoice-paper-meta-end">
+                    <p className="invoice-paper-label">DATE</p>
                     <p>{invoice?.issued_at || invoice?.created_at || order?.created_at || "-"}</p>
                   </div>
                 </div>
@@ -227,9 +229,9 @@ function AdminInvoiceDetail() {
                   </tbody>
                 </table>
 
-                <div style={{ marginTop: "30px", textAlign: "right", borderTop: "2px solid #1a1a1a", paddingTop: "20px" }}>
-                  <p style={{ fontSize: "14px", color: "#888" }}>Total Amount</p>
-                  <h2 style={{ fontFamily: "Fraunces", fontSize: "2rem" }}>{formatMoney(total)}</h2>
+                <div className="invoice-paper-total">
+                  <p className="invoice-paper-total-label">Total Amount</p>
+                  <h2 className="invoice-paper-total-value">{formatMoney(total)}</h2>
                 </div>
               </section>
             </>
@@ -244,7 +246,7 @@ function AdminInvoiceDetail() {
       <aside className="admin-action-sidebar">
         <div className="sidebar-card">
           <h4>Quick Actions</h4>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div className="invoice-sidebar-actions">
             <Link to={listPath} className="btn-archive" style={{ textDecoration: "none", textAlign: "center" }}>
               Back to invoices
             </Link>

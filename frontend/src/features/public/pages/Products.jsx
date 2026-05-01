@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo/library.png";
 import { getCategories } from "@/shared/services/categoryService";
 import { getProducts } from "@/shared/services/productService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
 
 function getFiltersFromLocation(search) {
@@ -26,6 +27,7 @@ function formatMoney(value) {
 function Products() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useUiPreferences();
   const [form, setForm] = useState(() => getFiltersFromLocation(location.search));
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -63,7 +65,7 @@ function Products() {
         setLastPage(productData?.last_page || 1);
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load products.");
+          setError(err?.response?.data?.message || t("pages.failedLoadProducts"));
         }
       } finally {
         if (active) {
@@ -77,7 +79,7 @@ function Products() {
     return () => {
       active = false;
     };
-  }, [location.search, page]);
+  }, [location.search, page, t]);
 
   useEffect(() => {
     let active = true;
@@ -171,13 +173,11 @@ function Products() {
     <div className="products-wrapper">
       <section className="search-filter-section">
         <div className="products-hero-header">
-          <img src={logo} alt="Library BOUGDIM" className="products-hero-logo" />
+          <img src={logo} alt={t("common.brandName")} className="products-hero-logo" />
           <div>
-            <p className="products-eyebrow">Library shop</p>
-            <h1>Browse school essentials.</h1>
-            <p className="products-subtitle">
-              Search by name, reference, category, status, discount, or best sellers.
-            </p>
+            <p className="products-eyebrow">{t("public.shopEyebrow")}</p>
+            <h1>{t("public.browseSchoolEssentials")}</h1>
+            <p className="products-subtitle">{t("public.shopSubtitle")}</p>
           </div>
         </div>
 
@@ -188,13 +188,13 @@ function Products() {
               name="search"
               value={form.search}
               onChange={handleChange}
-              placeholder="Find by name, reference, or category..."
+              placeholder={t("public.searchProductsPlaceholder")}
             />
           </div>
 
           <div className="filter-row products-filter-row">
             <select className="custom-select" name="category" value={form.category} onChange={handleChange}>
-              <option value="all">All Categories</option>
+              <option value="all">{t("public.allCategories")}</option>
               {normalizedCategories.map((category) => (
                 <option key={category.value} value={category.slug || category.value}>
                   {category.label}
@@ -203,25 +203,25 @@ function Products() {
             </select>
 
             <select className="custom-select" name="status" value={form.status} onChange={handleChange}>
-              <option value="all">All Status</option>
-              <option value="available">Available</option>
-              <option value="inactive">Inactive</option>
+              <option value="all">{t("public.allStatus")}</option>
+              <option value="available">{t("public.available")}</option>
+              <option value="inactive">{t("common.inactive")}</option>
             </select>
 
             <select className="custom-select" name="sort" value={form.sort} onChange={handleChange}>
-              <option value="featured">Featured</option>
-              <option value="best-sellers">Best Sellers</option>
-              <option value="discount">Discount</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
+              <option value="featured">{t("public.featured")}</option>
+              <option value="best-sellers">{t("public.bestSellers")}</option>
+              <option value="discount">{t("public.discount")}</option>
+              <option value="price-asc">{t("public.priceLowToHigh")}</option>
+              <option value="price-desc">{t("public.priceHighToLow")}</option>
             </select>
 
             <button className="btn-elegant" style={{ padding: "10px 25px", fontSize: "12px" }} type="submit">
-              Apply Filters
+              {t("public.applyFilters")}
             </button>
 
             <button className="btn-base btn-outline" style={{ padding: "10px 18px" }} type="button" onClick={handleReset}>
-              Reset
+              {t("public.resetFilters")}
             </button>
           </div>
         </form>
@@ -231,8 +231,8 @@ function Products() {
         {error ? <p className="form-alert form-alert-error">{error}</p> : null}
         {loading ? (
           <div className="empty-state-card">
-            <h3>Loading products...</h3>
-            <p>Please wait while the catalogue is refreshed.</p>
+            <h3>{t("public.loadingProducts")}</h3>
+            <p>{t("public.loadingProductsDescription")}</p>
           </div>
         ) : (
           <>
@@ -246,7 +246,7 @@ function Products() {
                   return (
                     <Link to={`/product-detail?productId=${product.id}`} className="product-item" key={product.id}>
                       <div className="product-img-holder">
-                        {imageSrc ? <img src={imageSrc} alt={product.name} /> : <div className="product-image-placeholder">No image</div>}
+                        {imageSrc ? <img src={imageSrc} alt={product.name} /> : <div className="product-image-placeholder">{t("public.noImage")}</div>}
                       </div>
                       <div className="product-info">
                         <span className="product-category">{categoryLabel}</span>
@@ -257,10 +257,10 @@ function Products() {
                         <div className="product-badges">
                           {Number(product.discount || 0) > 0 ? <span className="product-badge product-badge-discount">-{product.discount}%</span> : null}
                           <span className={`product-badge ${isAvailable ? "product-badge-available" : "product-badge-unavailable"}`}>
-                            {isAvailable ? "Available" : "Special order"}
+                            {isAvailable ? t("public.available") : t("public.specialOrder")}
                           </span>
                           {(product.order_items_count || 0) > 0 ? (
-                            <span className="product-badge product-badge-sold">{product.order_items_count} sold</span>
+                            <span className="product-badge product-badge-sold">{t("public.soldCount", { count: product.order_items_count })}</span>
                           ) : null}
                         </div>
                       </div>
@@ -269,10 +269,10 @@ function Products() {
                 })
               ) : (
                 <div className="empty-state-card">
-                  <h3>No products match your filters.</h3>
-                  <p>Try resetting the filters or searching with a different keyword.</p>
+                  <h3>{t("public.noProductsMatch")}</h3>
+                  <p>{t("public.tryDifferentFilters")}</p>
                   <button type="button" className="btn-base btn-primary" onClick={handleReset}>
-                    Reset filters
+                    {t("public.resetFilters")}
                   </button>
                 </div>
               )}
@@ -280,10 +280,10 @@ function Products() {
 
             <div style={{ display: "flex", gap: "10px", marginTop: "24px", justifyContent: "center" }}>
               <button type="button" className="btn-base btn-outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                Previous
+                {t("public.previousPage")}
               </button>
               <button type="button" className="btn-base btn-outline" disabled={page >= lastPage} onClick={() => setPage(page + 1)}>
-                Next
+                {t("public.nextPage")}
               </button>
             </div>
           </>

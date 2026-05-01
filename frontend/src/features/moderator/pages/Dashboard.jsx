@@ -2,9 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "@/features/auth/authContext";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
+  const { t } = useUiPreferences();
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -25,7 +27,7 @@ function Dashboard() {
           return;
         }
 
-        setError(err?.response?.data?.message || "Failed to load dashboard.");
+        setError(err?.response?.data?.message || t("pages.failedLoadDashboard"));
       } finally {
         if (active) {
           setLoading(false);
@@ -57,26 +59,26 @@ function Dashboard() {
     <>
       <header style={{ marginBottom: "28px" }}>
         <p style={{ color: "#888", fontSize: "12px", fontWeight: "bold", textTransform: "uppercase" }}>
-          Welcome back, {user?.name || "Moderator"}
+          {t("dashboard.welcomeBack")}, {user?.name || t("dashboard.moderatorTitle")}
         </p>
-        <h1 style={{ fontFamily: "Fraunces", fontSize: "2.2rem" }}>Moderator Area</h1>
+        <h1 style={{ fontFamily: "Fraunces", fontSize: "2.2rem" }}>{t("dashboard.moderatorTitle")}</h1>
       </header>
 
       <section className="stats-grid">
         <div className="stat-card">
-          <h4>Pending Orders</h4>
+          <h4>{t("dashboard.pendingOrders")}</h4>
           <div className="number">{stats.pending_orders ?? 0}</div>
         </div>
         <div className="stat-card">
-          <h4>Processed Orders</h4>
+          <h4>{t("dashboard.processedOrders")}</h4>
           <div className="number">{stats.processed_orders ?? 0}</div>
         </div>
         <div className="stat-card">
-          <h4>Low Stock</h4>
+          <h4>{t("dashboard.lowStock")}</h4>
           <div className="number" style={{ color: "#ff5e78" }}>{stats.low_stock ?? 0}</div>
         </div>
         <div className="stat-card">
-          <h4>Pending Special Orders</h4>
+          <h4>{t("dashboard.pendingSpecialOrders")}</h4>
           <div className="number">{stats.pending_special_orders ?? 0}</div>
         </div>
       </section>
@@ -84,18 +86,18 @@ function Dashboard() {
       <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: "24px" }}>
         <section className="table-container">
           <div className="section-title">
-            Recent Orders
+            {t("dashboard.recentOrders")}
             <Link to="/moderator/orders" style={{ fontSize: "13px", textDecoration: "none" }}>
-              View all
+              {t("dashboard.viewAll")}
             </Link>
           </div>
           <table>
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Customer</th>
-                <th>School</th>
-                <th>Status</th>
+                <th>{t("pages.customer")}</th>
+                <th>{t("pages.school")}</th>
+                <th>{t("common.status")}</th>
               </tr>
             </thead>
             <tbody>
@@ -106,31 +108,31 @@ function Dashboard() {
                   <td>{order.school?.name || "-"}</td>
                   <td>{order.status}</td>
                 </tr>
-              )) : (
-                <tr>
-                  <td colSpan="4">No recent orders.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
+                )) : (
+                  <tr>
+                    <td colSpan="4">{t("dashboard.noRecentOrders")}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
 
         <section className="table-container">
           <div className="section-title">
-            Quick Links
+            {t("dashboard.quickLinks")}
             <Link to="/moderator/reports" style={{ fontSize: "13px", textDecoration: "none" }}>
-              Reports
+              {t("dashboard.reports")}
             </Link>
           </div>
           <div style={{ display: "grid", gap: "12px" }}>
             <Link to="/moderator/products" className="btn-update-profile" style={{ textDecoration: "none", textAlign: "center" }}>
-              Manage Products
+              {t("dashboard.manageProducts")}
             </Link>
             <Link to="/moderator/stock" className="btn-update-profile" style={{ textDecoration: "none", textAlign: "center" }}>
-              Review Stock
+              {t("dashboard.reviewStock")}
             </Link>
             <Link to="/moderator/special-orders" className="btn-update-profile" style={{ textDecoration: "none", textAlign: "center" }}>
-              Special Orders
+              {t("dashboard.specialOrders")}
             </Link>
           </div>
         </section>
@@ -138,13 +140,13 @@ function Dashboard() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginTop: "24px" }}>
         <section className="table-container">
-          <h3>Recent Special Orders</h3>
+          <h3>{t("dashboard.recentSpecialOrders")}</h3>
           <table>
             <thead>
               <tr>
-                <th>Item</th>
-                <th>School</th>
-                <th>Status</th>
+                <th>{t("pages.item")}</th>
+                <th>{t("pages.school")}</th>
+                <th>{t("common.status")}</th>
               </tr>
             </thead>
             <tbody>
@@ -154,23 +156,23 @@ function Dashboard() {
                   <td>{item.school?.name || "-"}</td>
                   <td>{item.status}</td>
                 </tr>
-              )) : (
-                <tr>
-                  <td colSpan="3">No special orders yet.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
+                )) : (
+                  <tr>
+                    <td colSpan="3">{t("dashboard.noSpecialOrders")}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </section>
 
         <section className="table-container">
-          <h3>Low Stock Products</h3>
+          <h3>{t("dashboard.lowStockProducts")}</h3>
           <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Stock</th>
-                <th>Min</th>
+                <th>{t("pages.name")}</th>
+                <th>{t("pages.stock")}</th>
+                <th>{t("pages.min")}</th>
               </tr>
             </thead>
             <tbody>
@@ -180,12 +182,12 @@ function Dashboard() {
                   <td>{product.stock}</td>
                   <td>{product.min_stock}</td>
                 </tr>
-              )) : (
-                <tr>
-                  <td colSpan="3">No stock alerts.</td>
-                </tr>
-              )}
-            </tbody>
+                )) : (
+                  <tr>
+                    <td colSpan="3">{t("dashboard.noStockAlerts")}</td>
+                  </tr>
+                )}
+              </tbody>
           </table>
         </section>
       </div>

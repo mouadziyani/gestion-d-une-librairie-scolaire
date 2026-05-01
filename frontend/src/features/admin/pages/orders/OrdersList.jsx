@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function OrdersList() {
   const location = useLocation();
+  const { t } = useUiPreferences();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
   const listPath = isModeratorRoute ? "/moderator/orders" : "/admin/orders";
   const detailsPath = isModeratorRoute ? "/moderator/order-details" : "/admin/orders/details";
@@ -30,7 +32,7 @@ function OrdersList() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load orders.");
+          setError(err?.response?.data?.message || t("pages.failedLoadOrders"));
         }
       } finally {
         if (active) {
@@ -63,33 +65,33 @@ function OrdersList() {
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / ORDERS</span>
-          <h2>Orders List</h2>
+          <span className="eyebrow-label">{isModeratorRoute ? t("pages.moderatorArea") : t("pages.adminArea")} / {t("sidebar.orders")}</span>
+          <h2>{t("pages.ordersList")}</h2>
         </div>
         <Link to={isModeratorRoute ? "/moderator/reports" : "/admin/reports/sales"} className="btn-add-role">
-          View Sales Report
+          {t("pages.viewSalesReport")}
         </Link>
       </header>
 
       <div className="filter-bar-admin">
         <div className="filter-field">
-          <label htmlFor="order-search">Search</label>
-          <input id="order-search" type="search" placeholder="Search by customer, school, or id..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <label htmlFor="order-search">{t("common.search")}</label>
+          <input id="order-search" type="search" placeholder={t("pages.searchOrdersPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <div className="filter-field">
-          <label htmlFor="order-status">Status</label>
+          <label htmlFor="order-status">{t("common.status")}</label>
           <select id="order-status" value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="all">{t("common.allStatuses")}</option>
+            <option value="pending">{t("pages.pending")}</option>
+            <option value="processing">{t("pages.processing")}</option>
+            <option value="shipped">{t("pages.shipped")}</option>
+            <option value="delivered">{t("pages.delivered")}</option>
+            <option value="cancelled">{t("pages.cancelled")}</option>
           </select>
         </div>
         {managePath ? (
           <Link to={managePath} className="btn-elegant">
-            Manage orders
+            {t("pages.manageOrders")}
           </Link>
         ) : null}
       </div>
@@ -102,12 +104,12 @@ function OrdersList() {
             <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Customer</th>
-                  <th>School</th>
-                  <th>Status</th>
-                  <th>Payment</th>
-                  <th>Total</th>
-                  <th>Actions</th>
+                  <th>{t("pages.customer")}</th>
+                  <th>{t("pages.school")}</th>
+                  <th>{t("common.status")}</th>
+                  <th>{t("pages.payment")}</th>
+                  <th>{t("cart.total")}</th>
+                  <th>{t("common.actions")}</th>
                 </tr>
               </thead>
             <tbody>
@@ -123,11 +125,11 @@ function OrdersList() {
                       <td>{Number(order.total_price || 0).toFixed(2)} MAD</td>
                       <td>
                         <Link to={`${detailsPath}?id=${order.id}`} className="action-link">
-                          View
+                          {t("common.view")}
                         </Link>
                         {managePath ? (
                           <Link to={`${managePath}?id=${order.id}`} className="action-link">
-                            Manage
+                            {t("pages.manageOrders")}
                           </Link>
                         ) : null}
                       </td>
@@ -135,7 +137,7 @@ function OrdersList() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7">No orders match your filters.</td>
+                    <td colSpan="7">{t("pages.noOrdersMatch")}</td>
                   </tr>
                 )
               ) : null}
@@ -144,12 +146,12 @@ function OrdersList() {
         </div>
       </section>
 
-      <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+      <div className="pagination-row pagination-row-top">
         <button type="button" className="btn-base btn-outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-          Previous
+          {t("common.previous")}
         </button>
         <button type="button" className="btn-base btn-outline" disabled={page >= lastPage} onClick={() => setPage(page + 1)}>
-          Next
+          {t("common.next")}
         </button>
       </div>
     </div>

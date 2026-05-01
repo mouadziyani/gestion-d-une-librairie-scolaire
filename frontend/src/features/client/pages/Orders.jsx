@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("fr-MA", {
@@ -11,6 +12,7 @@ function formatMoney(value) {
 }
 
 function Orders() {
+  const { t } = useUiPreferences();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -28,7 +30,7 @@ function Orders() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load your orders.");
+          setError(err?.response?.data?.message || t("clientOrders.failedLoadOrders"));
         }
       } finally {
         if (active) {
@@ -42,7 +44,7 @@ function Orders() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
 
   const filteredOrders = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -61,36 +63,36 @@ function Orders() {
     <div className="dashboard-container">
       <header className="page-shell-header">
         <div>
-          <span className="eyebrow-label">CLIENT / ORDERS</span>
-          <h1 className="page-shell-title">My Orders</h1>
-          <p className="page-shell-subtitle">Track your orders, delivery status, and payment state.</p>
+          <span className="eyebrow-label">{t("clientOrders.eyebrow")}</span>
+          <h1 className="page-shell-title">{t("clientOrders.title")}</h1>
+          <p className="page-shell-subtitle">{t("clientOrders.subtitle")}</p>
         </div>
       </header>
 
       <div className="filter-bar-admin">
         <div className="filter-field">
-          <label htmlFor="client-order-search">Search</label>
+          <label htmlFor="client-order-search">{t("clientOrders.search")}</label>
           <input
             id="client-order-search"
             type="search"
-            placeholder="Search by id, status, or school..."
+            placeholder={t("clientOrders.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className="filter-field">
-          <label htmlFor="client-order-status">Status</label>
+          <label htmlFor="client-order-status">{t("clientOrders.status")}</label>
           <select id="client-order-status" value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="all">{t("common.allStatuses")}</option>
+            <option value="pending">{t("pages.pending")}</option>
+            <option value="processing">{t("pages.processing")}</option>
+            <option value="shipped">{t("pages.shipped")}</option>
+            <option value="delivered">{t("pages.delivered")}</option>
+            <option value="cancelled">{t("pages.cancelled")}</option>
           </select>
         </div>
         <Link to="/checkout" className="btn-elegant">
-          New checkout
+          {t("clientOrders.newCheckout")}
         </Link>
       </div>
 
@@ -101,12 +103,12 @@ function Orders() {
           <table className="custom-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>School</th>
-                <th>Payment</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>Actions</th>
+                <th>{t("clientOrders.id")}</th>
+                <th>{t("clientOrders.school")}</th>
+                <th>{t("clientOrders.payment")}</th>
+                <th>{t("clientOrders.status")}</th>
+                <th>{t("clientOrders.total")}</th>
+                <th>{t("clientOrders.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -121,19 +123,19 @@ function Orders() {
                       <td>{formatMoney(order.total_price || 0)}</td>
                       <td>
                         <Link to={`/order-detail?id=${order.id}`} className="action-link">
-                          View
+                          {t("clientOrders.view")}
                         </Link>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6">No orders match your filters.</td>
+                    <td colSpan="6">{t("clientOrders.noOrdersMatch")}</td>
                   </tr>
                 )
               ) : (
                 <tr>
-                  <td colSpan="6">Loading your orders...</td>
+                  <td colSpan="6">{t("clientOrders.loadingOrders")}</td>
                 </tr>
               )}
             </tbody>

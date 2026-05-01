@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { api } from "@/shared/services/api";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   return new Intl.NumberFormat("fr-MA", {
@@ -16,6 +17,7 @@ function getInvoiceFromOrder(order) {
 
 function AdminInvoiceList() {
   const location = useLocation();
+  const { t } = useUiPreferences();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
   const detailPath = isModeratorRoute ? "/moderator/invoice-detail" : "/admin/invoices/details";
   const [orders, setOrders] = useState([]);
@@ -40,7 +42,7 @@ function AdminInvoiceList() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load invoices.");
+          setError(err?.response?.data?.message || t("pages.failedLoadInvoices"));
         }
       } finally {
         if (active) {
@@ -92,34 +94,34 @@ function AdminInvoiceList() {
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span className="eyebrow-label">{isModeratorRoute ? "MODERATOR" : "ADMIN"} / INVOICES</span>
-          <h2>Invoice Archive</h2>
+          <span className="eyebrow-label">{isModeratorRoute ? t("pages.moderatorArea") : t("pages.adminArea")} / {t("sidebar.invoices")}</span>
+          <h2>{t("pages.invoiceArchive")}</h2>
         </div>
         {!isModeratorRoute ? (
           <Link to="/admin/invoices/create" className="btn-add-role">
-            + New Invoice
+            + {t("pages.newInvoice")}
           </Link>
         ) : null}
       </header>
 
       <section className="filter-bar-admin">
         <div className="filter-field">
-          <label htmlFor="invoice-search">Search</label>
+          <label htmlFor="invoice-search">{t("common.search")}</label>
           <input
             id="invoice-search"
             type="search"
-            placeholder="Search by invoice, customer, or school..."
+            placeholder={t("pages.searchInvoicesPlaceholder")}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
         <div className="filter-field">
-          <label htmlFor="invoice-status">Status</label>
+          <label htmlFor="invoice-status">{t("common.status")}</label>
           <select id="invoice-status" value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option value="all">All statuses</option>
-            <option value="paid">Paid</option>
-            <option value="unpaid">Unpaid</option>
-            <option value="pending">Pending</option>
+            <option value="all">{t("common.allStatuses")}</option>
+            <option value="paid">{t("pages.paid")}</option>
+            <option value="unpaid">{t("pages.unpaid")}</option>
+            <option value="pending">{t("pages.pending")}</option>
           </select>
         </div>
       </section>
@@ -131,13 +133,13 @@ function AdminInvoiceList() {
           <table className="custom-table">
             <thead>
               <tr>
-                <th>Invoice</th>
-                <th>Client</th>
-                <th>School</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>Actions</th>
+                <th>{t("pages.invoice")}</th>
+                <th>{t("pages.customer")}</th>
+                <th>{t("pages.school")}</th>
+                <th>{t("pages.date")}</th>
+                <th>{t("common.status")}</th>
+                <th>{t("cart.total")}</th>
+                <th>{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -153,14 +155,14 @@ function AdminInvoiceList() {
                       <td>{formatMoney(row.amount)}</td>
                       <td>
                         <Link to={`${detailPath}?id=${row.order.id}`} className="action-link">
-                          View
+                          {t("common.view")}
                         </Link>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7">No invoices match your filters.</td>
+                    <td colSpan="7">{t("pages.noInvoicesMatch")}</td>
                   </tr>
                 )
               ) : null}
@@ -169,12 +171,12 @@ function AdminInvoiceList() {
         </div>
       </section>
 
-      <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+      <div className="pagination-row pagination-row-top">
         <button type="button" className="btn-base btn-outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-          Previous
+          {t("common.previous")}
         </button>
         <button type="button" className="btn-base btn-outline" disabled={page >= lastPage} onClick={() => setPage(page + 1)}>
-          Next
+          {t("common.next")}
         </button>
       </div>
     </div>

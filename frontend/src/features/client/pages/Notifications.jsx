@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { markAllNotificationsRead, markNotificationRead, getNotifications } from "@/features/notifications/services/notificationService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function getIcon(type) {
   if (type === "order") return { icon: "📦", className: "icon-order" };
@@ -9,6 +10,7 @@ function getIcon(type) {
 }
 
 function Notifications() {
+  const { t } = useUiPreferences();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,7 +21,7 @@ function Notifications() {
       setNotifications(Array.isArray(data) ? data : []);
       setError("");
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to load notifications.");
+      setError(err?.response?.data?.message || t("notificationsPage.failedLoadNotifications"));
     } finally {
       setLoading(false);
     }
@@ -27,7 +29,7 @@ function Notifications() {
 
   useEffect(() => {
     loadNotifications();
-  }, []);
+  }, [t]);
 
   async function handleMarkAll() {
     await markAllNotificationsRead();
@@ -46,12 +48,12 @@ function Notifications() {
       <header className="notif-header">
         <div>
           <span className="notif-eyebrow">
-            CLIENT / UPDATES
+            {t("notificationsPage.eyebrow")}
           </span>
-          <h2 className="notif-title">Notifications</h2>
+          <h2 className="notif-title">{t("notificationsPage.title")}</h2>
         </div>
         <button className="btn-mark-all" onClick={handleMarkAll} type="button">
-          Mark all as read
+          {t("notificationsPage.markAllAsRead")}
         </button>
       </header>
 
@@ -66,9 +68,9 @@ function Notifications() {
                 <div key={notification.id} className={`notif-card ${notification.is_read ? "" : "unread"}`}>
                   <div className={`notif-icon ${config.className}`}>{config.icon}</div>
                   <div className="notif-content">
-                    <h4>{notification.type?.replace(/_/g, " ") || "Notification"}</h4>
+                    <h4>{notification.type?.replace(/_/g, " ") || t("notificationsPage.notificationFallback")}</h4>
                     <p>{notification.message}</p>
-                    <span className="notif-time">{notification.created_at || "Just now"}</span>
+                    <span className="notif-time">{notification.created_at || t("notificationsPage.justNow")}</span>
                   </div>
                   {!notification.is_read ? (
                     <button
@@ -76,7 +78,7 @@ function Notifications() {
                       className="btn-mark-all notif-mark-one"
                       onClick={() => handleMarkOne(notification.id)}
                     >
-                      Mark read
+                      {t("notificationsPage.markRead")}
                     </button>
                   ) : null}
                 </div>
@@ -85,16 +87,16 @@ function Notifications() {
           ) : (
             <div className="notif-card">
               <div className="notif-content">
-                <h4>No notifications yet</h4>
-                <p>You'll see order and special request updates here.</p>
+                <h4>{t("notificationsPage.emptyTitle")}</h4>
+                <p>{t("notificationsPage.emptyDescription")}</p>
               </div>
             </div>
           )
         ) : (
           <div className="notif-card">
             <div className="notif-content">
-              <h4>Loading...</h4>
-              <p>Please wait.</p>
+              <h4>{t("ui.loading")}</h4>
+              <p>{t("ui.pleaseWait")}</p>
             </div>
           </div>
         )}

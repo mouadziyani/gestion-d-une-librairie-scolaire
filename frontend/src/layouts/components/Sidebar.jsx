@@ -1,11 +1,13 @@
 import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, Settings, LogOut, PackageSearch, ShoppingCart, BookOpen, ChartColumn, ShieldCheck } from "lucide-react";
+import { BookOpen, ChartColumn, LayoutDashboard, LogOut, PackageSearch, Settings, ShieldCheck, ShoppingCart, Users } from "lucide-react";
 import { AuthContext } from "@/features/auth/authContext";
 import { getSidebarLinks } from "@/shared/utils/common/helpers";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function Sidebar() {
   const { user, logout } = useContext(AuthContext);
+  const { language, setLanguage, t } = useUiPreferences();
   const roleSlug = user?.role?.slug;
   const menuItems = getSidebarLinks(roleSlug);
 
@@ -32,6 +34,35 @@ function Sidebar() {
     }
   }
 
+  function translateSidebarLabel(label) {
+    const keyByLabel = {
+      Dashboard: "sidebar.dashboard",
+      Analytics: "sidebar.analytics",
+      Products: "sidebar.products",
+      "Add Product": "sidebar.addProduct",
+      Categories: "sidebar.categories",
+      Stock: "sidebar.stock",
+      Orders: "sidebar.orders",
+      Users: "sidebar.users",
+      "Add User": "sidebar.addUser",
+      Schools: "sidebar.schools",
+      Suppliers: "sidebar.suppliers",
+      Invoices: "sidebar.invoices",
+      "Special Orders": "sidebar.specialOrders",
+      Reports: "sidebar.reports",
+      "Roles & Permissions": "sidebar.rolesPermissions",
+      Settings: "sidebar.settings",
+      "System Config": "sidebar.systemConfig",
+      Shop: "sidebar.shop",
+      Cart: "sidebar.cart",
+      Checkout: "sidebar.checkout",
+      Wishlist: "sidebar.wishlist",
+      Profile: "sidebar.profile",
+    };
+
+    return t(keyByLabel[label] || label);
+  }
+
   if (!roleSlug) {
     return null;
   }
@@ -43,40 +74,59 @@ function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <p className="nav-group-title">Main Menu</p>
+        <p className="nav-group-title">{t("sidebar.mainMenu")}</p>
         {menuItems.map((item) => (
-          <NavLink 
-            key={item.path} 
-            to={item.path} 
-            className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"}
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => (isActive ? "sidebar-link active" : "sidebar-link")}
           >
             {iconByTitle(item.title || item.label)}
-            <span>{item.label}</span>
+            <span>{translateSidebarLabel(item.label)}</span>
           </NavLink>
         ))}
 
-        <p className="nav-group-title">System</p>
+        <p className="nav-group-title">{t("sidebar.system")}</p>
         {(roleSlug === "admin" || roleSlug === "moderator") && (
           <NavLink to="/admin/settings/general" className="sidebar-link">
             <Settings size={18} />
-            <span>Home Settings</span>
+            <span>{t("sidebar.homeSettings")}</span>
           </NavLink>
         )}
       </nav>
 
       <div className="sidebar-footer">
+        <div className="sidebar-preferences">
+          <div className="sidebar-language-switch">
+            <label className="sidebar-language-label" htmlFor="sidebar-language-select">
+              <span className="language-icon" aria-hidden="true">{t("common.languageIcon")}</span>
+            </label>
+            <select
+              id="sidebar-language-select"
+              className="sidebar-language-select"
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+              aria-label={t("common.language")}
+            >
+              <option value="en">🇺🇸</option>
+              <option value="fr">🇫🇷</option>
+              <option value="ar">🇲🇦</option>
+            </select>
+          </div>
+
+        </div>
+
         <button
           type="button"
           onClick={handleLogout}
-          className="sidebar-link"
-          style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer' }}
+          className="sidebar-link sidebar-logout-button"
         >
           <LogOut size={18} />
-          <span>Logout</span>
+          <span>{t("common.logout")}</span>
         </button>
       </div>
     </aside>
   );
 }
 
-export default Sidebar; 
+export default Sidebar;

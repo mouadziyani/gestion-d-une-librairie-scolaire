@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { deleteStockEntry, getStockOverview } from "@/shared/services/stockService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function StockList() {
   const location = useLocation();
+  const { t } = useUiPreferences();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
   const updatePath = isModeratorRoute ? "/moderator/update-stock" : "/admin/stock/update";
   const historyPath = isModeratorRoute ? "/moderator/stock-history" : "/admin/stock/history";
-  const areaLabel = isModeratorRoute ? "MODERATOR AREA" : "ADMIN AREA";
+  const areaLabel = isModeratorRoute ? t("pages.moderatorArea") : t("pages.adminArea");
   const [items, setItems] = useState([]);
   const [stats, setStats] = useState({ total_items: 0, low_stock_alerts: 0, out_of_stock: 0 });
   const [loading, setLoading] = useState(true);
@@ -23,7 +25,7 @@ function StockList() {
       setStats(data.stats || { total_items: 0, low_stock_alerts: 0, out_of_stock: 0 });
       setError("");
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to load stock data.");
+      setError(err?.response?.data?.message || t("pages.failedLoadStock"));
     } finally {
       setLoading(false);
     }
@@ -51,7 +53,7 @@ function StockList() {
       return;
     }
 
-    const confirmed = window.confirm(`Delete last stock movement for "${item.name}"?`);
+    const confirmed = window.confirm(t("pages.deleteStockConfirm", { name: item.name }));
 
     if (!confirmed) {
       return;
@@ -61,7 +63,7 @@ function StockList() {
       await deleteStockEntry(item.latest_stock_id);
       await loadStock();
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to delete stock movement.");
+      setError(err?.response?.data?.message || t("pages.failedDeleteStock"));
     }
   }
 
@@ -69,36 +71,36 @@ function StockList() {
     <div className="stock-list-wrapper">
       <header className="admin-header">
         <div>
-          <span style={{ fontSize: "11px", letterSpacing: "2px", color: "#888" }}>{areaLabel}</span>
-          <h2 style={{ fontFamily: "Fraunces, serif", fontSize: "2.5rem" }}>Stock Inventory</h2>
+          <span className="eyebrow-label">{areaLabel}</span>
+          <h2>{t("pages.stockInventory")}</h2>
         </div>
         <Link to={updatePath} className="btn-base btn-primary" style={{ textDecoration: "none" }}>
-          + New Adjustment
+          + {t("pages.newAdjustment")}
         </Link>
       </header>
 
       <section className="stock-stats-row">
         <div className="stock-card-mini">
-          <span>Total Items</span>
+          <span>{t("pages.totalItems")}</span>
           <strong>{stats.total_items}</strong>
         </div>
         <div className="stock-card-mini">
-          <span>Low Stock Alerts</span>
-          <strong style={{ color: "#e67e22" }}>{stats.low_stock_alerts}</strong>
+          <span>{t("pages.lowStockAlerts")}</span>
+          <strong className="warning-text">{stats.low_stock_alerts}</strong>
         </div>
         <div className="stock-card-mini">
-          <span>Out of Stock</span>
-          <strong style={{ color: "#ff6b6b" }}>{stats.out_of_stock}</strong>
+          <span>{t("pages.outOfStock")}</span>
+          <strong className="danger-text">{stats.out_of_stock}</strong>
         </div>
       </section>
 
       <section className="filter-bar-admin">
         <div className="filter-field" style={{ flex: 3 }}>
-          <label htmlFor="search">Search by name or code</label>
+          <label htmlFor="search">{t("pages.searchByNameOrCode")}</label>
           <input
             type="text"
             id="search"
-            placeholder="Search by name or code..."
+            placeholder={t("pages.searchByNameOrCodePlaceholder")}
             className="admin-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -106,35 +108,31 @@ function StockList() {
         </div>
 
         <div className="filter-field">
-          <label htmlFor="status">Status</label>
+          <label htmlFor="status">{t("common.status")}</label>
           <select className="admin-input" id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="all">{t("pages.allStatus")}</option>
+            <option value="active">{t("common.active")}</option>
+            <option value="inactive">{t("common.inactive")}</option>
           </select>
         </div>
 
         <button type="button" className="btn-elegant" style={{ padding: "0 30px" }} onClick={loadStock}>
-          Apply
+          {t("common.apply")}
         </button>
       </section>
 
-      {error && (
-        <div style={{ marginBottom: "16px", color: "#b91c1c", fontSize: "14px" }}>
-          {error}
-        </div>
-      )}
+      {error && <div className="form-alert form-alert-error">{error}</div>}
 
       <section className="admin-table-wrapper">
         {!loading ? (
           <table className="admin-table">
             <thead>
               <tr>
-                <th>ID / Code</th>
-                <th>Stock Item Name</th>
-                <th>Quantity</th>
-                <th>Status</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th>{t("pages.idCode")}</th>
+                <th>{t("pages.stockItemName")}</th>
+                <th>{t("pages.quantity")}</th>
+                <th>{t("common.status")}</th>
+                <th className="table-align-end">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -142,42 +140,41 @@ function StockList() {
                 visibleItems.map((item) => (
                   <tr key={item.id}>
                     <td>
-                      <div style={{ fontWeight: "700" }}>#{item.id}</div>
-                      <div style={{ fontSize: "10px", color: "#aaa" }}>{item.code}</div>
+                      <div className="table-strong-cell">#{item.id}</div>
+                      <div className="table-meta-cell table-meta-cell-small">{item.code}</div>
                     </td>
-                    <td style={{ fontWeight: "600" }}>{item.name}</td>
+                    <td className="table-strong-cell">{item.name}</td>
                     <td>
-                      {item.quantity} units
-                      {item.low_stock && <span className="low-stock-warning">Low Stock</span>}
+                      {item.quantity} {t("pages.units")}
+                      {item.low_stock && <span className="low-stock-warning">{t("pages.lowStockLabel")}</span>}
                     </td>
                     <td>
                       <span className={`badge ${item.status === "active" ? "badge-active" : "badge-inactive"}`}>
-                        {item.status === "active" ? "Active" : "Inactive"}
+                        {item.status === "active" ? t("common.active") : t("common.inactive")}
                       </span>
                     </td>
-                    <td style={{ textAlign: "right" }}>
+                    <td className="table-align-end">
                       <Link to={`${historyPath}?product_id=${item.product_id}`} className="action-link">
-                        View
+                        {t("common.view")}
                       </Link>
                       <Link to={`${updatePath}?id=${item.product_id}`} className="action-link">
-                        Edit
+                        {t("common.edit")}
                       </Link>
                       <button
                         type="button"
                         className="action-link delete-link"
                         onClick={() => handleDelete(item)}
-                        style={{ background: "none", border: "none", cursor: "pointer" }}
                         disabled={!item.latest_stock_id}
                       >
-                        Delete
+                        {t("common.delete")}
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ padding: "24px", textAlign: "center", color: "#888" }}>
-                    No stock items found.
+                  <td colSpan="5" className="table-empty-cell table-empty-cell-compact">
+                    {t("pages.noStockItems")}
                   </td>
                 </tr>
               )}

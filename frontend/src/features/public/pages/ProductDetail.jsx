@@ -4,6 +4,7 @@ import { getProduct } from "@/shared/services/productService";
 import { addToCart } from "@/features/client/services/cartService";
 import { addToWishlist, isInWishlist } from "@/features/client/services/wishlistService";
 import { AuthContext } from "@/features/auth/authContext";
+import { useUiPreferences } from "@/shared/context/UIContext";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
 
 function formatMoney(value) {
@@ -16,6 +17,7 @@ function formatMoney(value) {
 
 function ProductDetail() {
   const { user } = useContext(AuthContext);
+  const { t } = useUiPreferences();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ function ProductDetail() {
     async function loadProduct() {
       if (!productId) {
         setProduct(null);
-        setError("Please choose a product from the catalogue.");
+        setError(t("public.chooseProductFromCatalogue"));
         setLoading(false);
         return;
       }
@@ -49,7 +51,7 @@ function ProductDetail() {
         }
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load product details.");
+          setError(err?.response?.data?.message || t("public.failedLoadProductDetails"));
         }
       } finally {
         if (active) {
@@ -63,7 +65,7 @@ function ProductDetail() {
     return () => {
       active = false;
     };
-  }, [productId]);
+  }, [productId, t]);
 
   const canAddToCart = useMemo(() => {
     if (!product) {
@@ -120,10 +122,10 @@ function ProductDetail() {
   if (error || !product) {
     return (
       <div className="product-detail-page detail-empty">
-        <h2>Product not found</h2>
-        <p>{error || "This product is not available."}</p>
+        <h2>{t("public.productNotFound")}</h2>
+        <p>{error || t("public.productUnavailable")}</p>
         <Link to="/products" className="btn-filled">
-          Back to products
+          {t("public.backToProducts")}
         </Link>
       </div>
     );
@@ -138,34 +140,34 @@ function ProductDetail() {
       <main className="detail-wrapper">
         <section className="detail-media-panel">
           <div className="detail-image-box">
-            {imageSrc ? <img src={imageSrc} alt={product.name} /> : <div className="detail-image-placeholder">No image selected</div>}
+            {imageSrc ? <img src={imageSrc} alt={product.name} /> : <div className="detail-image-placeholder">{t("public.noImageSelected")}</div>}
           </div>
           <div className="detail-media-strip">
             <span>{product.reference || "NO-REF"}</span>
-            <strong>{product.category?.name || "Product"}</strong>
+            <strong>{product.category?.name || t("public.productFallback")}</strong>
           </div>
         </section>
 
         <div className="detail-info-box">
           <div className="detail-badges-row">
-            <span className="brand">{product.category?.name || "Product"}</span>
+            <span className="brand">{product.category?.name || t("public.productFallback")}</span>
             {hasDiscount ? <span className="detail-discount-badge">-{product.discount}%</span> : null}
           </div>
           <h1>{product.name}</h1>
           <div className="detail-price-row">
             <span className="price-tag">{formatMoney(product.price)}</span>
             <span className={canAddToCart ? "detail-stock-pill is-available" : "detail-stock-pill"}>
-              {canAddToCart ? `${stockCount} in stock` : "Special order"}
+              {canAddToCart ? t("public.inStockCount", { count: stockCount }) : t("public.specialOrder")}
             </span>
           </div>
 
           <div className="detail-description">
-            <p>{product.description || "No description available."}</p>
+            <p>{product.description || t("public.noDescription")}</p>
           </div>
 
           <div className="detail-purchase-panel">
             <div className="detail-quantity-row">
-              <span>Quantity</span>
+              <span>{t("public.quantity")}</span>
               <div className="detail-quantity-stepper">
                 <button type="button" onClick={() => handleQuantityChange(quantity - 1)} disabled={!canAddToCart || quantity <= 1}>
                   -
@@ -179,14 +181,14 @@ function ProductDetail() {
 
             <div className="detail-actions">
               <button className="btn-cart" type="button" onClick={handleAddToCart} disabled={isAuthenticated && !canAddToCart}>
-                {!isAuthenticated ? "Login to Add" : canAddToCart ? (added ? `${quantity} Added` : "Add to Cart") : "Special Order"}
+                {!isAuthenticated ? t("public.loginToAdd") : canAddToCart ? (added ? t("public.addedQuantity", { count: quantity }) : t("public.addToCart")) : t("public.specialOrder")}
               </button>
               <button className="btn-wishlist" type="button" onClick={handleWishlist} disabled={wishlisted}>
-                {wishlisted ? "In Wishlist" : "Add to Wishlist"}
+                {wishlisted ? t("public.inWishlist") : t("public.addToWishlist")}
               </button>
               {isAuthenticated ? (
                 <Link to="/cart" className="btn-wishlist">
-                  View Cart
+                  {t("public.viewCart")}
                 </Link>
               ) : null}
             </div>
@@ -194,20 +196,20 @@ function ProductDetail() {
 
           <div className="detail-spec-grid">
             <div>
-              <span>SKU</span>
+              <span>{t("public.sku")}</span>
               <strong>{product.reference || "-"}</strong>
             </div>
             <div>
-              <span>Category</span>
+              <span>{t("public.category")}</span>
               <strong>{product.category?.name || "-"}</strong>
             </div>
             <div>
-              <span>Stock</span>
-              <strong>{canAddToCart ? `${product.stock} available` : "Special order"}</strong>
+              <span>{t("public.stock")}</span>
+              <strong>{canAddToCart ? t("public.availableCount", { count: product.stock }) : t("public.specialOrder")}</strong>
             </div>
             <div>
-              <span>Discount</span>
-              <strong>{hasDiscount ? `${product.discount}%` : "No discount"}</strong>
+              <span>{t("public.discount")}</span>
+              <strong>{hasDiscount ? `${product.discount}%` : t("public.noDiscount")}</strong>
             </div>
           </div>
         </div>

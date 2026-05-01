@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { deleteProduct, getProducts } from "@/shared/services/productService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function formatMoney(value) {
   const amount = Number(value || 0);
@@ -13,6 +14,7 @@ function formatMoney(value) {
 
 function ProductsListAdmin() {
   const location = useLocation();
+  const { t } = useUiPreferences();
   const isModeratorRoute = location.pathname.startsWith("/moderator");
   const addPath = isModeratorRoute ? null : "/admin/products/create";
   const detailsPath = isModeratorRoute ? "/moderator/product-details" : "/admin/products/details";
@@ -37,7 +39,7 @@ function ProductsListAdmin() {
       setLastPage(data?.last_page || 1);
       setError("");
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to load products.");
+      setError(err?.response?.data?.message || t("pages.failedLoadProducts"));
     } finally {
       setLoading(false);
     }
@@ -48,7 +50,7 @@ function ProductsListAdmin() {
   }, [page, search, statusFilter]);
 
   async function handleDelete(id) {
-    const confirmed = window.confirm("Delete this product?");
+    const confirmed = window.confirm(t("pages.deleteProductConfirm"));
     if (!confirmed) {
       return;
     }
@@ -57,7 +59,7 @@ function ProductsListAdmin() {
       await deleteProduct(id);
       await loadProducts();
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to delete product.");
+      setError(err?.response?.data?.message || t("pages.failedDeleteProduct"));
     }
   }
 
@@ -65,8 +67,8 @@ function ProductsListAdmin() {
     <div className="admin-list-wrapper">
       <header className="admin-list-header">
         <div>
-          <span style={{ fontSize: "11px", color: "#888", letterSpacing: "2px", fontWeight: "bold" }}>ADMIN AREA</span>
-          <h2>Inventory List</h2>
+          <span className="eyebrow-label">{t("pages.adminArea")}</span>
+          <h2>{t("pages.inventoryList")}</h2>
         </div>
         {addPath ? (
           <Link
@@ -74,18 +76,18 @@ function ProductsListAdmin() {
             className="btn-base btn-primary"
             style={{ textDecoration: "none", padding: "12px 25px" }}
           >
-            + Add New Product
+            + {t("pages.addNewProduct")}
           </Link>
         ) : null}
       </header>
 
       <section className="filter-bar-admin">
         <div className="filter-field" style={{ flex: 2 }}>
-          <label htmlFor="search">Search Products</label>
+          <label htmlFor="search">{t("pages.searchProducts")}</label>
           <input
             type="text"
             id="search"
-            placeholder="Search by name, reference, or category..."
+            placeholder={t("pages.searchProductsPlaceholder")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -95,7 +97,7 @@ function ProductsListAdmin() {
         </div>
 
         <div className="filter-field">
-          <label htmlFor="status">Status</label>
+          <label htmlFor="status">{t("common.status")}</label>
           <select
             id="status"
             value={statusFilter}
@@ -104,9 +106,9 @@ function ProductsListAdmin() {
               setPage(1);
             }}
           >
-            <option value="all">All Items</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Inactive Only</option>
+            <option value="all">{t("pages.allItems")}</option>
+            <option value="active">{t("pages.activeOnly")}</option>
+            <option value="inactive">{t("pages.inactiveOnly")}</option>
           </select>
         </div>
 
@@ -116,15 +118,11 @@ function ProductsListAdmin() {
           style={{ padding: "12px 30px" }}
           onClick={loadProducts}
         >
-          Refresh
+          {t("common.refresh")}
         </button>
       </section>
 
-      {error && (
-        <div style={{ marginBottom: "16px", color: "#b91c1c", fontSize: "14px" }}>
-          {error}
-        </div>
-      )}
+      {error && <div className="form-alert form-alert-error">{error}</div>}
 
       <section className="data-table-container">
         {!loading ? (
@@ -132,12 +130,12 @@ function ProductsListAdmin() {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Product Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Status</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th>{t("pages.productName")}</th>
+                <th>{t("navbar.categories")}</th>
+                <th>{t("pages.price")}</th>
+                <th>{t("pages.stock")}</th>
+                <th>{t("common.status")}</th>
+                <th className="table-align-end">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -147,35 +145,35 @@ function ProductsListAdmin() {
 
                   return (
                     <tr key={product.id}>
-                      <td style={{ color: "#aaa", fontSize: "12px" }}>#{product.id}</td>
-                      <td style={{ fontWeight: "600" }}>{product.name}</td>
+                      <td className="table-meta-cell">#{product.id}</td>
+                      <td className="table-strong-cell">{product.name}</td>
                       <td>{product.category?.name || "-"}</td>
                       <td>{formatMoney(product.price)}</td>
-                      <td>{product.stock ?? 0} units</td>
+                      <td>{product.stock ?? 0} {t("pages.units")}</td>
                       <td>
                         <span className={`status-indicator ${isActive ? "active-status" : "inactive-status"}`}>
-                          {isActive ? "ACTIVE" : "INACTIVE"}
+                          {isActive ? t("pages.productStatusActive") : t("pages.productStatusInactive")}
                         </span>
                       </td>
-                      <td style={{ textAlign: "right" }}>
+                      <td className="table-align-end">
                         <Link
                           to={`${detailsPath}?id=${product.id}`}
-                          style={{ marginRight: "15px", fontSize: "13px", color: "#1a1a1a" }}
+                          className="action-link spaced-action-link"
                         >
-                          View
+                          {t("common.view")}
                         </Link>
                         <Link
                           to={`${editPath}?id=${product.id}`}
-                          style={{ marginRight: "15px", fontSize: "13px", color: "#1a1a1a" }}
+                          className="action-link spaced-action-link"
                         >
-                          Edit
+                          {t("common.edit")}
                         </Link>
                         <button
                           type="button"
                           onClick={() => handleDelete(product.id)}
-                          style={{ background: "none", border: "none", color: "#ff6b6b", cursor: "pointer", fontSize: "13px" }}
+                          className="action-link action-button-link delete-link"
                         >
-                          Delete
+                          {t("common.delete")}
                         </button>
                       </td>
                     </tr>
@@ -183,8 +181,8 @@ function ProductsListAdmin() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" style={{ padding: "24px", textAlign: "center", color: "#888" }}>
-                    No products found.
+                  <td colSpan="7" className="table-empty-cell table-empty-cell-compact">
+                    {t("pages.noProductsFound")}
                   </td>
                 </tr>
               )}
@@ -193,12 +191,12 @@ function ProductsListAdmin() {
         ) : null}
       </section>
 
-      <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+      <div className="pagination-row pagination-row-bottom">
         <button type="button" className="btn-base btn-outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-          Previous
+          {t("common.previous")}
         </button>
         <button type="button" className="btn-base btn-outline" disabled={page >= lastPage} onClick={() => setPage(page + 1)}>
-          Next
+          {t("common.next")}
         </button>
       </div>
     </div>

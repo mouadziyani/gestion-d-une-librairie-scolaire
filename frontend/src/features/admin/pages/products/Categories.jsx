@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createCategory, deleteCategory, getCategories, updateCategory } from "@/shared/services/categoryService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 const initialForm = {
   name: "",
@@ -17,6 +18,7 @@ function slugify(value) {
 }
 
 function CategoriesAdmin() {
+  const { t } = useUiPreferences();
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
@@ -44,7 +46,7 @@ function CategoriesAdmin() {
         setCategories(Array.isArray(data) ? data : []);
       } catch (err) {
         if (active) {
-          setError(err?.response?.data?.message || "Failed to load categories.");
+          setError(err?.response?.data?.message || t("pages.failedLoadCategories"));
         }
       } finally {
         if (active) {
@@ -118,7 +120,7 @@ function CategoriesAdmin() {
       await loadCategories();
       resetForm();
     } catch (err) {
-      setActionError(err?.response?.data?.message || "Failed to save category.");
+      setActionError(err?.response?.data?.message || t("pages.failedSaveCategory"));
     } finally {
       setSaving(false);
     }
@@ -135,7 +137,7 @@ function CategoriesAdmin() {
   }
 
   async function handleDelete(category) {
-    const confirmed = window.confirm(`Delete category "${category.name}"?`);
+    const confirmed = window.confirm(t("pages.deleteCategoryConfirm", { name: category.name }));
 
     if (!confirmed) {
       return;
@@ -151,7 +153,7 @@ function CategoriesAdmin() {
         resetForm();
       }
     } catch (err) {
-      setActionError(err?.response?.data?.message || "Failed to delete category.");
+      setActionError(err?.response?.data?.message || t("pages.failedDeleteCategory"));
     }
   }
 
@@ -164,14 +166,14 @@ function CategoriesAdmin() {
       <header className="admin-header" style={{ marginBottom: "30px" }}>
         <div>
           <span style={{ fontSize: "12px", color: "#888", fontWeight: "700", letterSpacing: "2px" }}>
-            ADMIN PANEL
+            {t("pages.adminPanel")}
           </span>
           <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "3rem", marginTop: "10px" }}>
-            Categories
+            {t("pages.categories")}
           </h1>
         </div>
         <button type="button" className="btn-base btn-primary" onClick={resetForm}>
-          + New Category
+          + {t("pages.newCategory")}
         </button>
       </header>
 
@@ -183,22 +185,22 @@ function CategoriesAdmin() {
 
       <section className="category-stats-grid">
         <div className="stat-card">
-          <h4>Total Categories</h4>
+          <h4>{t("pages.totalCategories")}</h4>
           <div className="count">{stats.totalCategories}</div>
         </div>
         <div className="stat-card">
-          <h4>Total Products</h4>
+          <h4>{t("pages.totalProducts")}</h4>
           <div className="count">{stats.totalProducts}</div>
         </div>
         <div className="stat-card">
-          <h4>Empty Categories</h4>
+          <h4>{t("pages.emptyCategories")}</h4>
           <div className="count">{stats.emptyCategories}</div>
         </div>
       </section>
 
       <section className="admin-card" style={{ gridTemplateColumns: "1fr", gap: "0", marginBottom: "30px" }}>
         <h3 style={{ marginBottom: "20px", fontSize: "18px" }}>
-          {editingId ? "Edit Category" : "Create Category"}
+          {editingId ? t("pages.editCategory") : t("pages.createCategory")}
         </h3>
 
         {actionError && (
@@ -211,7 +213,7 @@ function CategoriesAdmin() {
           <div className="edit-admin-wrapper" style={{ padding: 0, maxWidth: "none" }}>
             <div className="form-grid">
               <div className="edit-group">
-                <label htmlFor="category-name">Category Name</label>
+                <label htmlFor="category-name">{t("pages.categoryName")}</label>
                 <input
                   id="category-name"
                   name="name"
@@ -222,23 +224,23 @@ function CategoriesAdmin() {
               </div>
 
               <div className="edit-group">
-                <label htmlFor="category-slug">Slug</label>
+                <label htmlFor="category-slug">{t("pages.slug")}</label>
                 <input
                   id="category-slug"
                   name="slug"
                   value={form.slug}
                   onChange={handleChange}
-                  placeholder="auto-generated from name if empty"
+                  placeholder={t("pages.autoSlug")}
                 />
               </div>
             </div>
 
             <div className="admin-actions-bar" style={{ marginTop: "20px" }}>
               <button type="submit" className="btn-save" disabled={saving}>
-                {saving ? "Saving..." : editingId ? "Update Category" : "Create Category"}
+                {saving ? t("pages.saving") : editingId ? t("pages.updateCategory") : t("pages.createCategory")}
               </button>
               <button type="button" className="btn-archive" onClick={resetForm}>
-                Cancel
+                {t("common.cancel")}
               </button>
             </div>
           </div>
@@ -256,12 +258,12 @@ function CategoriesAdmin() {
             flexWrap: "wrap",
           }}
         >
-          <h3 style={{ margin: 0, fontSize: "18px" }}>Category Management</h3>
+          <h3 style={{ margin: 0, fontSize: "18px" }}>{t("pages.categoryManagement")}</h3>
           <input
             className="admin-input"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search categories..."
+            placeholder={t("pages.searchCategories")}
             style={{ minWidth: "240px" }}
           />
         </div>
@@ -269,17 +271,17 @@ function CategoriesAdmin() {
         <table className="cat-list-table">
           <thead>
             <tr>
-              <th>Category Name</th>
-              <th>Slug</th>
-              <th>Items Linked</th>
-              <th style={{ textAlign: "right" }}>Actions</th>
+              <th>{t("pages.categoryName")}</th>
+              <th>{t("pages.slug")}</th>
+              <th>{t("pages.itemsLinked")}</th>
+              <th style={{ textAlign: "right" }}>{t("common.actions")}</th>
             </tr>
           </thead>
           <tbody>
             {filteredCategories.length === 0 ? (
               <tr>
                 <td colSpan="4" style={{ textAlign: "center", padding: "30px", color: "#888" }}>
-                  No categories found.
+                  {t("pages.noCategoriesFound")}
                 </td>
               </tr>
             ) : (
@@ -289,21 +291,21 @@ function CategoriesAdmin() {
                   <td>
                     <span className="cat-badge">{category.slug || "-"}</span>
                   </td>
-                  <td>{Number(category.products_count || 0)} Products</td>
+                  <td>{Number(category.products_count || 0)} {t("pages.productsCount")}</td>
                   <td style={{ textAlign: "right" }}>
                     <button
                       type="button"
                       className="action-link"
                       onClick={() => handleEdit(category)}
                     >
-                      Edit
+                      {t("common.edit")}
                     </button>
                     <button
                       type="button"
                       className="action-link delete-link"
                       onClick={() => handleDelete(category)}
                     >
-                      Delete
+                      {t("common.delete")}
                     </button>
                   </td>
                 </tr>

@@ -4,6 +4,7 @@ import AppRoutes from "@/app/routes";
 import AuthProvider from "@/features/auth/AuthProvider";
 import { AuthContext } from "@/features/auth/authContext";
 import Loading from "@/components/ui/Loading";
+import { UIProvider } from "@/shared/context/UIContext";
 
 function applyResponsiveTableLabels() {
   document.querySelectorAll("table").forEach((table) => {
@@ -96,9 +97,11 @@ function AppShell() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppShell />
-    </AuthProvider>
+    <UIProvider>
+      <AuthProvider>
+        <AppShell />
+      </AuthProvider>
+    </UIProvider>
   );
 }
 

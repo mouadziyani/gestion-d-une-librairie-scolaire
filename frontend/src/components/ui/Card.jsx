@@ -15,11 +15,7 @@ function Card({
         <div className="card-image-box">
           <img src={image} alt={title} />
           {badge && (
-            <span style={{ 
-              position: 'absolute', top: '10px', right: '10px', 
-              background: '#1a1a1a', color: '#fff', padding: '4px 10px', 
-              borderRadius: '4px', fontSize: '10px', fontWeight: 'bold' 
-            }}>
+            <span className="card-badge">
               {badge}
             </span>
           )}
@@ -36,7 +32,7 @@ function Card({
           variant="outline" 
           size="sm" 
           onClick={onBtnClick} 
-          style={{ width: '100%' }}
+          className="card-action-button"
         >
           {btnText}
         </Button>

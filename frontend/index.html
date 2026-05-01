@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -62,6 +62,18 @@
           "query-input": "required name=search_term_string"
         }
       }
+    </script>
+    <script>
+      (function () {
+        var storedLanguage = localStorage.getItem("bougdim-language");
+        var language = storedLanguage === "fr" || storedLanguage === "ar" || storedLanguage === "en" ? storedLanguage : "en";
+        var root = document.documentElement;
+        localStorage.removeItem("bougdim-theme");
+        root.classList.remove("dark");
+        root.setAttribute("data-theme", "light");
+        root.setAttribute("lang", language);
+        root.setAttribute("dir", language === "ar" ? "rtl" : "ltr");
+      })();
     </script>
   </head>
   <body>

@@ -1,10 +1,12 @@
 import React from "react";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function AdminLayout() {
+  const { t } = useUiPreferences();
   return (
     <div>
       <header>
-        <h1>Library BOUGDIM</h1>
+        <h1>{t("common.brandName")}</h1>
         <h2>Admin Layout</h2>
       </header>
       <main>
@@ -14,7 +16,7 @@ function AdminLayout() {
         </section>
       </main>
       <footer>
-        <p>Library BOUGDIM - Layout Footer</p>
+        <p>{t("common.brandName")} - Layout Footer</p>
       </footer>
     </div>
   );

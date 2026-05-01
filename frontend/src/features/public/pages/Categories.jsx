@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { getCategories } from "@/shared/services/categoryService";
+import { useUiPreferences } from "@/shared/context/UIContext";
 
 function Categories() {
+  const { t } = useUiPreferences();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -23,7 +25,7 @@ function Categories() {
       } catch (err) {
         if (active) {
           setCategories([]);
-          setError("We could not load the categories right now.");
+          setError(t("public.failedLoadCategoriesPublic"));
         }
       } finally {
         if (active) {
@@ -37,7 +39,7 @@ function Categories() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
 
   const stats = useMemo(() => {
     const totalCategories = categories.length;
@@ -51,28 +53,25 @@ function Categories() {
     <div className="categories-page">
       <section className="categories-hero">
         <div className="categories-hero-copy">
-          <p className="categories-eyebrow">Library collection</p>
-          <h1>Explore every category available in the shop.</h1>
-          <p>
-            Browse the full catalog of books, supplies, and school essentials. Guests and clients can use this page to
-            discover what is available before jumping into products.
-          </p>
+          <p className="categories-eyebrow">{t("public.categoriesEyebrow")}</p>
+          <h1>{t("public.categoriesTitle")}</h1>
+          <p>{t("public.categoriesDescription")}</p>
           <Link to="/products" className="btn-elegant categories-primary-action">
-            Browse products
+            {t("public.browseProducts")}
           </Link>
         </div>
 
         <div className="categories-stats">
           <div className="categories-stat-card">
-            <span>Total categories</span>
+            <span>{t("public.totalCategories")}</span>
             <strong>{stats.totalCategories}</strong>
           </div>
           <div className="categories-stat-card">
-            <span>Total products</span>
+            <span>{t("public.totalProducts")}</span>
             <strong>{stats.totalProducts}</strong>
           </div>
           <div className="categories-stat-card">
-            <span>Empty categories</span>
+            <span>{t("public.emptyCategories")}</span>
             <strong>{stats.emptyCategories}</strong>
           </div>
         </div>
@@ -81,11 +80,11 @@ function Categories() {
       <section className="categories-grid-section">
         <div className="categories-section-heading">
           <div>
-            <p className="categories-eyebrow">Available sections</p>
-            <h2>Every category in one place.</h2>
+            <p className="categories-eyebrow">{t("public.availableSections")}</p>
+            <h2>{t("public.everyCategoryInOnePlace")}</h2>
           </div>
           <Link to="/products" className="categories-inline-link">
-            View all products <ArrowRight size={16} />
+            {t("public.viewAllProducts")} <ArrowRight size={16} />
           </Link>
         </div>
 
@@ -99,7 +98,7 @@ function Categories() {
               return (
                 <article className="category-card" key={category.id}>
                   <div className="category-card-top">
-                    <p className="category-card-tag">{category.slug || "category"}</p>
+                    <p className="category-card-tag">{category.slug || t("public.category")}</p>
                     <span className="category-card-count">{Number(category.products_count || 0)}</span>
                   </div>
 
@@ -107,20 +106,20 @@ function Categories() {
                     <h3>{category.name}</h3>
                     <p className="category-card-text">
                       {Number(category.products_count || 0) > 0
-                        ? "Products are already available in this category."
-                        : "This category is ready for future products."}
+                        ? t("public.productsAvailableInCategory")
+                        : t("public.categoryReadyForFuture")}
                     </p>
                   </div>
 
                   <Link to={`/products?category=${encodeURIComponent(slug)}`} className="category-card-link">
-                    Browse products <ArrowRight size={16} />
+                    {t("public.browseProducts")} <ArrowRight size={16} />
                   </Link>
                 </article>
               );
             })}
           </div>
         ) : (
-          <div className="categories-empty">{loading ? null : "No categories found."}</div>
+          <div className="categories-empty">{loading ? null : t("public.noCategoriesFound")}</div>
         )}
       </section>
     </div>
