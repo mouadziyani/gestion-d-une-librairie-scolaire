@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import "@/styles/index.css";
+import "@/i18n";
 import App from "@/app/App.jsx";
 import axios from "axios";
 import { API_BASE_URL } from "@/shared/services/api";

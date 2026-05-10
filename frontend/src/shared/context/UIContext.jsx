@@ -1,54 +1,25 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import en from "@/translations/en";
-import fr from "@/translations/fr";
-import ar from "@/translations/ar";
+import { createContext, useContext, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, SUPPORTED_LANGUAGES } from "@/i18n";
 
 const UIContext = createContext(null);
 
-const LANGUAGE_STORAGE_KEY = "bougdim-language";
-const DEFAULT_LANGUAGE = "en";
-const translations = { en, fr, ar };
-
-function readStoredLanguage() {
-  if (typeof window === "undefined") {
-    return DEFAULT_LANGUAGE;
-  }
-
-  const storedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-  return storedLanguage === "fr" || storedLanguage === "ar" || storedLanguage === "en"
-    ? storedLanguage
-    : DEFAULT_LANGUAGE;
-}
-
-function getTranslationValue(language, key) {
-  return key.split(".").reduce((value, segment) => value?.[segment], translations[language]);
-}
-
-function interpolate(template, replacements = {}) {
-  return Object.entries(replacements).reduce((message, [token, value]) => {
-    return message.replaceAll(`{${token}}`, String(value));
-  }, template);
-}
-
-function applyDocumentPreferences(language) {
-  if (typeof document === "undefined") {
-    return;
-  }
-
-  const root = document.documentElement;
-  root.classList.remove("dark");
-  root.setAttribute("data-theme", "light");
-  root.setAttribute("lang", language);
-  root.setAttribute("dir", language === "ar" ? "rtl" : "ltr");
+function resolveLanguage(i18n) {
+  const language = (i18n.resolvedLanguage || i18n.language || DEFAULT_LANGUAGE).split("-")[0];
+  return SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
 }
 
 export function UIProvider({ children }) {
-  const [language, setLanguage] = useState(readStoredLanguage);
+  const { t, i18n } = useTranslation();
+  const language = resolveLanguage(i18n);
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
     window.localStorage.removeItem("bougdim-theme");
-    applyDocumentPreferences(language);
   }, [language]);
 
   const value = useMemo(() => {
@@ -58,17 +29,11 @@ export function UIProvider({ children }) {
       language,
       direction: isArabic ? "rtl" : "ltr",
       isArabic,
-      setLanguage,
-      t(key, replacements) {
-        const translated =
-          getTranslationValue(language, key) ??
-          getTranslationValue(DEFAULT_LANGUAGE, key) ??
-          key;
-
-        return typeof translated === "string" ? interpolate(translated, replacements) : translated;
-      },
+      setLanguage: i18n.changeLanguage.bind(i18n),
+      t,
+      i18n,
     };
-  }, [language]);
+  }, [i18n, language, t]);
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 }

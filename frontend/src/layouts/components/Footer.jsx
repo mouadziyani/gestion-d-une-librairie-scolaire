@@ -4,20 +4,24 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import logo from "@/assets/logo/library.png";
 import { getSitePreferences } from "@/shared/services/sitePreferencesService";
 import { useUiPreferences } from "@/shared/context/UIContext";
-import ar from "@/translations/ar";
-import en from "@/translations/en";
-import fr from "@/translations/fr";
+import arCommon from "@/i18n/locales/ar/common.json";
+import enCommon from "@/i18n/locales/en/common.json";
+import frCommon from "@/i18n/locales/fr/common.json";
 
-const DEFAULT_STORE_NAMES = new Set(["Library BOUGDIM", "Librairie BOUGDIM", "مكتبة بوكديم"]);
+const DEFAULT_STORE_NAMES = new Set([
+  enCommon.common.brandName,
+  frCommon.common.brandName,
+  arCommon.common.brandName,
+]);
 const DEFAULT_FOOTER_DESCRIPTIONS = new Set([
-  en.footer.brandDescription,
-  fr.footer.brandDescription,
-  ar.footer.brandDescription,
+  enCommon.footer.brandDescription,
+  frCommon.footer.brandDescription,
+  arCommon.footer.brandDescription,
 ]);
 const DEFAULT_FOOTER_COLUMN_LABELS = {
-  explore: new Set([en.footer.explore, fr.footer.explore, ar.footer.explore]),
-  support: new Set([en.footer.support, fr.footer.support, ar.footer.support]),
-  office: new Set([en.footer.office, fr.footer.office, ar.footer.office]),
+  explore: new Set([enCommon.footer.explore, frCommon.footer.explore, arCommon.footer.explore]),
+  support: new Set([enCommon.footer.support, frCommon.footer.support, arCommon.footer.support]),
+  office: new Set([enCommon.footer.office, frCommon.footer.office, arCommon.footer.office]),
 };
 
 function resolveFooterCopy(value, fallback, defaults) {

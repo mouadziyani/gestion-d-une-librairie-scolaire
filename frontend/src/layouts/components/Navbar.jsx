@@ -23,7 +23,7 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useContext(AuthContext);
-  const { language, setLanguage, t } = useUiPreferences();
+  const { i18n, language, t } = useUiPreferences();
 
   const isAuthenticated = !!user;
   const roleSlug = (user?.role?.slug || "").toLowerCase();
@@ -247,7 +247,7 @@ function Navbar() {
               id="nav-language-select"
               className="nav-language-select"
               value={language}
-              onChange={(event) => setLanguage(event.target.value)}
+              onChange={(event) => i18n.changeLanguage(event.target.value)}
               aria-label={t("common.language")}
             >
               <option value="en">🇺🇸</option>

@@ -7,7 +7,7 @@ import { useUiPreferences } from "@/shared/context/UIContext";
 
 function Sidebar() {
   const { user, logout } = useContext(AuthContext);
-  const { language, setLanguage, t } = useUiPreferences();
+  const { i18n, language, t } = useUiPreferences();
   const roleSlug = user?.role?.slug;
   const menuItems = getSidebarLinks(roleSlug);
 
@@ -105,7 +105,7 @@ function Sidebar() {
               id="sidebar-language-select"
               className="sidebar-language-select"
               value={language}
-              onChange={(event) => setLanguage(event.target.value)}
+              onChange={(event) => i18n.changeLanguage(event.target.value)}
               aria-label={t("common.language")}
             >
               <option value="en">🇺🇸</option>
