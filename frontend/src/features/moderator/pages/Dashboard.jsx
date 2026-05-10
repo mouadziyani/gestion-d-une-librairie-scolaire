@@ -83,7 +83,7 @@ function Dashboard() {
         </div>
       </section>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: "24px" }}>
+      <div className="dashboard-split-grid dashboard-split-grid-wide">
         <section className="table-container">
           <div className="section-title">
             {t("dashboard.recentOrders")}
@@ -124,7 +124,7 @@ function Dashboard() {
               {t("dashboard.reports")}
             </Link>
           </div>
-          <div style={{ display: "grid", gap: "12px" }}>
+          <div className="dashboard-link-stack">
             <Link to="/moderator/products" className="btn-update-profile" style={{ textDecoration: "none", textAlign: "center" }}>
               {t("dashboard.manageProducts")}
             </Link>
@@ -138,7 +138,7 @@ function Dashboard() {
         </section>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginTop: "24px" }}>
+      <div className="dashboard-split-grid dashboard-split-grid-tight">
         <section className="table-container">
           <h3>{t("dashboard.recentSpecialOrders")}</h3>
           <table>

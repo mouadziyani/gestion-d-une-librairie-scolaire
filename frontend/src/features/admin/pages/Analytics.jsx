@@ -78,7 +78,7 @@ function Analytics() {
             ))}
           </div>
 
-          <div className="admin-detail-container" style={{ padding: 0, gridTemplateColumns: "1fr 1fr" }}>
+          <div className="admin-detail-container admin-detail-grid-2 admin-detail-container-flush">
             <section className="invoice-paper">
               <h2 style={{ fontFamily: "Fraunces, serif", marginBottom: "18px" }}>Recent Orders</h2>
               <div className="table-container">
@@ -109,7 +109,7 @@ function Analytics() {
 
             <section className="invoice-paper">
               <h2 style={{ fontFamily: "Fraunces, serif", marginBottom: "18px" }}>Revenue Signals</h2>
-              <div className="landing-cards-grid" style={{ gridTemplateColumns: "1fr", gap: "14px" }}>
+              <div className="landing-cards-grid landing-cards-grid-single">
                 <div className="landing-highlight-card">
                   <h4>Pending special orders</h4>
                   <p>{stats.pending_special_orders || 0}</p>

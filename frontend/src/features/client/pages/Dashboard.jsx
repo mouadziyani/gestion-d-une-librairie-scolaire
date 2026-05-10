@@ -91,7 +91,7 @@ function DashboardClient() {
         ))}
       </section>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "30px" }}>
+      <div className="dashboard-split-grid dashboard-split-grid-wide dashboard-split-grid-loose">
         <section>
           <div className="section-title">
             {t("dashboard.recentOrders")}
@@ -142,7 +142,7 @@ function DashboardClient() {
         </section>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "30px", marginTop: "30px" }}>
+      <div className="dashboard-split-grid dashboard-split-grid-tight dashboard-split-grid-loose">
         <section className="table-container">
           <h3>{t("dashboard.recentInvoices")}</h3>
           <table>

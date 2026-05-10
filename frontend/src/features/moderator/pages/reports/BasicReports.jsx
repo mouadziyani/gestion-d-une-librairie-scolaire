@@ -95,7 +95,7 @@ function BasicReports() {
             ))}
           </div>
 
-          <div className="admin-detail-container" style={{ padding: 0, gridTemplateColumns: "1fr 1fr" }}>
+          <div className="admin-detail-container admin-detail-grid-2 admin-detail-container-flush">
             <section className="invoice-paper">
               <h2 style={{ fontFamily: "Fraunces, serif", marginBottom: "18px" }}>Recent Orders</h2>
               <div className="table-container">
@@ -157,7 +157,7 @@ function BasicReports() {
             </section>
           </div>
 
-          <div className="admin-detail-container" style={{ padding: 0, gridTemplateColumns: "1fr" }}>
+          <div className="admin-detail-container admin-detail-container-flush">
             <section className="invoice-paper">
               <div className="section-title">
                 <span>Low Stock Products</span>

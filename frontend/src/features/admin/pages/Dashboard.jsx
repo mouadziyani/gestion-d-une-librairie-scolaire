@@ -121,7 +121,7 @@ function AdminDashboard() {
         </table>
       </section>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginTop: "24px" }}>
+      <div className="dashboard-split-grid dashboard-split-grid-tight">
         <section className="table-container">
           <h3>{t("dashboard.recentProducts")}</h3>
           <table>
@@ -175,7 +175,7 @@ function AdminDashboard() {
         </section>
       </div>
 
-      <section className="table-container" style={{ marginTop: "24px" }}>
+      <section className="table-container dashboard-section-spaced">
         <h3>{t("dashboard.recentSpecialOrders")}</h3>
         <table>
           <thead>
