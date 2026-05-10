@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Bell, ChevronDown, LogOut, Menu, Minus, Plus, Search, ShoppingCart, Trash2, UserRound, X } from "lucide-react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Bell, BookOpen, ChartColumn, ChevronDown, CreditCard, FileText, House, LayoutDashboard, LogOut, Menu, Minus, PackageSearch, Plus, Search, Settings, ShieldCheck, ShoppingCart, Trash2, UserRound, Users, X } from "lucide-react";
 import logo from "@/assets/logo/library.png";
 import { AuthContext } from "@/features/auth/authContext";
 import { CART_CHANGED_EVENT, getCartItems, getCartTotals, removeCartItem, syncCartWithProducts, updateCartItem } from "@/features/client/services/cartService";
@@ -9,17 +9,22 @@ import { getUnreadNotificationCount } from "@/features/notifications/services/no
 import { formatDh } from "@/data/catalog";
 import { resolveMediaUrl } from "@/shared/utils/common/media";
 import { useUiPreferences } from "@/shared/context/UIContext";
+import { getNavbarPageSections, getRoleHomePath } from "@/shared/utils/common/helpers";
 
 function Navbar() {
   const [categories, setCategories] = useState([]);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [, setPreferencesTick] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState(() => getCartItems());
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileShopOpen, setMobileShopOpen] = useState(false);
+  const navRef = useRef(null);
+  const cartDrawerRef = useRef(null);
+  const searchInputRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useContext(AuthContext);
@@ -27,7 +32,16 @@ function Navbar() {
 
   const isAuthenticated = !!user;
   const roleSlug = (user?.role?.slug || "").toLowerCase();
+  const mobileMenuOpen = mobileSearchOpen || mobileShopOpen;
   const notificationsPath = roleSlug === "client" ? "/client/notifications" : "/notifications";
+  const profilePath = isAuthenticated ? "/profile" : "/login";
+  const homePath = isAuthenticated ? getRoleHomePath(roleSlug) : "/";
+  const pageSections = getNavbarPageSections(roleSlug);
+  const mobilePages = pageSections.flatMap((section) => section.links.map((link) => ({ ...link, section: section.label })));
+  const isHomeActive = location.pathname === homePath || location.pathname === "/" || location.pathname === "/home";
+  const isShopActive = mobileShopOpen || ["/products", "/categories", "/pages", "/product-detail", "/special-order", "/about", "/contact", "/faq", "/dashboard", "/admin", "/moderator", "/client"].some((path) => location.pathname.startsWith(path));
+  const isCartActive = cartOpen || ["/cart", "/checkout", "/orders", "/order-detail", "/wishlist", "/my-invoices", "/invoice-detail"].some((path) => location.pathname.startsWith(path));
+  const isProfileActive = ["/profile", "/login", "/register", "/forgot-password", "/reset-password", "/password-reset"].some((path) => location.pathname.startsWith(path));
 
   useEffect(() => {
     let active = true;
@@ -55,9 +69,52 @@ function Navbar() {
   useEffect(() => {
     setCategoriesOpen(false);
     setProfileOpen(false);
-    setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
+    setMobileShopOpen(false);
     setCartOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      const target = event.target;
+
+      if (cartOpen && cartDrawerRef.current && !cartDrawerRef.current.contains(target) && !navRef.current?.contains(target)) {
+        setCartOpen(false);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setCategoriesOpen(false);
+        setProfileOpen(false);
+        setMobileSearchOpen(false);
+        setMobileShopOpen(false);
+        setCartOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [cartOpen, mobileSearchOpen, mobileShopOpen]);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+
+    if (mobileSearchOpen || mobileShopOpen || cartOpen) {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [cartOpen, mobileSearchOpen, mobileShopOpen]);
 
   useEffect(() => {
     let active = true;
@@ -156,8 +213,10 @@ function Navbar() {
     try {
       await logout();
     } finally {
+      setCategoriesOpen(false);
       setProfileOpen(false);
-      setMobileMenuOpen(false);
+      setMobileSearchOpen(false);
+      setMobileShopOpen(false);
       navigate("/");
     }
   }
@@ -165,7 +224,8 @@ function Navbar() {
   function closeMenus() {
     setCategoriesOpen(false);
     setProfileOpen(false);
-    setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
+    setMobileShopOpen(false);
   }
 
   function closeAllOverlays() {
@@ -192,6 +252,8 @@ function Navbar() {
     setCartOpen((current) => !current);
     setCategoriesOpen(false);
     setProfileOpen(false);
+    setMobileSearchOpen(false);
+    setMobileShopOpen(false);
   }
 
   function handleCartQuantity(productId, quantity) {
@@ -204,13 +266,69 @@ function Navbar() {
 
   function goToCart(path) {
     setCartOpen(false);
-    setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
+    setMobileShopOpen(false);
     navigate(path);
+  }
+
+  function focusSearchField() {
+    closeMenus();
+    setMobileSearchOpen(true);
+  }
+
+  function handleMobileCartPress() {
+    if (isAuthenticated) {
+      handleCartToggle();
+      return;
+    }
+
+    navigate("/login");
+  }
+
+  function openShopSheet() {
+    setCategoriesOpen(false);
+    setMobileSearchOpen(false);
+    setProfileOpen(false);
+    setMobileShopOpen(true);
+  }
+
+  function handleMobilePageSelect(path) {
+    closeMenus();
+    navigate(path);
+  }
+
+  function iconForPath(path, label) {
+    const normalized = `${path} ${label}`.toLowerCase();
+
+    if (normalized.includes("dashboard")) return <LayoutDashboard size={18} />;
+    if (normalized.includes("analytic")) return <ChartColumn size={18} />;
+    if (normalized.includes("product")) return <BookOpen size={18} />;
+    if (normalized.includes("categor")) return <BookOpen size={18} />;
+    if (normalized.includes("stock")) return <PackageSearch size={18} />;
+    if (normalized.includes("order")) return <ShoppingCart size={18} />;
+    if (normalized.includes("invoice")) return <FileText size={18} />;
+    if (normalized.includes("checkout")) return <CreditCard size={18} />;
+    if (normalized.includes("user")) return <Users size={18} />;
+    if (normalized.includes("school")) return <BookOpen size={18} />;
+    if (normalized.includes("supplier")) return <BookOpen size={18} />;
+    if (normalized.includes("report")) return <ChartColumn size={18} />;
+    if (normalized.includes("setting")) return <Settings size={18} />;
+    if (normalized.includes("role")) return <ShieldCheck size={18} />;
+    if (normalized.includes("profile")) return <UserRound size={18} />;
+    if (normalized.includes("home")) return <House size={18} />;
+    if (normalized.includes("contact")) return <Bell size={18} />;
+    if (normalized.includes("support") || normalized.includes("faq")) return <Bell size={18} />;
+
+    return <BookOpen size={18} />;
   }
 
   return (
     <>
-      <nav className={`main-nav ${mobileMenuOpen ? "mobile-open" : ""}`}>
+      {mobileSearchOpen || mobileShopOpen ? (
+        <button type="button" className="nav-mobile-backdrop" aria-label={t("common.close")} onClick={closeMenus} />
+      ) : null}
+
+      <nav ref={navRef} className={`main-nav ${mobileMenuOpen ? "mobile-open" : ""}`}>
         <div className="nav-logo">
           <Link to="/" aria-label={t("navbar.goHome")}>
             <img src={logo} alt={t("common.brandName")} />
@@ -220,6 +338,7 @@ function Navbar() {
         <form className="nav-search-form" onSubmit={handleSearchSubmit} role="search">
           <Search size={18} className="nav-search-icon" />
           <input
+            ref={searchInputRef}
             type="search"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
@@ -231,7 +350,7 @@ function Navbar() {
         <button
           type="button"
           className="nav-menu-toggle"
-          onClick={() => setMobileMenuOpen((current) => !current)}
+          onClick={closeMenus}
           aria-label={mobileMenuOpen ? t("navbar.closeMenu") : t("navbar.openMenu")}
           aria-expanded={mobileMenuOpen}
         >
@@ -379,8 +498,86 @@ function Navbar() {
         <button className="cart-drawer-backdrop" type="button" aria-label={t("common.close")} onClick={closeAllOverlays} />
       ) : null}
 
+      <nav className="mobile-bottom-nav" aria-label={t("navbar.openMenu")}>
+        <NavLink to={homePath} end className={({ isActive }) => `mobile-bottom-nav__item ${isActive || isHomeActive ? "active" : ""}`}>
+          <House size={18} />
+          <span>{t("footer.home")}</span>
+        </NavLink>
+
+        <button type="button" className={`mobile-bottom-nav__item ${mobileSearchOpen ? "active" : ""}`} onClick={focusSearchField}>
+          <Search size={18} />
+          <span>{t("common.search")}</span>
+        </button>
+
+        <button type="button" className={`mobile-bottom-nav__item mobile-bottom-nav__item--center ${isShopActive ? "active" : ""}`} onClick={openShopSheet}>
+          <span className="mobile-bottom-nav__center-badge">
+            <img src={logo} alt={t("common.brandName")} />
+          </span>
+          <span>{t("sidebar.shop")}</span>
+        </button>
+
+        <button type="button" className={`mobile-bottom-nav__item ${isCartActive ? "active" : ""}`} onClick={handleMobileCartPress}>
+          <span className="mobile-bottom-nav__icon-wrap">
+            <ShoppingCart size={18} />
+            {cartTotals.itemCount > 0 ? <span className="mobile-bottom-nav__badge">{cartTotals.itemCount > 9 ? "9+" : cartTotals.itemCount}</span> : null}
+          </span>
+          <span>{t("sidebar.cart")}</span>
+        </button>
+
+        <NavLink to={profilePath} className={({ isActive }) => `mobile-bottom-nav__item ${isActive || isProfileActive ? "active" : ""}`}>
+          <UserRound size={18} />
+          <span>{t("sidebar.profile")}</span>
+        </NavLink>
+      </nav>
+
+      {mobileSearchOpen ? (
+        <div className="mobile-nav-sheet mobile-nav-sheet-search" role="dialog" aria-modal="true" aria-label={t("common.search")}>
+          <div className="mobile-nav-sheet__grabber" aria-hidden="true" />
+          <div className="mobile-nav-sheet__header">
+            <h3>{t("common.search")}</h3>
+            <button type="button" className="mobile-nav-sheet__close" onClick={closeMenus} aria-label={t("common.close")}>
+              <X size={18} />
+            </button>
+          </div>
+          <form className="mobile-nav-sheet__search" onSubmit={handleSearchSubmit} role="search">
+            <Search size={18} className="nav-search-icon" />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder={t("navbar.searchPlaceholder")}
+              aria-label={t("navbar.searchProducts")}
+              autoFocus
+            />
+            <button type="submit" className="mobile-nav-sheet__submit">
+              {t("common.search")}
+            </button>
+          </form>
+        </div>
+      ) : null}
+
+      {mobileShopOpen ? (
+        <div className="mobile-nav-sheet mobile-nav-sheet-shop" role="dialog" aria-modal="true" aria-label={t("sidebar.shop")}>
+          <div className="mobile-nav-sheet__grabber" aria-hidden="true" />
+          <div className="mobile-nav-sheet__header">
+            <h3>{t("sidebar.shop")}</h3>
+            <button type="button" className="mobile-nav-sheet__close" onClick={closeMenus} aria-label={t("common.close")}>
+              <X size={18} />
+            </button>
+          </div>
+          <div className="mobile-nav-grid">
+            {mobilePages.map((page) => (
+              <button key={`${page.section}-${page.path}`} type="button" className="mobile-nav-grid__item" onClick={() => handleMobilePageSelect(page.path)}>
+                <span className="mobile-nav-grid__icon">{iconForPath(page.path, page.label)}</span>
+                <span className="mobile-nav-grid__label">{page.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {isAuthenticated ? (
-        <aside id="cart-drawer" className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-hidden={!cartOpen}>
+        <aside ref={cartDrawerRef} id="cart-drawer" className={`cart-drawer ${cartOpen ? "open" : ""}`} aria-hidden={!cartOpen}>
           <div className="cart-drawer-header">
             <div>
               <span className="cart-drawer-kicker">{t("cart.title")}</span>

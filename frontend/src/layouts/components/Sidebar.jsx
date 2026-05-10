@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
-import { BookOpen, ChartColumn, LayoutDashboard, LogOut, PackageSearch, Settings, ShieldCheck, ShoppingCart, Users } from "lucide-react";
+import { BookOpen, ChartColumn, LayoutDashboard, LogOut, PackageSearch, Settings, ShieldCheck, ShoppingCart, Users, X } from "lucide-react";
 import { AuthContext } from "@/features/auth/authContext";
 import { getSidebarLinks } from "@/shared/utils/common/helpers";
 import { useUiPreferences } from "@/shared/context/UIContext";
 
-function Sidebar() {
+function Sidebar({ isOpen = false, onClose = () => {} }) {
   const { user, logout } = useContext(AuthContext);
   const { i18n, language, t } = useUiPreferences();
   const roleSlug = user?.role?.slug;
@@ -29,6 +29,7 @@ function Sidebar() {
   async function handleLogout() {
     try {
       await logout();
+      onClose();
     } catch (error) {
       console.error(error?.response?.data || error);
     }
@@ -68,8 +69,17 @@ function Sidebar() {
   }
 
   return (
-    <aside className="main-sidebar">
-      <div className="sidebar-logo">
+    <aside className={`main-sidebar ${isOpen ? "open" : ""}`}>
+      <div className="sidebar-mobile-head">
+        <div className="sidebar-logo">
+          <strong>BOUGDIM</strong>
+        </div>
+        <button type="button" className="sidebar-close-button" onClick={onClose} aria-label={t("common.close")}>
+          <X size={18} />
+        </button>
+      </div>
+
+      <div className="sidebar-logo sidebar-logo-desktop">
         <strong>BOUGDIM</strong>
       </div>
 
@@ -79,6 +89,7 @@ function Sidebar() {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={onClose}
             className={({ isActive }) => (isActive ? "sidebar-link active" : "sidebar-link")}
           >
             {iconByTitle(item.title || item.label)}
@@ -88,7 +99,7 @@ function Sidebar() {
 
         <p className="nav-group-title">{t("sidebar.system")}</p>
         {(roleSlug === "admin" || roleSlug === "moderator") && (
-          <NavLink to="/admin/settings/general" className="sidebar-link">
+          <NavLink to="/admin/settings/general" onClick={onClose} className="sidebar-link">
             <Settings size={18} />
             <span>{t("sidebar.homeSettings")}</span>
           </NavLink>
